@@ -1,12 +1,13 @@
-import React from 'react'
-import Link from 'next/link'
+import React from 'react';
+import Link from 'next/link';
+import Search from '../components/search';
 
 const links = [
-  { href: 'https://github.com/segmentio/create-next-app', label: 'Github' }
+  {href: 'https://github.com/segmentio/create-next-app', label: 'Github'},
 ].map(link => {
-  link.key = `nav-link-${link.href}-${link.label}`
-  return link
-})
+  link.key = `nav-link-${link.href}-${link.label}`;
+  return link;
+});
 
 const Nav = () => (
   <nav>
@@ -17,7 +18,7 @@ const Nav = () => (
         </Link>
       </li>
       <ul>
-        {links.map(({ key, href, label }) => (
+        {links.map(({key, href, label}) => (
           <li key={key}>
             <Link href={href}>
               <a>{label}</a>
@@ -35,6 +36,7 @@ const Nav = () => (
       }
       nav {
         text-align: center;
+        position: fixed;
       }
       ul {
         display: flex;
@@ -53,7 +55,8 @@ const Nav = () => (
         font-size: 13px;
       }
     `}</style>
+    <Search />
   </nav>
-)
+);
 
-export default Nav
+export default Nav;

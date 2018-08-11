@@ -1,0 +1,8 @@
+{
+  "FullTime": "Full-time",
+  "PartTime": "Part-time",
+  "Contract": "Contract",
+  "Temporary": "Temporary",
+  "Volunteer": "Volunteer",
+  "Internship": "Internship"
+}

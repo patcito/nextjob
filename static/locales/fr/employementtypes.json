@@ -1,0 +1,8 @@
+{
+  "FullTime": "CDI Plein-temps",
+  "PartTime": "CDI Temps-partiel",
+  "Contract": "Freelance",
+  "Temporary": "CDD",
+  "Volunteer": "Bénévolat",
+  "Internship": "Stage"
+}

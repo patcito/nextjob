@@ -1,0 +1,1510 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+
+import React from 'react';
+import PropTypes from 'prop-types';
+const grequest = require('graphql-request');
+
+import NewJobBar from '../components/newjobbar';
+import {withStyles} from '@material-ui/core/styles';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Grid from '@material-ui/core/Grid';
+import {Parallax} from 'react-parallax';
+
+import {I18nextProvider} from 'react-i18next';
+import startI18n from '../tools/startI18n';
+import {getTranslation} from '../tools/translationHelpers';
+import IndexBody from '../components/indexbody';
+
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormLabel from '@material-ui/core/FormLabel';
+
+import INDUSTRIES from '../data/industries';
+import JOBSTITLES from '../data/jobstitles';
+import JOBFUNCTIONS from '../data/jobfunctions';
+import EMPLOYEMENTTYPES from '../data/employementtypes';
+import SENIORITYLEVELS from '../data/senioritylevels';
+import SKILLS from '../data/skills';
+
+import SingleSelect from '../components/select';
+import DownshiftSelect from '../components/downshift';
+import MultipleDownshiftSelect from '../components/multipledownshift';
+
+import Slider from '@material-ui/lab/Slider';
+import dynamic from 'next/dynamic';
+
+import Router from 'next/router';
+
+import DynamicMaps from '../components/maps';
+const PlacesSelect = dynamic(import('../components/placesselect'), {
+  ssr: false,
+});
+import {withRouter} from 'next/router';
+
+// get language from query parameter or url path
+const lang = 'fr';
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    width: '90%',
+  },
+  flex: {
+    flexGrow: 1,
+  },
+  button: {
+    marginTop: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+  },
+  actionsContainer: {
+    marginBottom: theme.spacing.unit * 2,
+  },
+  resetContainer: {
+    padding: theme.spacing.unit * 3,
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+  },
+});
+
+class NewJob extends React.Component {
+  state = {
+    job: {},
+    open: false,
+    remote: false,
+    selectedCompany: '',
+    selectedEmployementType: '',
+    selectedSeniorityLevel: '',
+    activeStep: 0,
+    addNewCompany: false,
+    hasApplicationEmail: true,
+    minSalary: 10,
+    maxSalary: 10,
+    minimumExperienceYears: 1,
+    maximumExperienceYears: 2,
+  };
+  handleNext = () => {
+    switch (this.state.activeStep) {
+      case 0:
+        if (this.state.addNewCompany) {
+          this.createCompany();
+        } else {
+          this.setState({
+            activeStep: 1,
+          });
+        }
+        break;
+      case 1:
+        this.setState(state => ({
+          activeStep: 2,
+        }));
+        break;
+      case 2:
+        //alert(JSON.stringify(this.props.job));
+        this.saveJob();
+        break;
+
+      default:
+        console.log('not submitting');
+    }
+  };
+
+  saveJob = () => {
+    const vars = {
+      isPublished: this.state.isPublished,
+      remote: this.state.remote,
+      companyId: this.state.selectedCompany,
+      applyDirectly: !this.state.hasApplicationEmail,
+      minimumExperienceYears: this.state.minimumExperienceYears,
+      maximumExperienceYears: this.state.maximumExperienceYears,
+      ownerId: this.state.currentUser.id,
+      street_number: this.state.fullAddress.street_number,
+      route: this.state.fullAddress.route,
+      locality: this.state.fullAddress.locality,
+      administrative_area_level_1: this.state.fullAddress
+        .administrative_area_level_1,
+      country: this.state.fullAddress.country,
+      postal_code: this.state.fullAddress.postal_code,
+      description: this.state.jobDescription,
+      EmployementType: this.state.selectedEmployementType.value,
+      SeniorityLevel: this.state.selectedSeniorityLevel.value,
+      JobTitle: this.state.jobTitle.value,
+      location: {
+        type: 'Point',
+        coordinates: [this.state.coordinates.lat, this.state.coordinates.lng],
+      },
+    };
+    if (this.props.job) {
+      vars.id = this.props.job.id;
+    }
+
+    const updateQuery = `
+	  mutation update_job( $remote: Boolean,
+$id: Int,
+  $companyId: Int,
+  $applyDirectly: Boolean,
+  $isPublished: Boolean,
+  $minimumExperienceYears: Int,
+  $maximumExperienceYears: Int,
+ $ownerId: Int,
+  $location: geography,
+  $street_number: String,
+ $route: String,
+ $locality: String,
+ $administrative_area_level_1: String,
+ $country: String,
+ $postal_code: String,
+ $description: String,
+ $EmployementType: String,
+ $SeniorityLevel: String,
+		$JobTitle: String ){
+			update_Job(where: {id: {_eq: $id}},
+_set:{
+				remote: $remote,
+				companyId: $companyId,
+				isPublished: $isPublished,
+				applyDirectly: $applyDirectly,
+				minimumExperienceYears: $minimumExperienceYears,
+				maximumExperienceYears: $maximumExperienceYears,
+				ownerId: $ownerId,
+
+				    location: $location,
+		  				street_number: $street_number,
+		  				route: $route,
+				locality: $locality,
+				administrative_area_level_1: $administrative_area_level_1,
+				country: $country,
+				postal_code: $postal_code,
+				description: $description,
+				EmployementType: $EmployementType,
+				SeniorityLevel: $SeniorityLevel,
+				JobTitle: $JobTitle,
+
+
+}
+){
+				returning{
+					      id
+          description
+
+
+}
+
+
+}
+
+
+}
+
+`;
+    const insertQuery = `mutation insert_job( $remote: Boolean,
+ $companyId: Int,
+ $applyDirectly: Boolean,
+ $isPublished: Boolean,
+ $minimumExperienceYears: Int,
+ $maximumExperienceYears: Int,
+ $ownerId: Int,
+ $location: geography,
+ $street_number: String,
+ $route: String,
+ $locality: String,
+ $administrative_area_level_1: String,
+ $country: String,
+ $postal_code: String,
+ $description: String,
+ $EmployementType: String,
+ $SeniorityLevel: String,
+		$JobTitle: String){
+			insert_Job(objects:[
+			{
+				remote: $remote,
+				companyId: $companyId,
+				isPublished: $isPublished,
+				applyDirectly: $applyDirectly,
+				minimumExperienceYears: $minimumExperienceYears,
+				maximumExperienceYears: $maximumExperienceYears,
+				ownerId: $ownerId,
+
+				    location: $location,
+				street_number: $street_number,
+				route: $route,
+				locality: $locality,
+				administrative_area_level_1: $administrative_area_level_1,
+				country: $country,
+				postal_code: $postal_code,
+				description: $description,
+				EmployementType: $EmployementType,
+				SeniorityLevel: $SeniorityLevel,
+				JobTitle: $JobTitle,
+
+			}
+
+			]){
+				returning{
+					      id
+
+				}
+
+			}
+
+		}
+		`;
+
+    const saveJobopts = {
+      uri: 'http://localhost:8080/v1alpha1/graphql',
+      json: true,
+      query: this.props.job ? updateQuery : insertQuery,
+      headers: {
+        'x-access-token': this.state.token,
+      },
+    };
+    const that = this;
+    const client = new grequest.GraphQLClient(saveJobopts.uri, {
+      headers: saveJobopts.headers,
+    });
+    client.request(saveJobopts.query, vars).then(gdata => {
+      const currentUser = that.state.currentUser;
+      //currentUser.jobs.push(gdata.insert_Job.returning[0]);
+      const jobId = that.props.job
+        ? that.props.job.id
+        : gdata.insert_Job.returning[0].id;
+      let jobFunctions = [];
+      let industries = [];
+      let skills = [];
+      that.state.jobFunction.map(jf => {
+        jobFunctions.push({JobFunction: jf.value.JobFunction, JobId: jobId});
+      });
+      that.state.companyIndustries.map(ci => {
+        industries.push({IndustryName: ci.value.IndustryName, JobId: jobId});
+      });
+      that.state.skills.map(skill => {
+        skills.push({Skill: skill.value.Skill, JobId: jobId});
+      });
+      const extraVars = {
+        skills: skills,
+        industries: industries,
+        jobFunctions: jobFunctions,
+      };
+
+      const saveJobExtrasopts = {
+        uri: 'http://localhost:8080/v1alpha1/graphql',
+        json: true,
+        query: `
+		mutation insert_shit_lol($skills: [SkillJob_insert_input!]!,
+		$industries: [JobIndustry_insert_input!]!,
+		  $jobFunctions: [JobFunctionJob_insert_input!]!
+		){
+		insert_SkillJob(objects: $skills){
+			    returning{Skill}
+
+		}
+		insert_JobIndustry(objects: $industries){
+			    returning{IndustryName}
+
+		}
+		insert_JobFunctionJob(objects: $jobFunctions){
+			    returning{JobFunction}
+		}
+	}
+	`,
+        headers: {
+          'x-access-token': this.state.token,
+        },
+      };
+
+      client.request(saveJobExtrasopts.query, extraVars).then(gdata => {
+        history.pushState({}, 'page 2', '/jobs/update/' + jobId);
+      });
+
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      that.setState({
+        addedJob: true,
+        activeStep: 3,
+      });
+    });
+  };
+
+  handleBack = init => {
+    switch (this.state.activeStep) {
+      case 0:
+        if ((this.state.activeStep === 0 && this.state.addNewCompany) || init) {
+          this.setState(state => ({
+            addNewCompany: false,
+            activeStep: 0,
+          }));
+        } else {
+          this.setState(state => ({
+            activeStep: 0,
+          }));
+        }
+        break;
+      case 1:
+        this.setState(state => ({
+          activeStep: 0,
+        }));
+        break;
+      case 2:
+        this.setState(state => ({
+          activeStep: 1,
+        }));
+        break;
+    }
+  };
+
+  handleReset = () => {
+    this.setState({
+      activeStep: 0,
+    });
+  };
+
+  handleChange = event => {
+    this.setState({[event.target.name]: event.target.value});
+  };
+
+  handleSliderChange = (event, value) => {
+    this.setState({[event.target.getAttribute('name')]: value});
+  };
+
+  handleCheckboxChange = event => {
+    this.setState({[event.target.name]: !this.state[event.target.name]});
+    //this.setState({remote: !this.state.remote});
+  };
+
+  handleRadioChange = event => {
+    this.setState({
+      value: event.target.value,
+      hasApplicationEmail: !this.state.hasApplicationEmail,
+    });
+  };
+
+  handleSelectCompany = event => {
+    this.setState({[event.target.name]: event.target.value});
+    if (event.target.value === '_add_') {
+      this.setState({addNewCompany: true});
+    }
+  };
+
+  handleSelectEmployementTypes = event => {
+    this.setState({
+      [event.target.name]: {
+        value: event.target.value,
+        label: this.i18n.t('employementtypes:' + event.target.value),
+      },
+    });
+  };
+
+  handleSelectSeniorityLevels = event => {
+    this.setState({
+      [event.target.name]: {
+        value: event.target.value,
+        label: this.i18n.t('senioritylevels:' + event.target.value),
+      },
+    });
+  };
+
+  handleChangeIndustry = value => {
+    if (value) {
+      this.setState({industry: value, industryvalid: true});
+    } else {
+      this.setState({industry: value, industryvalid: false});
+    }
+  };
+
+  handleChangeJobTitle = value => {
+    if (value) {
+      this.setState({jobTitle: value, jobTitlevalid: true});
+    } else {
+      this.setState({jobTitle: this.state.jobTitle, jobTitlevalid: false});
+    }
+  };
+
+  handleChangeJobFunction = value => {
+    if (value) {
+      this.setState({jobFunction: value, jobFunctionvalid: true});
+    } else {
+      this.setState({
+        jobFunction: this.state.jobFunction,
+        jobFunctionvalid: false,
+      });
+    }
+  };
+
+  handleChangeSkills = value => {
+    if (value) {
+      this.setState({skills: value, skillsvalid: true});
+    } else {
+      this.setState({
+        skills: this.state.skills,
+        skillsvalid: false,
+      });
+    }
+  };
+
+  handleChangeCompanyIndustries = value => {
+    if (value) {
+      this.setState({companyIndustries: value, companyIndustriesvalid: true});
+    } else {
+      this.setState({
+        companyIndustries: this.state.companyIndustries,
+        companyIndustriesvalid: false,
+      });
+    }
+  };
+
+  static async getInitialProps({query}) {
+    const translations = await getTranslation(
+      lang,
+      [
+        'common',
+        'namespace1',
+        'industries',
+        'newjob',
+        'jobstitles',
+        'jobfunctions',
+        'employementtypes',
+        'senioritylevels',
+      ],
+      'http://localhost:4000/static/locales/',
+    );
+    const createCompanyopts = {
+      uri: 'http://localhost:8080/v1alpha1/graphql',
+      json: true,
+      query: `query Job($id: Int){
+			Job(where: {id: {_eq: $id}}){
+				    id
+				    ownerId
+				    remote
+					JobFunctions{
+    		  			JobFunction
+					}
+				Industries{
+				  IndustryName
+
+			}
+				Skills{
+				  Skill
+
+			}
+		  isPublished
+		  companyId
+		  applyDirectly
+		  minimumExperienceYears
+		  maximumExperienceYears
+		location
+        street_number
+        route
+        locality
+        administrative_area_level_1
+        country
+        postal_code
+      description
+
+      EmployementType
+      SeniorityLevel
+      JobTitle
+
+			}
+	}`,
+      headers: {
+        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+      },
+    };
+    const client = new grequest.GraphQLClient(createCompanyopts.uri, {
+      headers: createCompanyopts.headers,
+    });
+    if (query.id) {
+      let job = await client.request(createCompanyopts.query, {
+        id: query.id || 0,
+      });
+      if (job.Job.length > 0) {
+        job = job.Job[0];
+      } else {
+        job = null;
+      }
+      return {translations, job};
+    } else {
+      const job = null;
+      return {translations, job};
+    }
+  }
+  constructor(props) {
+    super(props);
+    const {router, job} = this.props;
+    this.i18n = startI18n(props.translations, lang);
+
+    this.classes = this.props;
+    this.INDUSTRIES = INDUSTRIES.map(suggestion => ({
+      value: suggestion.industry,
+      label: this.i18n.t('industries:' + suggestion.industry),
+    }));
+    this.JOBSTITLES = JOBSTITLES.map(suggestion => ({
+      value: suggestion.title,
+      label: this.i18n.t('jobstitles:' + suggestion.title),
+    }));
+    this.JOBFUNCTIONS = JOBFUNCTIONS.map(suggestion => ({
+      value: suggestion.title,
+      label: this.i18n.t('jobfunctions:' + suggestion.title),
+    }));
+    this.EMPLOYEMENTTYPES = EMPLOYEMENTTYPES.map(suggestion => ({
+      value: suggestion.type,
+      label: this.i18n.t('employementtypes:' + suggestion.type),
+    }));
+    this.SENIORITYLEVELS = SENIORITYLEVELS.map(suggestion => ({
+      value: suggestion.level,
+      label: this.i18n.t('senioritylevels:' + suggestion.level),
+    }));
+    this.SKILLS = SKILLS.map(suggestion => ({
+      value: suggestion.name,
+      label: suggestion.name,
+    }));
+    //return a.industry - b.industry;
+    //});
+  }
+
+  componentDidMount(props) {
+    /*location: {
+        type: 'Point',
+        coordinates: [this.state.coordinates.lat, this.state.coordinates.lng],
+      },
+    };*/
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const job = this.props.job;
+      if (job) {
+        const jobState = {
+          isPublished: job.isPublished,
+          remote: job.remote,
+          selectedCompany: job.companyId,
+          hasApplicationEmail: job.applyDirectly,
+          minimumExperienceYears: job.minimumExperienceYears,
+          maximumExperienceYears: job.maximumExperienceYears,
+          location: job.location,
+          coordinates: {
+            lat: job.location.coordinates[0],
+            lng: job.location.coordinates[1],
+          },
+          fullAddress: {
+            street_number: job.street_number,
+            route: job.route,
+            locality: job.locality,
+            state: job.administrative_area_level_1,
+            country: job.country,
+            postal_code: job.postal_code,
+          },
+          currentAddressDescription:
+            job.street_number +
+            ' ' +
+            job.route +
+            ' ' +
+            job.locality +
+            ', ' +
+            job.country,
+          jobDescription: job.description,
+          jobFunction: job.JobFunctions.map(v => ({
+            value: v,
+            label: this.i18n.t('jobfunctions:' + v.JobFunction),
+          })),
+          skills: job.Skills.map(v => ({
+            value: v,
+            label: v.Skill,
+          })),
+          companyIndustries: job.Industries.map(v => ({
+            value: v,
+            label: this.i18n.t('industries:' + v.IndustryName),
+          })),
+          selectedEmployementType: {
+            value: job.EmployementType,
+            label: this.i18n.t('employementtypes:' + job.EmployementType),
+          },
+          selectedSeniorityLevel: {
+            value: job.SeniorityLevel,
+            label: this.i18n.t('senioritylevels:' + job.SeniorityLevel),
+          },
+          jobTitle: {
+            label: this.i18n.t('jobstitles:' + job.JobTitle),
+            value: job.JobTitle,
+          },
+        };
+        this.setState(jobState);
+      }
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('currentUser');
+      if (token && typeof user !== 'undefined') {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser.jobs) {
+          currentUser.jobs = [];
+        }
+        const companies = currentUser.Companies;
+        if (companies && companies.length > 0) {
+          this.setState({
+            currentUser: currentUser,
+            token: localStorage.getItem('token'),
+            selectedCompany: this.props.job
+              ? this.props.job.companyId
+              : companies[0].id,
+            addNewCompany: false,
+            applicationEmail: currentUser.linkedinEmail,
+          });
+        } else {
+          this.setState({
+            currentUser: JSON.parse(localStorage.getItem('currentUser')),
+            token: localStorage.getItem('token'),
+            addNewCompany: true,
+            applicationEmail: currentUser.linkedinEmail,
+          });
+        }
+      }
+    }
+  }
+  getSteps = () => {
+    return [
+      this.i18n.t('Set Company, position and location'),
+      this.i18n.t('Add more job details'),
+      this.i18n.t('Target your audience'),
+    ];
+  };
+
+  createCompany = () => {
+    const newCompany = {
+      name: this.state.name,
+      Industry: this.state.industry.value,
+      yearFounded: this.state.yearFounded,
+      description: this.state.description,
+      url: this.state.url,
+      ownerId: this.state.currentUser.id,
+    };
+    const that = this;
+    const createCompanyopts = {
+      uri: 'http://localhost:8080/v1alpha1/graphql',
+      json: true,
+      query: `mutation insert_Company($ownerId: Int!,
+    			$name: String!,
+			    $url: String!,
+			    $description: String!,
+			    $yearFounded: Int!,
+				$Industry: String!) {
+				  insert_Company(objects: [{
+					ownerId: $ownerId,
+					name: $name,
+					url: $url,
+					description: $description,
+					yearFounded: $yearFounded,
+					Industry: $Industry
+
+				}]){
+					returning{
+					  id
+					  name
+			}
+			}
+			}
+				`,
+      headers: {
+        'x-access-token': this.state.token,
+      },
+    };
+    const client = new grequest.GraphQLClient(createCompanyopts.uri, {
+      headers: createCompanyopts.headers,
+    });
+    client.request(createCompanyopts.query, newCompany).then(gdata => {
+      const currentUser = that.state.currentUser;
+      currentUser.Companies.push(gdata.insert_Company.returning[0]);
+
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      that.setState({
+        currentUser: currentUser,
+        selectedCompany: gdata.insert_Company.returning[0].id,
+        addNewCompany: false,
+      });
+      this.handleBack(true);
+    });
+  };
+
+  checkActiveStepValidity = activeStep => {
+    switch (activeStep) {
+      case 0:
+        if (this.state.addNewCompany) {
+          return !(
+            this.state.name &&
+            this.state.description &&
+            this.state.url &&
+            this.state.yearFounded &&
+            this.state.yearFounded > 1900 &&
+            this.state.industry
+          );
+        } else {
+          return (
+            !this.state.selectedCompany ||
+            !this.state.jobTitle ||
+            !this.state.fullAddress
+          );
+        }
+        break;
+      case 1:
+        return !(
+          this.state.jobFunction &&
+          this.state.jobFunction.length > 0 &&
+          this.state.jobFunction.length <= 3 &&
+          this.state.selectedEmployementType &&
+          this.state.selectedSeniorityLevel &&
+          this.state.companyIndustries &&
+          this.state.companyIndustries.length > 0 &&
+          this.state.companyIndustries.length <= 3 &&
+          this.state.jobDescription &&
+          this.state.jobDescription.length > 2
+        );
+        break;
+    }
+  };
+
+  handleBlur = (event, required) => {
+    this.setState({
+      [event.target.name + 'valid']:
+        event.target.value || !required ? true : false,
+    });
+  };
+
+  handleBlurIndustry = (value, required) => {
+    this.setState({
+      industryvalid: value || !required ? true : false,
+    });
+  };
+
+  handleBlurJobTitle = (value, required) => {
+    this.setState({
+      jobTitlevalid: value || !required ? true : false,
+    });
+  };
+
+  handleBlurJobFunction = (value, required) => {
+    this.setState({
+      jobFunctionvalid: value || !required ? true : false,
+    });
+  };
+
+  handleBlurSkills = (value, required) => {
+    this.setState({
+      skillsvalid: value || !required ? true : false,
+    });
+  };
+
+  handleBlurCompanyIndustries = (value, required) => {
+    this.setState({
+      companyIndustriesvalid: value || !required ? true : false,
+    });
+  };
+
+  handleFocus = (event, required) => {
+    this.setState({
+      [event.target.name + 'valid']: true,
+    });
+  };
+
+  getStepContent = (
+    step,
+    classes,
+    industries,
+    jobstitles,
+    jobfunctions,
+    employementtypes,
+    senioritylevels,
+    skills,
+  ) => {
+    switch (step) {
+      case 0:
+        return (
+          <>
+            {this.state.currentUser &&
+            this.state.currentUser.Companies &&
+            this.state.currentUser.Companies.length > 0 &&
+            !this.state.addNewCompany ? (
+              <>
+                <FormControl className={classes.formControl}>
+                  <InputLabel htmlFor="selectedCompany-helper">
+                    {this.i18n.t('newjob:Company')}
+                  </InputLabel>
+                  <Select
+                    value={this.state.selectedCompany}
+                    onChange={this.handleSelectCompany}
+                    input={
+                      <Input name="selectedCompany" id="selectCompany-helper" />
+                    }>
+                    {this.state.currentUser.Companies.map(c => (
+                      <MenuItem key={c.id} value={c.id}>
+                        {c.name}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="_add_">
+                      {this.i18n.t('Add a new company')}
+                    </MenuItem>
+                  </Select>
+                  <FormHelperText>
+                    {this.i18n.t('newjob:Select your company')}
+                  </FormHelperText>
+                </FormControl>
+                <FormControl fullWidth={true} className={classes.formControl}>
+                  <DownshiftSelect
+                    i18n={this.i18n}
+                    suggestions={jobstitles}
+                    defaultInputValue={this.state.jobTitle}
+                    label={this.i18n.t('newjob:Job title')}
+                    onBlur={e => this.handleBlur(e, true)}
+                    onFocus={e => this.handleFocus(e, true)}
+                    handleParentChange={this.handleChangeJobTitle}
+                    handleParentBlur={this.handleBlurJobTitle}
+                    name="jobTitle"
+                    id="jobTitle"
+                    required={true}
+                  />
+                  <FormHelperText>
+                    {this.i18n.t("newjob:Select your job's title")}
+                  </FormHelperText>
+                </FormControl>
+                <FormControl fullWidth={true}>
+                  {this.state.googleMaps || typeof google !== 'undefined' ? (
+                    <PlacesSelect
+                      i18n={this.i18n}
+                      placeholder={
+                        this.state.currentAddressDescription ||
+                        this.i18n.t('newjob:Where the job will take place')
+                      }
+                      that={this}
+                    />
+                  ) : null}
+                </FormControl>
+                <FormControl fullWidth={true} className={classes.formControl}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={this.state.remote}
+                        name="remote"
+                        value="remote"
+                        onChange={this.handleCheckboxChange}
+                        color="primary"
+                      />
+                    }
+                    label={this.i18n.t('Remote')}
+                  />
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                  <FormLabel component="legend">
+                    {this.i18n.t('newjob:Choose how you want people to apply')}
+                  </FormLabel>
+                  <RadioGroup
+                    aria-label="Has application email"
+                    name="hasApplicationEmail"
+                    className={classes.group}
+                    value={this.state.value}
+                    onChange={this.handleRadioChange}>
+                    <FormControlLabel
+                      value="hasApplicationEmail"
+                      control={
+                        <Radio checked={this.state.hasApplicationEmail} />
+                      }
+                      label={this.i18n.t(
+                        'newjob:Recommended, let applicants apply through this site with their Github account and notify me by email',
+                      )}
+                    />
+                    <FormControl
+                      style={{marginTop: '-15px'}}
+                      error={this.state.namevalid === false}>
+                      <Input
+                        id="name-simple"
+                        style={{width: '45%'}}
+                        name="applicationEmail"
+                        value={this.state.applicationEmail}
+                        onChange={this.handleChange}
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        required={true}
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.namevalid !== false
+                            ? 'name-helper-text'
+                            : 'name-error-text'
+                        }>
+                        {this.i18n.t(
+                          'newjob:The email applications will be sent to',
+                        )}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControlLabel
+                      value="male"
+                      control={<Radio />}
+                      label={this.i18n.t(
+                        'newjob:Direct applicants to an external site to apply',
+                      )}
+                    />
+                    <FormControl
+                      style={{marginTop: '-15px'}}
+                      error={this.state.namevalid === false}>
+                      <Input
+                        id="name-simple"
+                        style={{width: '50%'}}
+                        name="applicationUrl"
+                        value={this.state.applicationUrl}
+                        disabled={this.state.hasApplicationEmail}
+                        onChange={this.handleChange}
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        required={true}
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.namevalid !== false
+                            ? 'name-helper-text'
+                            : 'name-error-text'
+                        }>
+                        {this.i18n.t(
+                          'newjob:The url applicants will be redirected to',
+                        )}
+                      </FormHelperText>
+                    </FormControl>
+                  </RadioGroup>
+                </FormControl>
+              </>
+            ) : (
+              <form>
+                <FormControl
+                  className={classes.formControl}
+                  error={this.state.namevalid === false}>
+                  <InputLabel htmlFor="name-simple">
+                    {this.i18n.t('Name')}
+                  </InputLabel>
+                  <Input
+                    id="name-simple"
+                    name="name"
+                    value={this.state.name}
+                    onChange={this.handleChange}
+                    onBlur={e => this.handleBlur(e, true)}
+                    onFocus={e => this.handleFocus(e, true)}
+                    required={true}
+                  />
+                  <FormHelperText
+                    id={
+                      this.state.namevalid !== false
+                        ? 'name-helper-text'
+                        : 'name-error-text'
+                    }>
+                    {this.state.namevalid !== false
+                      ? this.i18n.t("Your company's name")
+                      : this.i18n.t("Your company's name is required")}
+                  </FormHelperText>
+                </FormControl>
+                <FormControl
+                  className={classes.formControl}
+                  error={this.state.urlvalid === false}
+                  aria-describedby="url-text">
+                  <InputLabel htmlFor="url">{this.i18n.t('URL')}</InputLabel>
+                  <Input
+                    id="url"
+                    value={this.state.url}
+                    name="url"
+                    required={true}
+                    type="url"
+                    onBlur={e => this.handleBlur(e, true)}
+                    onFocus={e => this.handleFocus(e, true)}
+                    onChange={this.handleChange}
+                  />
+                  <FormHelperText
+                    id={
+                      this.state.urlvalid !== false
+                        ? 'url-helper-text'
+                        : 'url-error-text'
+                    }>
+                    {this.state.urlvalid !== false
+                      ? this.i18n.t("Your company's website")
+                      : this.i18n.t("Your company's website is required")}
+                  </FormHelperText>
+                </FormControl>
+                <FormControl
+                  className={classes.formControl}
+                  error={this.state.yearFoundedvalid === false}>
+                  <InputLabel htmlFor="yearFounded">
+                    {this.i18n.t('Year founded')}
+                  </InputLabel>
+                  <Input
+                    id="yearFounded"
+                    name="yearFounded"
+                    value={this.state.yearFounded}
+                    onChange={this.handleChange}
+                    required={true}
+                    min={1900}
+                    placeholder="2018"
+                    onBlur={e => this.handleBlur(e, true)}
+                    onFocus={e => this.handleFocus(e, true)}
+                    type="number"
+                  />
+                  <FormHelperText
+                    id={
+                      this.state.yearFoundedvalid !== false
+                        ? 'yearFounded-helper-text'
+                        : 'yearFounded-error-text'
+                    }>
+                    {this.state.yearFoundedvalid !== false
+                      ? this.i18n.t('The year your company was founded')
+                      : this.i18n.t(
+                          'The year your company was founded is required',
+                        )}
+                  </FormHelperText>
+                </FormControl>
+                <FormControl
+                  className={classes.formControl}
+                  error={this.state.industryvalid === false}>
+                  <DownshiftSelect
+                    i18n={this.i18n}
+                    suggestions={industries}
+                    label={this.i18n.t('Industry')}
+                    onBlur={e => this.handleBlur(e, true)}
+                    onFocus={e => this.handleFocus(e, true)}
+                    handleParentChange={this.handleChangeIndustry}
+                    handleParentBlur={this.handleBlurIndustry}
+                    name="industry"
+                    id="jobIndustry"
+                    required={true}
+                  />
+                  <FormHelperText
+                    id={
+                      this.state.industryvalid !== false
+                        ? 'industry-helper-text'
+                        : 'industry-error-text'
+                    }>
+                    {this.state.industryvalid !== false
+                      ? this.i18n.t("Select your company's industry")
+                      : this.i18n.t(
+                          "Selecting your company's industry is required",
+                        )}
+                  </FormHelperText>
+                </FormControl>
+                <FormControl
+                  fullWidth={true}
+                  className={classes.formControl}
+                  error={this.state.descriptionvalid === false}>
+                  <InputLabel htmlFor="name-simple">
+                    {this.i18n.t('Description')}
+                  </InputLabel>
+                  <Input
+                    id="description"
+                    value={this.state.description}
+                    onChange={this.handleChange}
+                    name="description"
+                    required={true}
+                    multiline={true}
+                    onBlur={e => this.handleBlur(e, true)}
+                    onFocus={e => this.handleFocus(e, true)}
+                    rows={5}
+                    fullWidth={true}
+                  />
+
+                  <FormHelperText
+                    id={
+                      this.state.descriptionvalid !== false
+                        ? 'description-helper-text'
+                        : 'description-error-text'
+                    }>
+                    {this.state.descriptionvalid !== false
+                      ? this.i18n.t(
+                          'Write a description about what your company is about',
+                        )
+                      : this.i18n.t(
+                          'Writing a description about what your company is about is required',
+                        )}
+                  </FormHelperText>
+                </FormControl>
+              </form>
+            )}
+          </>
+        );
+      case 1:
+        return (
+          <>
+            <FormControl fullWidth={true} className={classes.formControl}>
+              <MultipleDownshiftSelect
+                i18n={this.i18n}
+                suggestions={jobfunctions}
+                selectedItems={this.state.jobFunction || []}
+                label={this.i18n.t('newjob:Job function')}
+                placeholder={this.i18n.t(
+                  'newjob:Select multiple functions (up to 3)',
+                )}
+                onBlur={e => this.handleBlur(e, true)}
+                onFocus={e => this.handleFocus(e, true)}
+                handleParentChange={this.handleChangeJobFunction}
+                handleParentBlur={this.handleBlurJobFunction}
+                name="jobFunction"
+                id="jobFunction"
+                maxSelection={3}
+                required={true}
+              />
+              <FormHelperText>
+                {this.i18n.t("newjob:Select your job's function")}
+              </FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl} style={{width: '45%'}}>
+              <InputLabel htmlFor="selectedEmployementTypes-helper">
+                {this.i18n.t('newjob:Employement types')}
+              </InputLabel>
+              <Select
+                fullWidth={true}
+                value={this.state.selectedEmployementType.value}
+                onChange={this.handleSelectEmployementTypes}
+                input={
+                  <Input
+                    name="selectedEmployementType"
+                    id="selectedEmployementTypes-helper"
+                  />
+                }>
+                {employementtypes.map(c => (
+                  <MenuItem key={c.value} value={c.value}>
+                    {c.label}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>
+                {this.i18n.t('newjob:Select your employement type')}
+              </FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl} style={{width: '45%'}}>
+              <InputLabel htmlFor="selectedSeniorityLevels-helper">
+                {this.i18n.t('newjob:Seniority level')}
+              </InputLabel>
+              <Select
+                fullWidth={true}
+                value={this.state.selectedSeniorityLevel.value}
+                onChange={this.handleSelectSeniorityLevels}
+                input={
+                  <Input
+                    name="selectedSeniorityLevel"
+                    id="selectedSeniorityLevels-helper"
+                  />
+                }>
+                {senioritylevels.map(c => (
+                  <MenuItem key={c.value} value={c.value}>
+                    {this.i18n.t(c.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>
+                {this.i18n.t('newjob:Select your seniority level')}
+              </FormHelperText>
+            </FormControl>
+            <FormControl fullWidth={true} className={classes.formControl}>
+              <MultipleDownshiftSelect
+                i18n={this.i18n}
+                maxSelection={3}
+                suggestions={industries}
+                selectedItems={this.state.companyIndustries || []}
+                label={this.i18n.t('newjob:Company industry')}
+                placeholder={this.i18n.t(
+                  'newjob:Select multiple company industries (up to 3)',
+                )}
+                onBlur={e => this.handleBlur(e, true)}
+                onFocus={e => this.handleFocus(e, true)}
+                handleParentChange={this.handleChangeCompanyIndustries}
+                handleParentBlur={this.handleBlurCompanyIndustries}
+                name="companyIndustries"
+                id="companyIndustries"
+                required={true}
+              />
+              <FormHelperText>
+                {this.i18n.t(
+                  "newjob:Select your job's company industries this job is related to",
+                )}
+              </FormHelperText>
+            </FormControl>
+            <FormControl
+              fullWidth={true}
+              className={classes.formControl}
+              error={this.state.jobdescriptionvalid === false}>
+              <InputLabel htmlFor="jobDescription">
+                {this.i18n.t('newjob:Job description')}
+              </InputLabel>
+              <Input
+                id="jobDescription"
+                value={this.state.jobDescription}
+                onChange={this.handleChange}
+                name="jobDescription"
+                required={true}
+                multiline={true}
+                onBlur={e => this.handleBlur(e, true)}
+                onFocus={e => this.handleFocus(e, true)}
+                rows={5}
+                fullWidth={true}
+              />
+
+              <FormHelperText
+                id={
+                  this.state.descriptionvalid !== false
+                    ? 'jobDescription-helper-text'
+                    : 'jobDescription-error-text'
+                }>
+                {this.state.jobDescriptionvalid !== false
+                  ? this.i18n.t(
+                      'Write a description about what your company is about',
+                    )
+                  : this.i18n.t(
+                      'Writing a description about what your company is about is required',
+                    )}
+              </FormHelperText>
+            </FormControl>
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <FormControl fullWidth={true} className={classes.formControl}>
+              <MultipleDownshiftSelect
+                i18n={this.i18n}
+                suggestions={skills}
+                selectedItems={this.state.skills || []}
+                label={this.i18n.t('newjob:Skills')}
+                placeholder={this.i18n.t(
+                  'newjob:Select multiple skills (up to 25)',
+                )}
+                onBlur={e => this.handleBlur(e, true)}
+                onFocus={e => this.handleFocus(e, true)}
+                handleParentChange={this.handleChangeSkills}
+                handleParentBlur={this.handleBlurSkills}
+                name="skills"
+                id="skills"
+                maxSelection={25}
+                required={true}
+              />
+              <FormHelperText>
+                {this.i18n.t('newjob:Select skills required for the job')}
+              </FormHelperText>
+            </FormControl>
+
+            <FormControl className={classes.formControl} style={{width: '45%'}}>
+              <InputLabel htmlFor="minimumExperienceYears-helper">
+                {this.i18n.t('newjob:Minimum years of experience')}
+              </InputLabel>
+              <Select
+                fullWidth={true}
+                value={this.state.minimumExperienceYears}
+                name="minimumExperienceYears"
+                onChange={this.handleChange}
+                input={
+                  <Input
+                    name="minimumExperienceYears"
+                    id="minimumExperienceYears-helper"
+                  />
+                }>
+                {[
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                ].map(v => (
+                  <MenuItem key={v} value={v}>
+                    {v}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>
+                {this.i18n.t('newjob:Minimum years of experience in the field')}
+              </FormHelperText>
+            </FormControl>
+
+            <FormControl className={classes.formControl} style={{width: '45%'}}>
+              <InputLabel htmlFor="maximumExperienceYears-helper">
+                {this.i18n.t('newjob:Maximum years of experience')}
+              </InputLabel>
+              <Select
+                fullWidth={true}
+                value={this.state.maximumExperienceYears}
+                onChange={this.handleChange}
+                name="maximumExperienceYears"
+                input={
+                  <Input
+                    name="maximumExperienceYears"
+                    id="maximumExperienceYears-helper"
+                  />
+                }>
+                {[
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                ].map(v => (
+                  <MenuItem key={v} value={v}>
+                    {v}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>
+                {this.i18n.t('newjob:Desired years of experience in the field')}
+              </FormHelperText>
+            </FormControl>
+            <FormControl fullWidth={true} className={classes.formControl}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={this.state.isPublished}
+                    name="isPublished"
+                    value="isPublished"
+                    onChange={this.handleCheckboxChange}
+                    color="primary"
+                  />
+                }
+                label={this.i18n.t('Publish')}
+              />
+            </FormControl>
+          </>
+        );
+      default:
+        return 'Unknown step';
+    }
+  };
+
+  render(props) {
+    const {classes} = this.props;
+    const steps = this.getSteps();
+    const {activeStep} = this.state;
+    const industries = this.INDUSTRIES;
+    const jobstitles = this.JOBSTITLES;
+    const jobfunctions = this.JOBFUNCTIONS;
+    const employementtypes = this.EMPLOYEMENTTYPES;
+    const senioritylevels = this.SENIORITYLEVELS;
+    const skills = this.SKILLS;
+    return (
+      <I18nextProvider i18n={this.i18n}>
+        <div>
+          {typeof google === 'undefined' ? (
+            <DynamicMaps
+              setGoogleMaps={() => {
+                this.setState({googleMaps: true});
+              }}
+            />
+          ) : null}
+          <NewJobBar i18n={this.i18n} />
+          <Grid container spacing={24} alignItems="center" justify="center">
+            <Grid item xs={12} md={6}>
+              <div>
+                <Stepper activeStep={activeStep} orientation="vertical">
+                  {steps.map((label, index) => {
+                    return (
+                      <Step key={label}>
+                        <StepLabel>{label}</StepLabel>
+                        <StepContent>
+                          {this.getStepContent(
+                            index,
+                            classes,
+                            industries,
+                            jobstitles,
+                            jobfunctions,
+                            employementtypes,
+                            senioritylevels,
+                            skills,
+                          )}
+                          <div className={classes.actionsContainer}>
+                            <div>
+                              <Button
+                                disabled={
+                                  activeStep === 0 && !this.state.addNewCompany
+                                }
+                                onClick={this.handleBack}
+                                className={classes.button}>
+                                {this.i18n.t('Back')}
+                              </Button>
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={this.handleNext}
+                                disabled={this.checkActiveStepValidity(
+                                  activeStep,
+                                )}
+                                className={classes.button}>
+                                {activeStep === steps.length - 1
+                                  ? this.i18n.t('Save')
+                                  : this.i18n.t('Next')}
+                              </Button>
+                            </div>
+                          </div>
+                        </StepContent>
+                      </Step>
+                    );
+                  })}
+                </Stepper>
+                {activeStep === steps.length && (
+                  <Paper
+                    square
+                    elevation={0}
+                    className={classes.resetContainer}>
+                    <Typography>
+                      {this.i18n.t(
+                        'newjob:All steps completed - your job has been saved!',
+                      )}
+                    </Typography>
+                    <Button
+                      onClick={this.handleReset}
+                      className={classes.button}>
+                      {this.i18n.t('newjob:Update your job post')}
+                    </Button>
+                  </Paper>
+                )}
+              </div>
+            </Grid>
+          </Grid>
+        </div>
+      </I18nextProvider>
+    );
+  }
+}
+NewJob.propTypes = {
+  classes: PropTypes.object,
+};
+
+export default withStyles(styles)(withRouter(NewJob));

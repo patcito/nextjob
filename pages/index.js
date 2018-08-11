@@ -1,93 +1,51 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+
 import React from 'react';
-import Link from 'next/link';
-import Head from '../components/head';
-import Nav from '../components/nav';
-import {I18n} from 'react-i18next';
-import i18n from '../i18n';
+import AppBarTop from '../components/appbar';
+import {withStyles} from '@material-ui/core/styles';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-const Home = () => (
-  <div>
-    <Head title="Home" />
-    <Nav />
+import {I18nextProvider} from 'react-i18next';
+import startI18n from '../tools/startI18n';
+import {getTranslation} from '../tools/translationHelpers';
+import IndexBody from '../components/indexbody';
+// get language from query parameter or url path
+const lang = 'fr';
 
-    <div className="hero">
-      <h1 className="title">Welcome to Next!</h1>
-      <p className="description">
-        To get started, edit <code>pages/index.js</code> and save to reload.
-      </p>
+class Index extends React.Component {
+  state = {
+    open: false,
+  };
 
-      <div className="row">
-        <Link href="https://github.com/zeit/next.js#getting-started">
-          <a className="card">
-            <h3>Getting Started &rarr;</h3>
-            <p>Learn more about Next on Github and in their examples</p>
-          </a>
-        </Link>
-        <Link href="https://open.segment.com/create-next-app">
-          <a className="card">
-            <h3>Examples &rarr;</h3>
-            <p>
-              Find other example boilerplates on the{' '}
-              <code>create-next-app</code> site
-            </p>
-          </a>
-        </Link>
-        <Link href="https://github.com/segmentio/create-next-app">
-          <a className="card">
-            <h3>Create Next App &rarr;</h3>
-            <p>Was this tool helpful? Let us know how we can improve it</p>
-          </a>
-        </Link>
-      </div>
-    </div>
+  constructor(props) {
+    super(props);
 
-    <style jsx>{`
-      .hero {
-        width: 100%;
-        color: #333;
-      }
-      .title {
-        margin: 0;
-        width: 100%;
-        padding-top: 80px;
-        line-height: 1.15;
-        font-size: 48px;
-      }
-      .title,
-      .description {
-        text-align: center;
-      }
-      .row {
-        max-width: 880px;
-        margin: 80px auto 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .card {
-        padding: 18px 18px 24px;
-        width: 220px;
-        text-align: left;
-        text-decoration: none;
-        color: #434343;
-        border: 1px solid #9b9b9b;
-      }
-      .card:hover {
-        border-color: #067df7;
-      }
-      .card h3 {
-        margin: 0;
-        color: #067df7;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 0;
-        padding: 12px 0 0;
-        font-size: 13px;
-        color: #333;
-      }
-    `}</style>
-  </div>
-);
+    this.i18n = startI18n(props.translations, 'fr');
+  }
 
-export default Home;
+  static async getInitialProps({req}) {
+    //console.log('index', stories);
+    //console.log(stories);
+    const translations = await getTranslation(
+      lang,
+      ['common', 'namespace1'],
+      'http://localhost:4000/static/locales/',
+    );
+    return {translations};
+  }
+
+  render(props) {
+    console.log('index', this.props.jobs);
+    const i18n = this.props.i18n;
+    return (
+      <I18nextProvider i18n={this.i18n}>
+        <div>
+          <AppBarTop i18n={this.i18n} />
+          <IndexBody i18n={this.i18n} jobs={[]} />
+        </div>
+      </I18nextProvider>
+    );
+  }
+}
+
+export default Index;
