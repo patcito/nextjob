@@ -111,11 +111,9 @@ class Job extends React.Component {
             <CardContent className={classes.content}>
               <Typography variant="headline">{job.title}</Typography>
               <Typography variant="subheading" color="textSecondary">
-                @ Stripe Inc
+                @ {job.Company.name} is looking for a {job.JobTitle}
               </Typography>
-              <Typography>
-                1ère plateforme de référencement et de paiement dématérialisée.
-              </Typography>
+              <Typography>{job.Company.description}</Typography>
               <Grid item>
                 <div className={classes.root}>
                   <Chip

@@ -27,6 +27,7 @@ const lang = 'fr';
 class IndexBody extends React.Component {
   constructor(props) {
     super(props);
+    const jobs = this.props.jobs;
   }
   state = {
     isSignedIn: false,
@@ -34,12 +35,12 @@ class IndexBody extends React.Component {
     someCollection: {},
     someDocument: null,
   };
+
   componentDidMount() {}
   componentWillUnmount() {}
   render(props) {
     const i18n = this.props.i18n;
     const {page, url, jobs} = this.props;
-
     return (
       <Grid container spacing={24}>
         <Grid item xs={12} md={3}>
@@ -47,7 +48,7 @@ class IndexBody extends React.Component {
         </Grid>
         <Grid item xs={12} md={8}>
           <div>
-            {jobs.map(job => (
+            {jobs.Job.map(job => (
               <Job key={job.id} i18n={i18n} job={job} />
             ))}
           </div>

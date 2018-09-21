@@ -9,6 +9,7 @@ import {I18nextProvider} from 'react-i18next';
 import startI18n from '../tools/startI18n';
 import {getTranslation} from '../tools/translationHelpers';
 import IndexBody from '../components/indexbody';
+const grequest = require('graphql-request');
 // get language from query parameter or url path
 const lang = 'fr';
 
@@ -31,17 +32,73 @@ class Index extends React.Component {
       ['common', 'namespace1'],
       'http://localhost:4000/static/locales/',
     );
-    return {translations};
+    const getJobsopts = {
+      uri: 'http://localhost:8080/v1alpha1/graphql',
+      json: true,
+      query: `query Job{
+			Job(where: {isPublished: {_eq: true}}){
+				    id
+					hasMonthlySalary
+                    Company{name
+                    description}
+				    ownerId
+				    remote
+					JobFunctions{
+    		  			JobFunction
+					}
+				Industries{
+				  IndustryName
+
+			}
+				Skills{
+				  Skill
+
+			}
+		  isPublished
+		  companyId
+		  applyDirectly
+		  minimumExperienceYears
+		  maximumExperienceYears
+      minimumYearlySalary
+      maximumYearlySalary
+      maximumMonthlySalary
+      minimumMonthlySalary
+
+
+		location
+        street_number
+        route
+        locality
+        administrative_area_level_1
+        country
+        postal_code
+      description
+
+      EmployementType
+      SeniorityLevel
+      JobTitle
+
+			}
+	}`,
+      headers: {},
+    };
+    const client = new grequest.GraphQLClient(getJobsopts.uri, {
+      headers: getJobsopts.headers,
+    });
+    let jobs = await client.request(getJobsopts.query, {});
+    console.log('jobs', jobs);
+    return {translations, jobs};
   }
 
   render(props) {
     console.log('index', this.props.jobs);
     const i18n = this.props.i18n;
+    const jobs = this.props.jobs;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
           <AppBarTop i18n={this.i18n} />
-          <IndexBody i18n={this.i18n} jobs={[]} />
+          <IndexBody i18n={this.i18n} jobs={jobs} />
         </div>
       </I18nextProvider>
     );

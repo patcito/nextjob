@@ -367,8 +367,13 @@ app.prepare().then(() => {
 
   server.get('/api', (req, res) => {
     var token = req.headers['x-access-token'];
-    if (!token)
-      return res.status(401).send({auth: false, message: 'No token provided.'});
+    if (!token) {
+      const x = {
+        'X-Hasura-Role': 'anon',
+      };
+      console.log(req.headers, 'ok', x);
+      return res.status(200).json(x);
+    }
 
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
