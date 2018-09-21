@@ -48,16 +48,23 @@ import SingleSelect from '../components/select';
 import DownshiftSelect from '../components/downshift';
 import MultipleDownshiftSelect from '../components/multipledownshift';
 
-import Slider from '@material-ui/lab/Slider';
 import dynamic from 'next/dynamic';
 
 import Router from 'next/router';
 
 import DynamicMaps from '../components/maps';
+
 const PlacesSelect = dynamic(import('../components/placesselect'), {
   ssr: false,
 });
 import {withRouter} from 'next/router';
+import Slider, {Range} from 'rc-slider';
+import Tooltip from 'rc-tooltip';
+
+import 'rc-slider/assets/index.css';
+const createSliderWithTooltip = Slider.createSliderWithTooltip;
+
+const TooltipRange = createSliderWithTooltip(Range);
 
 // get language from query parameter or url path
 const lang = 'fr';
@@ -87,7 +94,11 @@ const styles = theme => ({
 class NewJob extends React.Component {
   state = {
     job: {},
+    yearsExperienceRange: [0, 4],
+    dailySalaryRange: [100, 1500],
     open: false,
+    yearlySalaryRange: [40000, 50000],
+    monthlySalaryRange: [500, 1000],
     remote: false,
     selectedCompany: '',
     selectedEmployementType: '',
@@ -97,8 +108,6 @@ class NewJob extends React.Component {
     hasApplicationEmail: true,
     minSalary: 10,
     maxSalary: 10,
-    minimumExperienceYears: 1,
-    maximumExperienceYears: 2,
   };
   handleNext = () => {
     switch (this.state.activeStep) {
@@ -132,8 +141,12 @@ class NewJob extends React.Component {
       remote: this.state.remote,
       companyId: this.state.selectedCompany,
       applyDirectly: !this.state.hasApplicationEmail,
-      minimumExperienceYears: this.state.minimumExperienceYears,
-      maximumExperienceYears: this.state.maximumExperienceYears,
+      minimumExperienceYears: this.state.yearsExperienceRange[0],
+      maximumExperienceYears: this.state.yearsExperienceRange[1],
+      minimumYearlySalary: this.state.yearlySalaryRange[0],
+      maximumYearlySalary: this.state.yearlySalaryRange[1],
+      minimumMonthlySalary: this.state.monthlySalaryRange[0],
+      maximumMonthlySalary: this.state.monthlySalaryRange[1],
       ownerId: this.state.currentUser.id,
       street_number: this.state.fullAddress.street_number,
       route: this.state.fullAddress.route,
@@ -146,6 +159,7 @@ class NewJob extends React.Component {
       EmployementType: this.state.selectedEmployementType.value,
       SeniorityLevel: this.state.selectedSeniorityLevel.value,
       JobTitle: this.state.jobTitle.value,
+      hasMonthlySalary: this.state.hasMonthlySalary,
       location: {
         type: 'Point',
         coordinates: [this.state.coordinates.lat, this.state.coordinates.lng],
@@ -161,8 +175,14 @@ $id: Int,
   $companyId: Int,
   $applyDirectly: Boolean,
   $isPublished: Boolean,
+$hasMonthlySalary: Boolean,
   $minimumExperienceYears: Int,
   $maximumExperienceYears: Int,
+      $minimumYearlySalary: Int,
+      $maximumYearlySalary: Int,
+      $maximumMonthlySalary: Int,
+      $minimumMonthlySalary: Int,
+
  $ownerId: Int,
   $location: geography,
   $street_number: String,
@@ -181,9 +201,14 @@ _set:{
 				companyId: $companyId,
 				isPublished: $isPublished,
 				applyDirectly: $applyDirectly,
+hasMonthlySalary: $hasMonthlySalary,
 				minimumExperienceYears: $minimumExperienceYears,
 				maximumExperienceYears: $maximumExperienceYears,
 				ownerId: $ownerId,
+      minimumYearlySalary: $minimumYearlySalary,
+      maximumYearlySalary: $maximumYearlySalary,
+      maximumMonthlySalary: $maximumMonthlySalary,
+      minimumMonthlySalary: $minimumMonthlySalary,
 
 				    location: $location,
 		  				street_number: $street_number,
@@ -218,8 +243,14 @@ _set:{
  $companyId: Int,
  $applyDirectly: Boolean,
  $isPublished: Boolean,
+$hasMonthlySalary: Boolean,
  $minimumExperienceYears: Int,
  $maximumExperienceYears: Int,
+      $minimumYearlySalary: Int,
+     $maximumYearlySalary: Int,
+      $maximumMonthlySalary: Int,
+      $minimumMonthlySalary: Int,
+
  $ownerId: Int,
  $location: geography,
  $street_number: String,
@@ -237,9 +268,15 @@ _set:{
 				remote: $remote,
 				companyId: $companyId,
 				isPublished: $isPublished,
+				hasMonthlySalary: $hasMonthlySalary,
 				applyDirectly: $applyDirectly,
 				minimumExperienceYears: $minimumExperienceYears,
 				maximumExperienceYears: $maximumExperienceYears,
+      minimumYearlySalary: $minimumYearlySalary,
+      maximumYearlySalary: $maximumYearlySalary,
+      maximumMonthlySalary: $maximumMonthlySalary,
+      minimumMonthlySalary: $minimumMonthlySalary,
+
 				ownerId: $ownerId,
 
 				    location: $location,
@@ -289,28 +326,50 @@ _set:{
       let industries = [];
       let skills = [];
       that.state.jobFunction.map(jf => {
-        jobFunctions.push({JobFunction: jf.value.JobFunction, JobId: jobId});
+        console.log(jf);
+        jobFunctions.push({
+          JobFunction: jf.value.JobFunction || jf.value,
+          JobId: jobId,
+        });
       });
       that.state.companyIndustries.map(ci => {
-        industries.push({IndustryName: ci.value.IndustryName, JobId: jobId});
+        console.log(ci);
+        industries.push({
+          IndustryName: ci.value.IndustryName || ci.value,
+          JobId: jobId,
+        });
       });
       that.state.skills.map(skill => {
-        skills.push({Skill: skill.value.Skill, JobId: jobId});
+        console.log(skill);
+        skills.push({Skill: skill.value.Skill || skill.value, JobId: jobId});
       });
       const extraVars = {
         skills: skills,
         industries: industries,
         jobFunctions: jobFunctions,
+        id: that.props.job ? that.props.job.id : 0,
       };
 
       const saveJobExtrasopts = {
         uri: 'http://localhost:8080/v1alpha1/graphql',
         json: true,
         query: `
-		mutation insert_shit_lol($skills: [SkillJob_insert_input!]!,
+		mutation insert_shit_lol($id: Int, $skills: [SkillJob_insert_input!]!,
 		$industries: [JobIndustry_insert_input!]!,
 		  $jobFunctions: [JobFunctionJob_insert_input!]!
 		){
+  delete_JobFunctionJob(where: {JobId: {_eq: $id}}){
+    affected_rows
+
+}
+	delete_JobIndustry(where: {JobId: {_eq: $id}}){
+    affected_rows
+
+}
+  delete_SkillJob(where: {JobId: {_eq: $id}}){
+    affected_rows
+
+}
 		insert_SkillJob(objects: $skills){
 			    returning{Skill}
 
@@ -378,8 +437,19 @@ _set:{
     this.setState({[event.target.name]: event.target.value});
   };
 
-  handleSliderChange = (event, value) => {
-    this.setState({[event.target.getAttribute('name')]: value});
+  handleSliderChange = value => {
+    console.log(this.state.yearsExperienceRange, value);
+    this.setState({yearsExperienceRange: value});
+  };
+
+  handleYearlySalaryRangeSliderChange = value => {
+    console.log(this.state.yearlySalaryRange, value);
+    this.setState({yearlySalaryRange: value});
+  };
+
+  handleMonthlySalaryRangeSliderChange = value => {
+    console.log(this.state.monthlySalaryRange, value);
+    this.setState({monthlySalaryRange: value});
   };
 
   handleCheckboxChange = event => {
@@ -489,6 +559,7 @@ _set:{
       query: `query Job($id: Int){
 			Job(where: {id: {_eq: $id}}){
 				    id
+					hasMonthlySalary
 				    ownerId
 				    remote
 					JobFunctions{
@@ -507,6 +578,12 @@ _set:{
 		  applyDirectly
 		  minimumExperienceYears
 		  maximumExperienceYears
+      minimumYearlySalary
+      maximumYearlySalary
+      maximumMonthlySalary
+      minimumMonthlySalary
+
+
 		location
         street_number
         route
@@ -593,8 +670,15 @@ _set:{
           remote: job.remote,
           selectedCompany: job.companyId,
           hasApplicationEmail: job.applyDirectly,
-          minimumExperienceYears: job.minimumExperienceYears,
-          maximumExperienceYears: job.maximumExperienceYears,
+          yearsExperienceRange: [
+            job.minimumExperienceYears,
+            job.maximumExperienceYears,
+          ],
+          yearlySalaryRange: [job.minimumYearlySalary, job.maximumYearlySalary],
+          monthlySalaryRange: [
+            job.minimumMonthlySalary,
+            job.maximumMonthlySalary,
+          ],
           location: job.location,
           coordinates: {
             lat: job.location.coordinates[0],
@@ -608,6 +692,7 @@ _set:{
             country: job.country,
             postal_code: job.postal_code,
           },
+          hasMonthlySalary: job.hasMonthlySalary,
           currentAddressDescription:
             job.street_number +
             ' ' +
@@ -1292,101 +1377,101 @@ _set:{
                 {this.i18n.t('newjob:Select skills required for the job')}
               </FormHelperText>
             </FormControl>
-
-            <FormControl className={classes.formControl} style={{width: '45%'}}>
-              <InputLabel htmlFor="minimumExperienceYears-helper">
-                {this.i18n.t('newjob:Minimum years of experience')}
-              </InputLabel>
-              <Select
-                fullWidth={true}
-                value={this.state.minimumExperienceYears}
-                name="minimumExperienceYears"
-                onChange={this.handleChange}
-                input={
-                  <Input
-                    name="minimumExperienceYears"
-                    id="minimumExperienceYears-helper"
-                  />
-                }>
-                {[
-                  0,
-                  1,
-                  2,
-                  3,
-                  4,
-                  5,
-                  6,
-                  7,
-                  8,
-                  9,
-                  10,
-                  11,
-                  12,
-                  13,
-                  14,
-                  15,
-                  16,
-                  17,
-                  18,
-                  19,
-                  20,
-                ].map(v => (
-                  <MenuItem key={v} value={v}>
-                    {v}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {this.i18n.t('newjob:Minimum years of experience in the field')}
-              </FormHelperText>
+            <FormControl className={classes.formControl} style={{width: '95%'}}>
+              <Typography variant="subheading" gutterBottom>
+                {this.i18n.t('newjob:Years of experience required')}
+              </Typography>
+              <Slider.Range
+                min={0}
+                max={20}
+                marks={{
+                  0: 0,
+                  2: 2,
+                  4: 4,
+                  6: 6,
+                  8: 8,
+                  10: 10,
+                  12: 12,
+                  14: 14,
+                  16: 16,
+                  18: 18,
+                  20: 20,
+                }}
+                step={20}
+                onChange={this.handleSliderChange}
+                name="yearsExperienceRange"
+                defaultValue={this.state.yearsExperienceRange}
+              />
             </FormControl>
-
-            <FormControl className={classes.formControl} style={{width: '45%'}}>
-              <InputLabel htmlFor="maximumExperienceYears-helper">
-                {this.i18n.t('newjob:Maximum years of experience')}
-              </InputLabel>
-              <Select
-                fullWidth={true}
-                value={this.state.maximumExperienceYears}
-                onChange={this.handleChange}
-                name="maximumExperienceYears"
-                input={
-                  <Input
-                    name="maximumExperienceYears"
-                    id="maximumExperienceYears-helper"
-                  />
-                }>
-                {[
-                  0,
-                  1,
-                  2,
-                  3,
-                  4,
-                  5,
-                  6,
-                  7,
-                  8,
-                  9,
-                  10,
-                  11,
-                  12,
-                  13,
-                  14,
-                  15,
-                  16,
-                  17,
-                  18,
-                  19,
-                  20,
-                ].map(v => (
-                  <MenuItem key={v} value={v}>
-                    {v}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {this.i18n.t('newjob:Desired years of experience in the field')}
-              </FormHelperText>
+            <FormControl className={classes.formControl} style={{width: '95%'}}>
+              <Typography variant="subheading" gutterBottom>
+                {this.i18n.t('newjob:Salary range')}{' '}
+                <a
+                  onClick={() => {
+                    this.setState({
+                      hasMonthlySalary: !this.state.hasMonthlySalary,
+                    });
+                    console.log(this.state.yearlySalaryRange);
+                  }}>
+                  <Button color="primary" className={classes.button}>
+                    {!this.state.hasMonthlySalary
+                      ? this.i18n.t('Switch to a yearly salary range instead')
+                      : this.i18n.t('Switch to a monthly salary range instead')}
+                    )
+                  </Button>
+                </a>
+              </Typography>
+              <TooltipRange
+                min={30000}
+                max={230000}
+                step={10000}
+                marks={{
+                  30000: '€30k',
+                  40000: '€40k',
+                  50000: '€50k',
+                  60000: '€60k',
+                  70000: '€70k',
+                  80000: '€80k',
+                  90000: '€90k',
+                  100000: '€100k',
+                  120000: '€120k',
+                  140000: '€140k',
+                  160000: '€160k',
+                  180000: '€180k',
+                  200000: '€200k',
+                  230000: '€230k',
+                }}
+                style={{
+                  display: this.state.hasMonthlySalary ? 'none' : 'inherit',
+                }}
+                tipFormatter={value => `€${value}`} //`
+                onChange={this.handleYearlySalaryRangeSliderChange}
+                name="salaryRange"
+                value={this.state.yearlySalaryRange}
+              />
+              <TooltipRange
+                min={100}
+                max={2500}
+                step={100}
+                marks={{
+                  100: '€100',
+                  300: '€300',
+                  500: '€500',
+                  700: '€700',
+                  1000: '€1000',
+                  1200: '€1200',
+                  1500: '€1500',
+                  2000: '€2000',
+                  2500: '€2500',
+                }}
+                style={{
+                  display: !this.state.hasMonthlySalary ? 'none' : 'inherit',
+                }}
+                tipFormatter={value => `€${value}`} //`
+                onChange={this.handleMonthlySalaryRangeSliderChange}
+                name="salaryRange"
+                value={this.state.monthlySalaryRange}
+              />
             </FormControl>
             <FormControl fullWidth={true} className={classes.formControl}>
               <FormControlLabel
@@ -1399,7 +1484,7 @@ _set:{
                     color="primary"
                   />
                 }
-                label={this.i18n.t('Publish')}
+                label={this.i18n.t('newjob:Publish')}
               />
             </FormControl>
           </>

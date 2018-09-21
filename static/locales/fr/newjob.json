@@ -24,10 +24,11 @@
   "Select multiple skills (up to 25)": "Selectionnez jusque 25 compétences.",
   "Select skills required for the job": "Selectionnez les compétences requises pour cette offre.",
   "Minimum years of experience": "Minimum d'années d'experience",
-  "Minimum years of experience in the field": "Minimum d'années d'experience pour ces compétences",
-  "Maximum years of experience": "Nombre d'années d'experience souhaitées",
-  "Desired years of experience in the field": "Nombre d'années d'experience ideal souhaitées",
+  "Years of experience required": "Nombre d'années d'experience pour ces compétences",
   "Update your job post": "Modifier votre offre",
   "All steps completed - your job has been saved!": "Toutes les étapes sont terminées - votre offre a bien été sauvegardée!",
-  "Publish": "Publier"
+  "Publish": "Publier",
+  "Salary range": "Fourchette de salaire",
+  "Switch to a yearly salary range instead": "Selectionner un salaire annuel",
+  "Switch to a monthly salary range instead": "Selectionner un salaire mensuel"
 }

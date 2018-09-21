@@ -162,7 +162,7 @@ class MultipleIntegrationDownshift extends React.Component {
               InputProps: getInputProps({
                 startAdornment: selectedItem.map(item => (
                   <Chip
-                    key={item.value}
+                    key={JSON.stringify(item.value)}
                     tabIndex={-1}
                     label={item.label}
                     className={classes.chip}
