@@ -104,12 +104,14 @@ class Job extends React.Component {
         <Card className={classes.card} style={{cursor: 'pointer'}}>
           <CardMedia
             className={classes.cover}
-            image="https://material-ui.com/static/images/cards/live-from-space.jpg"
+            image={'/' + job.companyId + '-' + job.ownerId + '-' + 'logo.png'}
             title={job.title}
           />
           <div className={classes.details}>
             <CardContent className={classes.content}>
-              <Typography variant="headline">{job.title}</Typography>
+              <Typography variant="headline">
+                {job.id} {job.title}
+              </Typography>
               <Typography variant="subheading" color="textSecondary">
                 @ {job.Company.name} is looking for a {job.JobTitle}
               </Typography>
@@ -122,7 +124,7 @@ class Job extends React.Component {
                         <PlaceIcon />
                       </Avatar>
                     }
-                    label="Paris"
+                    label={job.locality ? job.locality : job.country}
                     className={classes.chip}
                   />
                   <Chip
@@ -140,7 +142,17 @@ class Job extends React.Component {
                         <EuroSymbolIcon />
                       </Avatar>
                     }
-                    label="&lt; 32k"
+                    label={
+                      job.hasMonthlySalary
+                        ? job.minimumMonthlySalary +
+                          '-' +
+                          job.maximumMonthlySalary
+                        : job.minimumYearlySalary / 1000 +
+                          'k' +
+                          '-' +
+                          job.maximumYearlySalary / 1000 +
+                          'k'
+                    }
                     className={classes.chip}
                   />
                   <Chip
@@ -149,33 +161,25 @@ class Job extends React.Component {
                         <WorkIcon />
                       </Avatar>
                     }
-                    label={i18n.t('Startup (<3 years)')}
+                    label={
+                      new Date().getFullYear() - job.Company.yearFounded > 3
+                        ? i18n.t('Company (>3 years)')
+                        : i18n.t('Startup (<3 years)')
+                    }
                     className={classes.chip}
                   />
                 </div>
               </Grid>
               <Grid item>
                 <div className={classes.root}>
-                  <Chip
-                    label="React Native"
-                    className={classes.chiptags}
-                    color="secondary"
-                  />
-                  <Chip
-                    label="Expo"
-                    color="secondary"
-                    className={classes.chiptags}
-                  />
-                  <Chip
-                    label="GraphQL"
-                    className={classes.chiptags}
-                    color="secondary"
-                  />
-                  <Chip
-                    label="Jest"
-                    color="secondary"
-                    className={classes.chiptags}
-                  />
+                  {job.Skills.map(Skill => (
+                    <Chip
+                      key={Skill.Skill}
+                      label={Skill.Skill}
+                      className={classes.chiptags}
+                      color="secondary"
+                    />
+                  ))}
                 </div>
               </Grid>
             </CardContent>

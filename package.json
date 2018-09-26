@@ -11,9 +11,12 @@
     "@material-ui/icons": "^3.0.1",
     "@material-ui/lab": "^3.0.0-alpha.14",
     "@zeit/next-css": "^1.0.1",
+    "accept-webp": "^1.4.0",
     "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
     "downshift": "^2.2.0",
     "express": "^4.16.3",
+    "express-fileupload": "^1.0.0-alpha.1",
     "graphql-request": "^1.8.2",
     "i18next": "^11.6.0",
     "i18next-browser-languagedetector": "^2.2.3",
@@ -21,6 +24,7 @@
     "i18next-node-fs-backend": "^2.0.0",
     "i18next-xhr-backend": "^1.5.1",
     "isomorphic-unfetch": "^2.1.1",
+    "js-cookie": "^2.2.0",
     "jsonwebtoken": "^8.3.0",
     "keycode": "^2.2.0",
     "material-ui": "^0.20.2",
@@ -40,6 +44,7 @@
     "react-parallax": "^1.8.0",
     "react-select": "^2.0.0",
     "request": "^2.88.0",
+    "sharp": "^0.20.8",
     "simple-oauth2": "^2.2.1"
   }
 }

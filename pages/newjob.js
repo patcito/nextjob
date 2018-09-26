@@ -13,7 +13,6 @@ import {Parallax} from 'react-parallax';
 import {I18nextProvider} from 'react-i18next';
 import startI18n from '../tools/startI18n';
 import {getTranslation} from '../tools/translationHelpers';
-import IndexBody from '../components/indexbody';
 
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -812,6 +811,7 @@ $hasMonthlySalary: Boolean,
       const currentUser = that.state.currentUser;
       currentUser.Companies.push(gdata.insert_Company.returning[0]);
 
+      this.upload(gdata.insert_Company.returning[0].id);
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       that.setState({
         currentUser: currentUser,
@@ -820,6 +820,28 @@ $hasMonthlySalary: Boolean,
       });
       this.handleBack(true);
     });
+  };
+
+  upload = companyId => {
+    console.log(this.state.file);
+    const formData = new FormData();
+    formData.append('file', this.state.file[0]);
+    console.log(formData);
+    fetch('/upload', {
+      // Your POST endpoint
+      method: 'POST',
+      headers: {companyId: companyId},
+      body: formData, // This is your file object
+    })
+      .then(
+        response => response.json(), // if the response is a JSON object
+      )
+      .then(
+        success => console.log(success), // Handle the success response object
+      )
+      .catch(
+        error => console.log(error), // Handle the error response object
+      );
   };
 
   checkActiveStepValidity = activeStep => {
@@ -1214,6 +1236,32 @@ $hasMonthlySalary: Boolean,
                         )}
                   </FormHelperText>
                 </FormControl>
+                <FormControl
+                  className={classes.formControl}
+                  error={this.state.namevalid === false}>
+                  <InputLabel htmlFor="name-simple">
+                    {this.i18n.t('Logo')}
+                  </InputLabel>
+                  <Input
+                    id="name-simple"
+                    name="file"
+                    type="file"
+                    onChange={e => {
+                      console.log(e.target.files);
+                      this.setState({file: e.target.files});
+                    }}
+                  />
+                  <FormHelperText
+                    id={
+                      this.state.namevalid !== false
+                        ? 'name-helper-text'
+                        : 'name-error-text'
+                    }>
+                    {this.state.namevalid !== false
+                      ? this.i18n.t("Your company's logo")
+                      : this.i18n.t("Your company's logo is required")}
+                  </FormHelperText>
+                </FormControl>
               </form>
             )}
           </>
@@ -1414,7 +1462,7 @@ $hasMonthlySalary: Boolean,
                     console.log(this.state.yearlySalaryRange);
                   }}>
                   <Button color="primary" className={classes.button}>
-                    {!this.state.hasMonthlySalary
+                    {this.state.hasMonthlySalary
                       ? this.i18n.t('Switch to a yearly salary range instead')
                       : this.i18n.t('Switch to a monthly salary range instead')}
                     )

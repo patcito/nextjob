@@ -67,6 +67,11 @@ class LoginAppBarTop extends React.Component {
   handleLogoutClick = () => {
     this.setState({token: false, currentUser: null});
     localStorage.clear();
+    document.cookie.split(';').forEach(function(c) {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+    });
   };
 
   constructor(props) {
@@ -100,6 +105,7 @@ class LoginAppBarTop extends React.Component {
             });
             const content = await rawResponse.json();
             localStorage.setItem('token', content.token);
+            document.cookie = 'token=' + content.token;
             localStorage.setItem('currentUser', JSON.stringify(content.user));
             this.setState({
               token: content.token,

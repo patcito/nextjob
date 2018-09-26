@@ -9,16 +9,47 @@ const handle = app.getRequestHandler();
 const bodyParser = require('body-parser');
 const request = require('request');
 const grequest = require('graphql-request');
+const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
+const sharp = require('sharp');
+const acceptWebp = require('accept-webp');
 
 app.prepare().then(() => {
   const server = express();
+  const staticPath = __dirname + '/uploads';
+
+  server.use(acceptWebp(staticPath, ['jpg', 'jpeg', 'png']));
+  server.use(express.static(staticPath));
 
   server.use(bodyParser.json());
+  server.use(cookieParser());
+  server.use(fileUpload());
   server.use(
     bodyParser.urlencoded({
       extended: true,
     }),
   );
+
+  checkToken = (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+      next();
+      return;
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+      if (err) {
+        next();
+        return;
+      } else {
+        req.userId = decoded.userId;
+        req.token = token;
+        next();
+        return;
+      }
+    });
+  };
+  server.use(checkToken);
 
   server.post('/auth', async (req, res) => {
     const originalRes = res;
@@ -377,13 +408,10 @@ app.prepare().then(() => {
 
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
-        return res.status(500).send({
-          auth: false,
-          message: 'Failed to authenticate token.',
-          err: err,
-          token: token,
-          s: process.env.JWT_SECRET,
-        });
+        const x = {
+          'X-Hasura-Role': 'anon',
+        };
+        return res.status(200).send(x);
       } else {
         console.log('decode token', decoded);
         const x = {
@@ -400,6 +428,54 @@ app.prepare().then(() => {
 
   server.get('/jobs/update/:id', (req, res) => {
     return app.render(req, res, '/newjob', {id: req.params.id});
+  });
+
+  server.get('/jobs/companies/:companyId', (req, res) => {
+    return app.render(req, res, '/', {companyId: req.params.companyId});
+  });
+
+  server.get('/companies', (req, res) => {
+    return app.render(req, res, '/', {companies: true});
+  });
+
+  server.get('/me/companies', (req, res) => {
+    return app.render(req, res, '/', {companies: true, me: true});
+  });
+
+  server.get('/companies/:companyId', (req, res) => {
+    return app.render(req, res, '/showcompanies', {
+      companyId: req.params.companyId,
+    });
+  });
+
+  server.get('/companies/:companyId/edit', (req, res) => {
+    return app.render(req, res, '/', {
+      companyId: req.params.companyId,
+      action: 'editCompany',
+    });
+  });
+
+  server.post('/upload', function(req, res) {
+    if (!req.files) return res.status(400).json('No files were uploaded.');
+    let sampleFile = req.files.file;
+    sharp(sampleFile.data).toFile(
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-logo.webp',
+      (err, info) => {
+        if (err) {
+          res.status(500).json(err);
+        }
+        sharp(sampleFile.data).toFile(
+          'uploads/' + req.get('companyId') + '-' + req.userId + '-logo.png',
+          (err, info) => {
+            if (err) {
+              res.status(500).json(err);
+            }
+            console.log(err, info);
+            res.status(200).json('ok');
+          },
+        );
+      },
+    );
   });
 
   server.get('*', (req, res) => {

@@ -4,14 +4,30 @@ import React from 'react';
 import AppBarTop from '../components/appbar';
 import {withStyles} from '@material-ui/core/styles';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Grid from '@material-ui/core/Grid';
+import MenuList from '../components/menu';
 
 import {I18nextProvider} from 'react-i18next';
 import startI18n from '../tools/startI18n';
 import {getTranslation} from '../tools/translationHelpers';
-import IndexBody from '../components/indexbody';
+import IndexJobs from '../components/indexjobs';
+import EditCompany from '../components/editcompany';
+import IndexCompanies from '../components/indexcompanies';
 const grequest = require('graphql-request');
 // get language from query parameter or url path
 const lang = 'fr';
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  flex: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginLeft: -12,
+    marginRight: 20,
+  },
+});
 
 class Index extends React.Component {
   state = {
@@ -24,23 +40,47 @@ class Index extends React.Component {
     this.i18n = startI18n(props.translations, 'fr');
   }
 
-  static async getInitialProps({req}) {
+  static async getInitialProps({req, query}) {
     //console.log('index', stories);
-    //console.log(stories);
+    console.log('companyid', query.companyId);
+    let userInfo = {};
+    let token = null;
+    let userId = null;
+    const companyId = query.companyId || null;
+    if (req) {
+      query.me && req.userId ? (userId = req.userId) : (userId = null);
+      token = req.token || null;
+      userInfo = {userId: userId, token: token};
+    } else {
+      token = localStorage.getItem('token');
+      localStorage.getItem('currentUser')
+        ? (userId = localStorage.getItem('currentUser').id)
+        : (userId = null);
+    }
     const translations = await getTranslation(
       lang,
-      ['common', 'namespace1'],
+      ['common', 'namespace1', 'industries'],
       'http://localhost:4000/static/locales/',
     );
     const getJobsopts = {
       uri: 'http://localhost:8080/v1alpha1/graphql',
       json: true,
-      query: `query Job{
-			Job(where: {isPublished: {_eq: true}}){
+      query: `query JobCompanies($ownerId: Int, $companyId: Int){
+              Company(where: {ownerId: {_eq: $ownerId}}){
+                  id
+                  description
+                  ownerId
+                  yearFounded
+                  Industry
+                  name
+                  url
+              }
+			Job(where: {_and: [{companyId: {_eq: $companyId}, isPublished: {_eq: true}}]}){
 				    id
 					hasMonthlySalary
                     Company{name
-                    description}
+                    description
+                    yearFounded}
 				    ownerId
 				    remote
 					JobFunctions{
@@ -80,29 +120,62 @@ class Index extends React.Component {
 
 			}
 	}`,
-      headers: {},
+      headers: {
+        'x-access-token': token,
+      },
     };
     const client = new grequest.GraphQLClient(getJobsopts.uri, {
       headers: getJobsopts.headers,
     });
-    let jobs = await client.request(getJobsopts.query, {});
-    console.log('jobs', jobs);
-    return {translations, jobs};
+    let jobsAndCompanies = await client.request(getJobsopts.query, {
+      ownerId: userId,
+      companyId: companyId,
+    });
+    return {translations, jobsAndCompanies, query};
   }
 
+  content = () => {
+    const query = this.props.query;
+    if (this.props.query.companies) {
+      return (
+        <IndexCompanies
+          i18n={this.i18n}
+          query={this.props.query}
+          companies={this.props.jobsAndCompanies.Company}
+        />
+      );
+    } else if (query.action === 'editCompany') {
+      return (
+        <EditCompany
+          i18n={this.i18n}
+          companies={this.props.jobsAndCompanies.Company}
+          companyId={query.companyId}
+        />
+      );
+    } else {
+      return (
+        <IndexJobs i18n={this.i18n} jobs={this.props.jobsAndCompanies.Job} />
+      );
+    }
+  };
   render(props) {
-    console.log('index', this.props.jobs);
-    const i18n = this.props.i18n;
-    const jobs = this.props.jobs;
+    const i18n = this.i18n;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
           <AppBarTop i18n={this.i18n} />
-          <IndexBody i18n={this.i18n} jobs={jobs} />
+          <Grid container spacing={24}>
+            <Grid item xs={12} md={3}>
+              <MenuList i18n={i18n} />
+            </Grid>
+            <Grid item xs={12} md={8}>
+              {this.content()}
+            </Grid>
+          </Grid>
         </div>
       </I18nextProvider>
     );
   }
 }
 
-export default Index;
+export default withStyles(styles)(Index);

@@ -76,7 +76,7 @@ class MenuList extends React.Component {
     return (
       <div className={classes.root}>
         <List component="nav">
-          <Link href="/newjob">
+          <Link href="/">
             <ListItem button>
               <ListItemIcon>
                 <ViewHeadlineIcon />
@@ -84,12 +84,14 @@ class MenuList extends React.Component {
               <ListItemText primary={i18n.t('Latest jobs')} />
             </ListItem>
           </Link>
-          <ListItem button>
-            <ListItemIcon>
-              <BusinessCenterIcon />
-            </ListItemIcon>
-            <ListItemText primary={i18n.t('Companies')} />
-          </ListItem>
+          <Link href="/companies">
+            <ListItem button>
+              <ListItemIcon>
+                <BusinessCenterIcon />
+              </ListItemIcon>
+              <ListItemText primary={i18n.t('Companies')} />
+            </ListItem>
+          </Link>
         </List>
         <Divider />
         <List component="nav">
@@ -105,12 +107,14 @@ class MenuList extends React.Component {
             </ListItemIcon>
             <ListItemText primary={i18n.t('Messages')} />
           </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary={i18n.t('Company details')} />
-          </ListItem>
+          <Link href="/me/companies">
+            <ListItem button>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary={i18n.t('Company details')} />
+            </ListItem>
+          </Link>
           <ListItem button>
             <ListItemIcon>
               <InboxIcon />
