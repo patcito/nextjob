@@ -353,7 +353,7 @@ $hasMonthlySalary: Boolean,
         uri: 'http://localhost:8080/v1alpha1/graphql',
         json: true,
         query: `
-		mutation insert_shit_lol($id: Int, $skills: [SkillJob_insert_input!]!,
+		mutation insert_extras($id: Int, $skills: [SkillJob_insert_input!]!,
 		$industries: [JobIndustry_insert_input!]!,
 		  $jobFunctions: [JobFunctionJob_insert_input!]!
 		){

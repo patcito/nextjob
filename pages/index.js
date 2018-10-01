@@ -71,9 +71,23 @@ class Index extends React.Component {
                   description
                   ownerId
                   yearFounded
+                  employeeCount
+                  devCount
+                  quote1
+                  quote2
+                  employee1
+                  employee2
+                  media1
+                  media2
+                  media3
                   Industry
                   name
                   url
+                  twitter
+                  Skills{
+                  Skill
+                  }
+                  Perks{Perk}
               }
 			Job(where: {_and: [{companyId: {_eq: $companyId}, isPublished: {_eq: true}}]}){
 				    id

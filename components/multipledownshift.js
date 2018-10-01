@@ -81,16 +81,18 @@ class MultipleIntegrationDownshift extends React.Component {
     selectedItem: [],
   };
 
-  handleKeyDown = event => {
+  handleKeyDown = (event, handleParentChange) => {
     const {inputValue, selectedItem} = this.state;
     if (
       selectedItem.length &&
       !inputValue.length &&
       keycode(event) === 'backspace'
     ) {
+      let newSelectedItems = selectedItem.slice(0, selectedItem.length - 1);
       this.setState({
-        selectedItem: selectedItem.slice(0, selectedItem.length - 1),
+        selectedItem: newSelectedItems,
       });
+      handleParentChange(newSelectedItems);
     }
   };
 
@@ -100,7 +102,7 @@ class MultipleIntegrationDownshift extends React.Component {
 
   handleChange = (item, handleParentChange, maxSelection) => {
     let {selectedItem} = this.state;
-
+    console.log('multiple', selectedItem);
     if (selectedItem.indexOf(item) === -1) {
       selectedItem = [...selectedItem, item];
     }
@@ -171,7 +173,7 @@ class MultipleIntegrationDownshift extends React.Component {
                 )),
                 onChange: this.handleInputChange,
                 //onChange={this.handleChange('single', handleParentChange)}
-                onKeyDown: this.handleKeyDown,
+                onKeyDown: e => this.handleKeyDown(e, handleParentChange),
                 placeholder: placeholder,
               }),
               label: label,

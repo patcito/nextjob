@@ -31,7 +31,7 @@
     "material-ui-search-bar": "^1.0.0-beta.9",
     "material-ui-slider": "^0.1.0",
     "mui-places-autocomplete": "^2.0.0",
-    "next": "^7.0.0",
+    "next": "^7.0.1",
     "node-fetch": "^2.2.0",
     "rc-slider": "^8.6.3",
     "rc-tooltip": "^3.7.3",
@@ -42,7 +42,9 @@
     "react-i18next": "^7.11.0",
     "react-material-tags": "^1.0.1",
     "react-parallax": "^1.8.0",
+    "react-player": "^1.6.6",
     "react-select": "^2.0.0",
+    "react-timeout": "^1.1.2",
     "request": "^2.88.0",
     "sharp": "^0.20.8",
     "simple-oauth2": "^2.2.1"

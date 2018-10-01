@@ -478,6 +478,129 @@ app.prepare().then(() => {
     );
   });
 
+  server.post('/uploadEmployee1Avatar', function(req, res) {
+    if (!req.files) return res.status(400).json('No files were uploaded.');
+    let sampleFile = req.files.file;
+    sharp(sampleFile.data).toFile(
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-employee1.webp',
+      (err, info) => {
+        if (err) {
+          res.status(500).json(err);
+        }
+        sharp(sampleFile.data).toFile(
+          'uploads/' +
+            req.get('companyId') +
+            '-' +
+            req.userId +
+            '-employee1.png',
+          (err, info) => {
+            if (err) {
+              res.status(500).json(err);
+            }
+            console.log(err, info);
+            res.status(200).json('ok');
+          },
+        );
+      },
+    );
+  });
+
+  server.post('/uploadEmployee2Avatar', function(req, res) {
+    if (!req.files) return res.status(400).json('No files were uploaded.');
+    let sampleFile = req.files.file;
+    sharp(sampleFile.data).toFile(
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-employee2.webp',
+      (err, info) => {
+        if (err) {
+          res.status(500).json(err);
+        }
+        sharp(sampleFile.data).toFile(
+          'uploads/' +
+            req.get('companyId') +
+            '-' +
+            req.userId +
+            '-employee2.png',
+          (err, info) => {
+            if (err) {
+              res.status(500).json(err);
+            }
+            console.log(err, info);
+            res.status(200).json('ok');
+          },
+        );
+      },
+    );
+  });
+
+  server.post('/uploadMedia1Image', function(req, res) {
+    if (!req.files) return res.status(400).json('No files were uploaded.');
+    let sampleFile = req.files.file;
+    sharp(sampleFile.data).toFile(
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-media1.webp',
+      (err, info) => {
+        if (err) {
+          res.status(500).json(err);
+        }
+        sharp(sampleFile.data).toFile(
+          'uploads/' + req.get('companyId') + '-' + req.userId + '-media1.png',
+          (err, info) => {
+            if (err) {
+              res.status(500).json(err);
+            }
+            console.log(err, info);
+            res.status(200).json('ok');
+          },
+        );
+      },
+    );
+  });
+
+  server.post('/uploadMedia2Image', function(req, res) {
+    if (!req.files) return res.status(400).json('No files were uploaded.');
+    let sampleFile = req.files.file;
+    sharp(sampleFile.data).toFile(
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-media2.webp',
+      (err, info) => {
+        if (err) {
+          res.status(500).json(err);
+        }
+        sharp(sampleFile.data).toFile(
+          'uploads/' + req.get('companyId') + '-' + req.userId + '-media2.png',
+          (err, info) => {
+            if (err) {
+              res.status(500).json(err);
+            }
+            console.log(err, info);
+            res.status(200).json('ok');
+          },
+        );
+      },
+    );
+  });
+
+  server.post('/uploadMedia3Image', function(req, res) {
+    if (!req.files) return res.status(400).json('No files were uploaded.');
+    let sampleFile = req.files.file;
+    sharp(sampleFile.data).toFile(
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-media3.webp',
+      (err, info) => {
+        if (err) {
+          res.status(500).json(err);
+        }
+        sharp(sampleFile.data).toFile(
+          'uploads/' + req.get('companyId') + '-' + req.userId + '-media3.png',
+          (err, info) => {
+            if (err) {
+              res.status(500).json(err);
+            }
+            console.log(err, info);
+            res.status(200).json('ok');
+          },
+        );
+      },
+    );
+  });
+
   server.get('*', (req, res) => {
     return handle(req, res);
   });
