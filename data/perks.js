@@ -1,0 +1,21 @@
+const PERKS = [
+  {title: 'Flexible hours'},
+  {title: 'Free drinks'},
+  {title: 'Free food'},
+  {title: 'Healthcare'},
+  {title: 'Parking'},
+  {title: 'Stocks'},
+  {title: 'Transportation'},
+  {title: 'Afterwork'},
+  {title: 'Daycare'},
+  {title: 'Competitive salary'},
+  {title: 'Corporate laptop'},
+  {title: 'Reimbursement for Conferences'},
+  {title: 'Flexible vacation time'},
+  {title: 'Employee bonuses'},
+  {title: 'Gym'},
+  {title: 'Video games room'},
+  {title: 'Company outings'},
+  {title: 'Corporate swag'},
+];
+export default PERKS;

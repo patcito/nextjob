@@ -109,9 +109,7 @@ class Job extends React.Component {
           />
           <div className={classes.details}>
             <CardContent className={classes.content}>
-              <Typography variant="headline">
-                {job.id} {job.title}
-              </Typography>
+              <Typography variant="headline">{job.title}</Typography>
               <Typography variant="subheading" color="textSecondary">
                 @ {job.Company.name} is looking for a {job.JobTitle}
               </Typography>

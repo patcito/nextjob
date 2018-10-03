@@ -537,7 +537,7 @@ $hasMonthlySalary: Boolean,
     }
   };
 
-  static async getInitialProps({query}) {
+  static async getInitialProps({req, query}) {
     const translations = await getTranslation(
       lang,
       [
@@ -552,6 +552,20 @@ $hasMonthlySalary: Boolean,
       ],
       'http://localhost:4000/static/locales/',
     );
+    let userInfo = {};
+    let token = null;
+    let userId = null;
+    if (req) {
+      query.me && req.userId ? (userId = req.userId) : (userId = null);
+      token = req.token || null;
+      userInfo = {userId: userId, token: token};
+    } else {
+      token = localStorage.getItem('token');
+      localStorage.getItem('currentUser')
+        ? (userId = localStorage.getItem('currentUser').id)
+        : (userId = null);
+    }
+
     const createCompanyopts = {
       uri: 'http://localhost:8080/v1alpha1/graphql',
       json: true,
@@ -599,7 +613,7 @@ $hasMonthlySalary: Boolean,
 			}
 	}`,
       headers: {
-        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+        'x-access-token': token,
       },
     };
     const client = new grequest.GraphQLClient(createCompanyopts.uri, {

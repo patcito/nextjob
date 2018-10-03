@@ -11,7 +11,6 @@ import {I18nextProvider} from 'react-i18next';
 import startI18n from '../tools/startI18n';
 import {getTranslation} from '../tools/translationHelpers';
 import IndexJobs from '../components/indexjobs';
-import EditCompany from '../components/editcompany';
 import IndexCompanies from '../components/indexcompanies';
 const grequest = require('graphql-request');
 // get language from query parameter or url path
@@ -59,7 +58,7 @@ class Index extends React.Component {
     }
     const translations = await getTranslation(
       lang,
-      ['common', 'namespace1', 'industries'],
+      ['common', 'namespace1'],
       'http://localhost:4000/static/locales/',
     );
     const getJobsopts = {
@@ -159,13 +158,7 @@ class Index extends React.Component {
         />
       );
     } else if (query.action === 'editCompany') {
-      return (
-        <EditCompany
-          i18n={this.i18n}
-          companies={this.props.jobsAndCompanies.Company}
-          companyId={query.companyId}
-        />
-      );
+      return null;
     } else {
       return (
         <IndexJobs i18n={this.i18n} jobs={this.props.jobsAndCompanies.Job} />

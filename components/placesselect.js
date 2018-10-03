@@ -110,6 +110,7 @@ class PlacesSelect extends React.Component {
           currentAddressDescription: suggestion.description,
           coordinates: coordinates,
         });
+        console.log('select', this.that);
         return fullAddress;
       })
       .catch(err => {

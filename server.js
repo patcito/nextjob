@@ -449,7 +449,7 @@ app.prepare().then(() => {
   });
 
   server.get('/companies/:companyId/edit', (req, res) => {
-    return app.render(req, res, '/', {
+    return app.render(req, res, '/editcompany', {
       companyId: req.params.companyId,
       action: 'editCompany',
     });
@@ -482,7 +482,11 @@ app.prepare().then(() => {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
     sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-employee1.webp',
+      'uploads/' +
+        req.get('companyId') +
+        '-' +
+        req.userId +
+        '-employee1avatar.webp',
       (err, info) => {
         if (err) {
           res.status(500).json(err);
@@ -492,7 +496,7 @@ app.prepare().then(() => {
             req.get('companyId') +
             '-' +
             req.userId +
-            '-employee1.png',
+            '-employee1avatar.png',
           (err, info) => {
             if (err) {
               res.status(500).json(err);
@@ -509,7 +513,11 @@ app.prepare().then(() => {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
     sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-employee2.webp',
+      'uploads/' +
+        req.get('companyId') +
+        '-' +
+        req.userId +
+        '-employee2avatar.webp',
       (err, info) => {
         if (err) {
           res.status(500).json(err);
@@ -519,7 +527,7 @@ app.prepare().then(() => {
             req.get('companyId') +
             '-' +
             req.userId +
-            '-employee2.png',
+            '-employee2avatar.png',
           (err, info) => {
             if (err) {
               res.status(500).json(err);
@@ -536,13 +544,13 @@ app.prepare().then(() => {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
     sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-media1.webp',
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-1media.webp',
       (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
         sharp(sampleFile.data).toFile(
-          'uploads/' + req.get('companyId') + '-' + req.userId + '-media1.png',
+          'uploads/' + req.get('companyId') + '-' + req.userId + '-1media.png',
           (err, info) => {
             if (err) {
               res.status(500).json(err);
@@ -559,13 +567,13 @@ app.prepare().then(() => {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
     sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-media2.webp',
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-2media.webp',
       (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
         sharp(sampleFile.data).toFile(
-          'uploads/' + req.get('companyId') + '-' + req.userId + '-media2.png',
+          'uploads/' + req.get('companyId') + '-' + req.userId + '-2media.png',
           (err, info) => {
             if (err) {
               res.status(500).json(err);
@@ -582,13 +590,13 @@ app.prepare().then(() => {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
     sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-media3.webp',
+      'uploads/' + req.get('companyId') + '-' + req.userId + '-3media.webp',
       (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
         sharp(sampleFile.data).toFile(
-          'uploads/' + req.get('companyId') + '-' + req.userId + '-media3.png',
+          'uploads/' + req.get('companyId') + '-' + req.userId + '-3media.png',
           (err, info) => {
             if (err) {
               res.status(500).json(err);
@@ -599,6 +607,18 @@ app.prepare().then(() => {
         );
       },
     );
+  });
+
+  server.get('/*logo.png', (req, res) => {
+    res.sendFile(staticPath + '/defaultlogo.png');
+  });
+
+  server.get('/*avatar.png', (req, res) => {
+    res.sendFile(staticPath + '/defaultavatar.png');
+  });
+
+  server.get('/*media.png', (req, res) => {
+    res.sendFile(staticPath + '/defaultmedia.png');
   });
 
   server.get('*', (req, res) => {

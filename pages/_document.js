@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Document, {Head, Main, NextScript} from 'next/document';
+import Document, {Main, NextScript} from 'next/document';
+import Head from 'next/head';
+
 import flush from 'styled-jsx/server';
 
 class MyDocument extends Document {
@@ -10,7 +12,6 @@ class MyDocument extends Document {
     return (
       <html lang="en" dir="ltr">
         <Head>
-          <title>My page</title>
           <meta charSet="utf-8" />
           {/* Use minimum-scale=1 to enable GPU rasterization */}
           <meta
@@ -25,12 +26,8 @@ class MyDocument extends Document {
             name="theme-color"
             content={pageContext.theme.palette.primary.main}
           />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
-          />
         </Head>
-        <body>
+        <body style={{'overflow-x': 'hidden'}}>
           <Main />
           <NextScript />
         </body>
