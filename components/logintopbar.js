@@ -65,7 +65,7 @@ class LoginAppBarTop extends React.Component {
   };
 
   handleLogoutClick = () => {
-    this.setState({token: false, currentUser: null});
+    this.setState({token: false, currentUser: null, loggedOut: true});
     localStorage.clear();
     document.cookie.split(';').forEach(function(c) {
       document.cookie = c
@@ -153,7 +153,10 @@ class LoginAppBarTop extends React.Component {
   }
 
   render(props) {
-    const isLoggedIn = this.state.token;
+    const isLoggedIn = this.props.userInfo
+      ? (this.props.userInfo.github || this.props.userInfo.linkedin) && !this.state.loggedOut
+      : false;
+	  console.log(this.props.userInfo)
     const isRecruiter =
       this.state.currentUser && this.state.currentUser.recruiter;
     const {classes} = this.props;
@@ -177,7 +180,7 @@ class LoginAppBarTop extends React.Component {
           </Typography>
         </Link>
         {!isLoggedIn ||
-        (this.state.currentUser && this.state.currentUser.linkedinEmail) ? (
+        (this.props.userInfo.github) ? (
           <Link href="/newjob">
             <Button
               variant="contained"
@@ -196,7 +199,7 @@ class LoginAppBarTop extends React.Component {
           }}>
           {i18n.t('Latest jobs')}
         </Button>
-        {this.state.token ? (
+        {isLoggedIn ? (
           <Button color="inherit" onClick={this.handleLogoutClick}>
             Logout
           </Button>

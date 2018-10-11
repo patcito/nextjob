@@ -38,22 +38,11 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormLabel from '@material-ui/core/FormLabel';
 
-import INDUSTRIES from '../data/industries';
-import JOBSTITLES from '../data/jobstitles';
-import JOBFUNCTIONS from '../data/jobfunctions';
-import EMPLOYEMENTTYPES from '../data/employementtypes';
-import SENIORITYLEVELS from '../data/senioritylevels';
-import SKILLS from '../data/skills';
-
 import SingleSelect from '../components/select';
 import DownshiftSelect from '../components/downshift';
 import MultipleDownshiftSelect from '../components/multipledownshift';
 
-import dynamic from 'next/dynamic';
-
 import Router from 'next/router';
-
-import DynamicMaps from '../components/maps';
 
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -76,7 +65,6 @@ import Link from 'next/link';
 
 import Cookies from 'js-cookie';
 
-import Snackbar from '@material-ui/core/Snackbar';
 import CloseIcon from '@material-ui/icons/Close';
 import TextField from '@material-ui/core/TextField';
 import ReactPlayer from 'react-player';
@@ -85,10 +73,6 @@ import PERKS from '../data/perks';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import {TwitterCircle, GithubCircle} from 'mdi-material-ui';
-
-const PlacesSelect = dynamic(import('../components/placesselect'), {
-  ssr: false,
-});
 import {withRouter} from 'next/router';
 import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
@@ -203,11 +187,20 @@ class ShowCompany extends React.Component {
     let userInfo = {};
     let token = null;
     let userId = null;
+    let github = false;
+    let linkedin = false;
     const companyId = query.companyId || null;
     if (req) {
       query.me && req.userId ? (userId = req.userId) : (userId = null);
       token = req.token || null;
-      userInfo = {userId: userId, token: token};
+      github = req.github;
+      linkedin = req.linkedin;
+      userInfo = {
+        userId: userId,
+        token: token,
+        github: github,
+        linkedin: linkedin,
+      };
     } else {
       token = localStorage.getItem('token');
       localStorage.getItem('currentUser')
@@ -262,55 +255,17 @@ class ShowCompany extends React.Component {
     const client = new grequest.GraphQLClient(queryOpts.uri, {
       headers: queryOpts.headers,
     });
-    let company = await client.request(queryOpts.query, {
+    let qcompany = await client.request(queryOpts.query, {
       ownerId: userId,
       companyId: companyId,
     });
 
-    if (company.Company.length > 0) {
-      company = company.Company[0];
+    if (qcompany.Company.length > 0) {
+      qcompany = qcompany.Company[0];
     } else {
-      company = null;
+      qcompany = null;
     }
-    return {translations, company, companyId};
-  }
-  constructor(props) {
-    super(props);
-    this.i18n = startI18n(props.translations, lang);
-    this.INDUSTRIES = INDUSTRIES.map(suggestion => ({
-      value: suggestion.industry,
-      label: this.i18n.t('industries:' + suggestion.industry),
-    }));
-    this.SKILLS = SKILLS.map(suggestion => ({
-      value: suggestion.name,
-      label: suggestion.name,
-    }));
-    this.PERKS = PERKS.map(suggestion => ({
-      value: suggestion.title,
-      label: suggestion.title,
-    }));
-  }
-
-  componentDidMount(props) {
-    let user;
-    if (typeof window !== 'undefined' && window.localStorage) {
-      let token = localStorage.getItem('token');
-      localStorage.getItem('currentUser')
-        ? (user = JSON.parse(localStorage.getItem('currentUser')))
-        : (user = null);
-    }
-    const company = this.props.company;
-    company.Moderators === []
-      ? (company.Moderators = [{userEmail: user.linkedinEmail}])
-      : null;
-    /*alert(
-          JSON.stringify({
-            industry: {
-              value: company.Industry,
-              label: this.props.i18n.t('industries:' + company.Industry),
-            },
-          }),
-        );*/
+    let company = qcompany;
     if (!company.employee1) {
       company.employee1 = {
         name: '',
@@ -349,8 +304,7 @@ class ShowCompany extends React.Component {
     currentAddressDescription === 'null null null, null'
       ? (currentAddressDescription = null)
       : null;
-    this.setState({
-      currentUser: user,
+    company = {
       skills: company.Skills.map(suggestion => ({
         value: suggestion.Skill,
         label: suggestion.Skill,
@@ -370,12 +324,31 @@ class ShowCompany extends React.Component {
       }).join(', '),
       industry: {
         value: company.Industry,
-        label: this.i18n.t('industries:' + company.Industry),
+        label: company.Industry,
       },
-    });
+    };
     delete company['Skills'];
     delete company['Perks'];
     delete company['Moderators'];
+    return {translations, company, companyId, userInfo};
+  }
+  constructor(props) {
+    super(props);
+    this.i18n = startI18n(props.translations, lang);
+    this.PERKS = PERKS.map(suggestion => ({
+      value: suggestion.title,
+      label: suggestion.title,
+    }));
+  }
+
+  componentDidMount(props) {
+    let user;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      let token = localStorage.getItem('token');
+      localStorage.getItem('currentUser')
+        ? (user = JSON.parse(localStorage.getItem('currentUser')))
+        : (user = null);
+    }
   }
 
   handleBlur = (event, required) => {
@@ -775,19 +748,13 @@ insert_Moderator(objects: $moderators){
     const i18n = this.i18n;
     const {open} = this.state;
     const industries = this.INDUSTRIES;
-    const skills = this.SKILLS;
-    const perks = this.PERKS;
+    const company = this.props.company.company;
+    const skills = this.props.company.skills;
+    const perks = this.props.company.perks;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
-          {typeof google === 'undefined' ? (
-            <DynamicMaps
-              setGoogleMaps={() => {
-                this.setState({googleMaps: true});
-              }}
-            />
-          ) : null}
-          <NewJobBar i18n={this.i18n} />
+          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
               <MenuList i18n={i18n} />
@@ -798,22 +765,22 @@ insert_Moderator(objects: $moderators){
                   <CardHeader
                     avatar={
                       <Avatar
-                        aria-label={this.state.company.name}
+                        aria-label={company.name}
                         src={
                           '/' +
-                          this.state.company.id +
+                          company.id +
                           '-' +
-                          this.state.company.ownerId +
+                          company.ownerId +
                           '-' +
                           'logo.png'
                         }
                         className={classes.avatar}
                       />
                     }
-                    title={this.state.company.name}
+                    title={company.name}
                     subheader={
                       <>
-                        <span>Since {this.state.company.yearFounded}</span>
+                        <span>Since {company.yearFounded}</span>
                         <IconButton
                           disableRipple={true}
                           disableFocusRipple={true}
@@ -827,7 +794,7 @@ insert_Moderator(objects: $moderators){
                             }
                             style={{color: 'rgba(0, 0, 0, 0.54)'}}
                             target="_blank">
-                            {this.state.company.locality}
+                            {company.locality}
                           </a>
                         </IconButton>
                         <IconButton
@@ -836,9 +803,9 @@ insert_Moderator(objects: $moderators){
                           className={classes.iconButton}
                           aria-label="Delete">
                           <PeopleIcon className={classes.headerIcons} />{' '}
-                          {this.state.company.employeeCount} employees
+                          {company.employeeCount} employees
                         </IconButton>
-                        <a href={this.state.company.url} target="_blank">
+                        <a href={company.url} target="_blank">
                           <IconButton
                             disableRipple={true}
                             disableFocusRipple={true}
@@ -846,7 +813,7 @@ insert_Moderator(objects: $moderators){
                             aria-label="Delete"
                             style={{cursor: 'pointer'}}>
                             <LinkIcon className={classes.headerIcons} />{' '}
-                            {this.state.company.url
+                            {company.url
                               .replace('http://wwww.', '')
                               .replace('https://wwww.', '')
                               .replace('https://', '')
@@ -857,21 +824,18 @@ insert_Moderator(objects: $moderators){
                     }
                   />
                   <CardActionArea className={classes.cardActionArea}>
-                    {this.state.company.media1.published ? (
+                    {company.media1.published ? (
                       <>
-                        {this.state.company.media1.hasVideo ? (
-                          <ReactPlayer
-                            url={this.state.company.media1.url}
-                            width="100%"
-                          />
+                        {company.media1.hasVideo ? (
+                          <ReactPlayer url={company.media1.url} width="100%" />
                         ) : (
                           <CardMedia
                             className={classes.media}
                             image={
                               '/' +
-                              this.state.company.id +
+                              company.id +
                               '-' +
-                              this.state.company.ownerId +
+                              company.ownerId +
                               '-' +
                               '1media.png?u=' +
                               this.state.media1Uploaded
@@ -883,18 +847,14 @@ insert_Moderator(objects: $moderators){
                     ) : null}
                     <CardContent>
                       <Typography component="p">
-                        {this.state.industry.label +
-                          this.state.company.description}
+                        {company.description}
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Link href={'/jobs/companies/' + this.state.company.id}>
+                      <Link href={'/jobs/companies/' + company.id}>
                         <Button>Jobs</Button>
                       </Link>
-                      <a
-                        href={
-                          'https://twitter.com/' + this.state.company.twitter
-                        }>
+                      <a href={'https://twitter.com/' + company.twitter}>
                         <Button>Twitter</Button>
                       </a>
                     </CardActions>
@@ -916,7 +876,7 @@ insert_Moderator(objects: $moderators){
                             component="h1"
                             variant="h1"
                             style={{fontSize: '100px'}}>
-                            {this.state.company.devCount}
+                            {company.devCount}
                           </Typography>
                           <LaptopIcon style={{fontSize: '200px'}} />
                         </Grid>
@@ -931,8 +891,9 @@ insert_Moderator(objects: $moderators){
                             style={{marginBottom: '20px'}}>
                             Techs we use
                           </Typography>
-                          {this.state.skills.map(skill => (
+                          {skills.map(skill => (
                             <Typography
+                              key={skill.value}
                               component="h1"
                               variant="h1"
                               style={{fontSize: '40', textAlign: 'left'}}>
@@ -944,22 +905,19 @@ insert_Moderator(objects: $moderators){
                     </CardContent>
                   </CardActionArea>
                 </Card>
-                {this.state.company.media2.published ? (
+                {company.media2.published ? (
                   <Card className={classes.card}>
                     <CardActionArea className={classes.cardActionArea}>
-                      {this.state.company.media2.hasVideo ? (
-                        <ReactPlayer
-                          url={this.state.company.media2.url}
-                          width="100%"
-                        />
+                      {company.media2.hasVideo ? (
+                        <ReactPlayer url={company.media2.url} width="100%" />
                       ) : (
                         <CardMedia
                           className={classes.media}
                           image={
                             '/' +
-                            this.state.company.id +
+                            company.id +
                             '-' +
-                            this.state.company.ownerId +
+                            company.ownerId +
                             '-' +
                             '2media.png?u=' +
                             this.state.media1Uploaded
@@ -985,16 +943,17 @@ insert_Moderator(objects: $moderators){
                             style={{marginBottom: '20px'}}>
                             Perks we provide
                           </Typography>
-                          {(this.state.perks || []).map(perk => (
+                          {(perks || []).map(perk => (
                             <Typography
                               component="h1"
+                              key={perk.label}
                               variant="h1"
                               style={{fontSize: '40'}}>
                               ✓ {perk.label}
                             </Typography>
                           ))}
                         </Grid>
-                        {this.state.company.employee1.published ? (
+                        {company.employee1.published ? (
                           <Grid item xs={12} md={6}>
                             <CardHeader
                               avatar={
@@ -1003,9 +962,9 @@ insert_Moderator(objects: $moderators){
                                   className={classes.avatar}
                                   src={
                                     '/' +
-                                    this.state.company.id +
+                                    company.id +
                                     '-' +
-                                    this.state.company.ownerId +
+                                    company.ownerId +
                                     '-' +
                                     'employee1avatar.png?u=' +
                                     this.state.employee1Uploaded
@@ -1014,12 +973,12 @@ insert_Moderator(objects: $moderators){
                               }
                               title={
                                 <>
-                                  {this.state.company.employee1.name}
+                                  {company.employee1.name}
                                   <a
                                     style={{color: 'black'}}
                                     href={
                                       'https://twitter.com/' +
-                                      this.state.company.employee1.twitter
+                                      company.employee1.twitter
                                     }>
                                     <TwitterCircle />
                                   </a>
@@ -1027,18 +986,16 @@ insert_Moderator(objects: $moderators){
                                     style={{color: 'black'}}
                                     href={
                                       'https://github.com/' +
-                                      this.state.company.employee1.github
+                                      company.employee1.github
                                     }>
                                     <GithubCircle />
                                   </a>
                                 </>
                               }
-                              subheader={
-                                <>{this.state.company.employee1.title}</>
-                              }
+                              subheader={<>{company.employee1.title}</>}
                             />
                             <Typography component="p">
-                              {this.state.company.employee1.bio}
+                              {company.employee1.bio}
                             </Typography>
                           </Grid>
                         ) : null}
@@ -1047,22 +1004,19 @@ insert_Moderator(objects: $moderators){
                   </CardActionArea>
                 </Card>
 
-                {this.state.company.media3.published ? (
+                {company.media3.published ? (
                   <Card className={classes.card}>
                     <CardActionArea className={classes.cardActionArea}>
-                      {this.state.company.media3.hasVideo ? (
-                        <ReactPlayer
-                          url={this.state.company.media3.url}
-                          width="100%"
-                        />
+                      {company.media3.hasVideo ? (
+                        <ReactPlayer url={company.media3.url} width="100%" />
                       ) : (
                         <CardMedia
                           className={classes.media}
                           image={
                             '/' +
-                            this.state.company.id +
+                            company.id +
                             '-' +
-                            this.state.company.ownerId +
+                            company.ownerId +
                             '-' +
                             '3media.png?u=' +
                             this.state.media1Uploaded
@@ -1073,7 +1027,7 @@ insert_Moderator(objects: $moderators){
                     </CardActionArea>
                   </Card>
                 ) : null}
-                {this.state.company.employee2.published ? (
+                {company.employee2.published ? (
                   <Card className={classes.card}>
                     <CardActionArea className={classes.cardActionArea}>
                       <CardContent>
@@ -1086,9 +1040,9 @@ insert_Moderator(objects: $moderators){
                                   className={classes.avatar}
                                   src={
                                     '/' +
-                                    this.state.company.id +
+                                    company.id +
                                     '-' +
-                                    this.state.company.ownerId +
+                                    company.ownerId +
                                     '-' +
                                     'employee2avatar.png?u=' +
                                     this.state.employee1Uploaded
@@ -1097,12 +1051,12 @@ insert_Moderator(objects: $moderators){
                               }
                               title={
                                 <>
-                                  {this.state.company.employee2.name}
+                                  {company.employee2.name}
                                   <a
                                     style={{color: 'black'}}
                                     href={
                                       'https://twitter.com/' +
-                                      this.state.company.employee2.twitter
+                                      company.employee2.twitter
                                     }>
                                     <TwitterCircle />
                                   </a>
@@ -1110,18 +1064,16 @@ insert_Moderator(objects: $moderators){
                                     style={{color: 'black'}}
                                     href={
                                       'https://github.com/' +
-                                      this.state.company.employee2.github
+                                      company.employee2.github
                                     }>
                                     <GithubCircle />
                                   </a>
                                 </>
                               }
-                              subheader={
-                                <>{this.state.company.employee2.title}</>
-                              }
+                              subheader={<>{company.employee2.title}</>}
                             />
                             <Typography component="p">
-                              {this.state.company.employee2.bio}
+                              {company.employee2.bio}
                             </Typography>
                           </Grid>
                         </Grid>
@@ -1129,47 +1081,6 @@ insert_Moderator(objects: $moderators){
                     </CardActionArea>
                   </Card>
                 ) : null}
-                <Snackbar
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                  }}
-                  open={this.state.openNotification}
-                  autoHideDuration={6000}
-                  onClose={() => {
-                    this.setState({openNotification: false});
-                  }}
-                  ContentProps={{
-                    'aria-describedby': 'message-id',
-                  }}
-                  message={
-                    <span id="message-id">
-                      {this.i18n.t('Company updated')}
-                    </span>
-                  }
-                  action={[
-                    /*  TODO implement undo save company
-                <Button
-                  key="undo"
-                  color="secondary"
-                  size="small"
-                  onClick={() => {
-                    this.setState({openNotification: false});
-                  }}>
-                  UNDO
-                </Button>,*/
-                    <IconButton
-                      key="close"
-                      aria-label="Close"
-                      color="inherit"
-                      className={styles.close}
-                      onClick={() => {
-                        this.setState({openNotification: false});
-                      }}>
-                      <CloseIcon />
-                    </IconButton>,
-                  ]}
-                />
               </div>
             </Grid>
           </Grid>

@@ -44,6 +44,8 @@ app.prepare().then(() => {
       } else {
         req.userId = decoded.userId;
         req.token = token;
+        req.github = decoded.github;
+        req.linkedin = decoded.linkedin;
         next();
         return;
       }
@@ -125,7 +127,12 @@ app.prepare().then(() => {
                 if (currentUser && currentUser.id) {
                   currentUser.recruiter = true;
                   var token = jwt.sign(
-                    {token: otoken, userId: currentUser.id},
+                    {
+                      token: otoken,
+                      userId: currentUser.id,
+                      github: true,
+                      linkedin: false,
+                    },
                     process.env.JWT_SECRET,
                     {
                       expiresIn: '200 days', // expires in 24 hours
@@ -186,7 +193,12 @@ app.prepare().then(() => {
                 };
                 client.request(uopts.query, variables).then(gdata => {
                   var token = jwt.sign(
-                    {token: otoken, userId: gdata.insert_User.returning.id},
+                    {
+                      token: otoken,
+                      userId: gdata.insert_User.returning.id,
+                      github: true,
+                      linkedin: false,
+                    },
                     process.env.JWT_SECRET,
                     {
                       expiresIn: 864000, // expires in 24 hours
@@ -283,7 +295,12 @@ app.prepare().then(() => {
                   const currentUser = ugdata.User[0];
                   if (currentUser && currentUser.id) {
                     const token = jwt.sign(
-                      {token: otoken, userId: currentUser.id},
+                      {
+                        token: otoken,
+                        userId: currentUser.id,
+                        github: false,
+                        linkedin: true,
+                      },
                       process.env.JWT_SECRET,
                       {
                         expiresIn: 86400, // expires in 24 hours
@@ -351,7 +368,12 @@ app.prepare().then(() => {
                     const currentUser = gdata.insert_User.returning[0];
                     currentUser.recruiter = true;
                     const token = jwt.sign(
-                      {token: otoken, userId: currentUser.id},
+                      {
+                        token: otoken,
+                        userId: currentUser.id,
+                        github: false,
+                        linkedin: true,
+                      },
                       process.env.JWT_SECRET,
                       {
                         expiresIn: 86400, // expires in 24 hours

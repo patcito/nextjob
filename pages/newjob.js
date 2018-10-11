@@ -555,10 +555,21 @@ $hasMonthlySalary: Boolean,
     let userInfo = {};
     let token = null;
     let userId = null;
+    let github = false;
+    let linkedin = false;
+
     if (req) {
       query.me && req.userId ? (userId = req.userId) : (userId = null);
       token = req.token || null;
-      userInfo = {userId: userId, token: token};
+      github = req.github;
+      linkedin = req.linkedin;
+
+      userInfo = {
+        userId: userId,
+        token: token,
+        github: github,
+        linkedin: linkedin,
+      };
     } else {
       token = localStorage.getItem('token');
       localStorage.getItem('currentUser')
@@ -628,10 +639,10 @@ $hasMonthlySalary: Boolean,
       } else {
         job = null;
       }
-      return {translations, job};
+      return {translations, job, userInfo};
     } else {
       const job = null;
-      return {translations, job};
+      return {translations, job, userInfo};
     }
   }
   constructor(props) {
@@ -1576,7 +1587,7 @@ $hasMonthlySalary: Boolean,
               }}
             />
           ) : null}
-          <NewJobBar i18n={this.i18n} />
+          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24} alignItems="center" justify="center">
             <Grid item xs={12} md={6}>
               <div>

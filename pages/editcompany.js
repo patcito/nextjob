@@ -184,11 +184,22 @@ class EditCompany extends React.Component {
     let userInfo = {};
     let token = null;
     let userId = null;
+    let github = false;
+    let linkedin = false;
+
     const companyId = query.companyId || null;
     if (req) {
       query.me && req.userId ? (userId = req.userId) : (userId = null);
       token = req.token || null;
-      userInfo = {userId: userId, token: token};
+      github = req.github;
+      linkedin = req.linkedin;
+
+      userInfo = {
+        userId: userId,
+        token: token,
+        github: github,
+        linkedin: linkedin,
+      };
     } else {
       token = localStorage.getItem('token');
       localStorage.getItem('currentUser')
@@ -253,7 +264,7 @@ class EditCompany extends React.Component {
     } else {
       company = null;
     }
-    return {translations, company, companyId};
+    return {translations, company, companyId, userInfo};
   }
   constructor(props) {
     super(props);
@@ -853,7 +864,7 @@ insert_Moderator(objects: $moderators){
               }}
             />
           ) : null}
-          <NewJobBar i18n={this.i18n} />
+          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
               <MenuList i18n={i18n} />

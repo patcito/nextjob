@@ -77,7 +77,7 @@ class SlimAppBarTop extends React.Component {
 
     return (
       <AppBar position="static">
-        <LoginAppBarTop i18n={i18n} />
+        <LoginAppBarTop i18n={i18n} userInfo={this.props.userInfo}/>
       </AppBar>
     );
   }

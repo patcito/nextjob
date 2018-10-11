@@ -45,11 +45,21 @@ class Index extends React.Component {
     let userInfo = {};
     let token = null;
     let userId = null;
+    let github = false;
+    let linkedin = false;
+
     const companyId = query.companyId || null;
     if (req) {
       query.me && req.userId ? (userId = req.userId) : (userId = null);
       token = req.token || null;
-      userInfo = {userId: userId, token: token};
+      github = req.github;
+      linkedin = req.linkedin;
+      userInfo = {
+        userId: userId,
+        token: token,
+        github: github,
+        linkedin: linkedin,
+      };
     } else {
       token = localStorage.getItem('token');
       localStorage.getItem('currentUser')
@@ -144,7 +154,7 @@ class Index extends React.Component {
       ownerId: userId,
       companyId: companyId,
     });
-    return {translations, jobsAndCompanies, query};
+    return {translations, jobsAndCompanies, query, userInfo};
   }
 
   content = () => {
@@ -170,7 +180,7 @@ class Index extends React.Component {
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
-          <AppBarTop i18n={this.i18n} />
+          <AppBarTop i18n={this.i18n} userInfo={this.props.userInfo}/>
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
               <MenuList i18n={i18n} />
