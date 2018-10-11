@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Document, {Main, NextScript} from 'next/document';
-import Head from 'next/head';
-
+import Document, {Head, Main, NextScript} from 'next/document';
 import flush from 'styled-jsx/server';
 
 class MyDocument extends Document {
@@ -26,8 +24,12 @@ class MyDocument extends Document {
             name="theme-color"
             content={pageContext.theme.palette.primary.main}
           />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
+          />
         </Head>
-        <body style={{'overflow-x': 'hidden'}}>
+        <body style={{overflowX: 'hidden'}}>
           <Main />
           <NextScript />
         </body>

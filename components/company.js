@@ -84,19 +84,24 @@ class Company extends React.Component {
 
     return (
       <Card className={classes.card}>
-        <CardActionArea className={classes.cardActionArea}>
-          <CardMedia
-            className={classes.media}
-            image={'/' + company.id + '-' + company.ownerId + '-' + 'logo.png'}
-            title="Contemplative Reptile"
-          />
-          <CardContent className={classes.card}>
-            <Typography gutterBottom variant="headline" component="h2">
-              {company.name}
-            </Typography>
-            <Typography component="p">{company.description}</Typography>
-          </CardContent>
-        </CardActionArea>
+        <Link href={'/companies/' + company.id}>
+          <CardActionArea className={classes.cardActionArea}>
+            <CardMedia
+              className={classes.media}
+              image={
+                '/' + company.id + '-' + company.ownerId + '-' + 'logo.png'
+              }
+              title="Contemplative Reptile"
+            />
+
+            <CardContent className={classes.card}>
+              <Typography gutterBottom variant="headline" component="h2">
+                {company.name}
+              </Typography>
+              <Typography component="p">{company.description}</Typography>
+            </CardContent>
+          </CardActionArea>
+        </Link>
         <CardActions>
           <Link href={'/jobs/companies/' + company.id}>
             <Button size="small" color="primary">

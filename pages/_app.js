@@ -7,16 +7,6 @@ import getPageContext from '../src/getPageContext';
 import Head from 'next/head';
 
 class MyApp extends App {
-  static async getInitialProps({Component, router, ctx}) {
-    let pageProps = {};
-
-    if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx);
-    }
-
-    return {pageProps};
-  }
-
   constructor(props) {
     super(props);
     this.pageContext = getPageContext();
@@ -36,10 +26,10 @@ class MyApp extends App {
     const {Component, pageProps} = this.props;
     return (
       <Container>
-        {/* Wrap every page in Jss and Theme providers */}
         <Head>
           <title>NextJob</title>
         </Head>
+        {/* Wrap every page in Jss and Theme providers */}
         <JssProvider
           registry={this.pageContext.sheetsRegistry}
           generateClassName={this.pageContext.generateClassName}>

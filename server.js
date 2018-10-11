@@ -443,8 +443,9 @@ app.prepare().then(() => {
   });
 
   server.get('/companies/:companyId', (req, res) => {
-    return app.render(req, res, '/showcompanies', {
+    return app.render(req, res, '/showcompany', {
       companyId: req.params.companyId,
+      action: 'showCompany',
     });
   });
 

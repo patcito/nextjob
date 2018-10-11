@@ -59,6 +59,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
+import CardHeader from '@material-ui/core/CardHeader';
 
 import Chip from '@material-ui/core/Chip';
 import DoneIcon from '@material-ui/icons/Face';
@@ -129,19 +130,34 @@ class EditCompany extends React.Component {
   state = {
     open: false,
     industry: {},
+    moderators: [],
     company: {
       yearFounded: 2006,
       url: '',
       name: '',
-      employeeCount: 0,
-      devCount: 0,
+      employeeCount: 5,
+      devCount: 5,
       id: 0,
       description: '',
-      employee1: {name: '', title: '', bio: '', twitter: '', github: ''},
-      employee2: {name: '', title: '', bio: '', twitter: '', github: ''},
-      media1: {url: ''},
-      media2: {url: ''},
-      media3: {url: ''},
+      employee1: {
+        name: '',
+        title: '',
+        bio: '',
+        twitter: '',
+        github: '',
+        published: false,
+      },
+      employee2: {
+        name: '',
+        title: '',
+        bio: '',
+        twitter: '',
+        github: '',
+        published: false,
+      },
+      media1: {url: '', published: false},
+      media2: {url: '', published: false},
+      media3: {url: '', published: false},
     },
   };
   handleBlurIndustry = (value, required) => {
@@ -176,7 +192,7 @@ class EditCompany extends React.Component {
     } else {
       token = localStorage.getItem('token');
       localStorage.getItem('currentUser')
-        ? (userId = localStorage.getItem('currentUser').id)
+        ? (userId = JSON.parse(localStorage.getItem('currentUser')).id)
         : (userId = null);
     }
 
@@ -214,6 +230,9 @@ class EditCompany extends React.Component {
                   administrative_area_level_1
                   postal_code
                   location
+                  Moderators{
+                    userEmail
+                  }
               }
 	}
           `,
@@ -234,7 +253,6 @@ class EditCompany extends React.Component {
     } else {
       company = null;
     }
-    console.log('got company initial props', company);
     return {translations, company, companyId};
   }
   constructor(props) {
@@ -255,9 +273,17 @@ class EditCompany extends React.Component {
   }
 
   componentDidMount(props) {
-    console.log('company', this.props.companies, this.props.companyId);
-    console.log(company, this.props.companyId);
+    let user;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      let token = localStorage.getItem('token');
+      localStorage.getItem('currentUser')
+        ? (user = JSON.parse(localStorage.getItem('currentUser')))
+        : (user = null);
+    }
     const company = this.props.company;
+    company.Moderators === []
+      ? (company.Moderators = [{userEmail: user.linkedinEmail}])
+      : null;
     /*alert(
           JSON.stringify({
             industry: {
@@ -293,9 +319,19 @@ class EditCompany extends React.Component {
     if (!company.media3) {
       company.media3 = {url: ''};
     }
-    console.log('got company', company);
-    console.log('got skills', company.Skills);
+    let currentAddressDescription =
+      company.street_number +
+      ' ' +
+      company.route +
+      ' ' +
+      company.locality +
+      ', ' +
+      company.country;
+    currentAddressDescription === 'null null null, null'
+      ? (currentAddressDescription = null)
+      : null;
     this.setState({
+      currentUser: user,
       skills: company.Skills.map(suggestion => ({
         value: suggestion.Skill,
         label: suggestion.Skill,
@@ -305,18 +341,14 @@ class EditCompany extends React.Component {
         label: suggestion.Perk,
       })),
       coordinates: {
-        lat: company.location.coordinates[0],
-        lng: company.location.coordinates[1],
+        lat: company.location ? company.location.coordinates[0] : 0,
+        lng: company.location ? company.location.coordinates[1] : 0,
       },
-      currentAddressDescription:
-        company.street_number +
-        ' ' +
-        company.route +
-        ' ' +
-        company.locality +
-        ', ' +
-        company.country,
+      currentAddressDescription: currentAddressDescription,
       company: company,
+      moderators: company.Moderators.map(mod => {
+        return mod.userEmail;
+      }).join(', '),
       industry: {
         value: company.Industry,
         label: this.i18n.t('industries:' + company.Industry),
@@ -324,6 +356,7 @@ class EditCompany extends React.Component {
     });
     delete company['Skills'];
     delete company['Perks'];
+    delete company['Moderators'];
   }
 
   handleBlur = (event, required) => {
@@ -344,7 +377,6 @@ class EditCompany extends React.Component {
   };
 
   handleChangeIndustry = value => {
-    console.log(JSON.stringify(value));
     if (value) {
       this.setState({industry: value, industryvalid: true});
     } else {
@@ -352,15 +384,92 @@ class EditCompany extends React.Component {
     }
   };
 
-  handleChange = event => {
-    console.log(this.state);
-    console.log(event.target.name, event.target.value, {
-      ...this.state.company,
-      ...{
-        [event.target.name]: event.target.value,
+  handleCheckboxChangeEmployee1 = event => {
+    const employee1 = {
+      employee1: {
+        ...this.state.company.employee1,
+        ...{
+          published: !this.state.company.employee1.published,
+        },
+      },
+    };
+    this.setState({
+      company: {
+        ...this.state.company,
+        ...employee1,
       },
     });
-    console.log('lolname', this.state.company.name);
+  };
+
+  handleCheckboxChangeEmployee2 = event => {
+    const employee2 = {
+      employee2: {
+        ...this.state.company.employee2,
+        ...{
+          published: !this.state.company.employee2.published,
+        },
+      },
+    };
+    this.setState({
+      company: {
+        ...this.state.company,
+        ...employee2,
+      },
+    });
+  };
+
+  handleCheckboxChangeMedia1 = event => {
+    const media1 = {
+      media1: {
+        ...this.state.company.media1,
+        ...{
+          published: !this.state.company.media1.published,
+        },
+      },
+    };
+    this.setState({
+      company: {
+        ...this.state.company,
+        ...media1,
+      },
+    });
+  };
+
+  handleCheckboxChangeMedia2 = event => {
+    const media2 = {
+      media2: {
+        ...this.state.company.media2,
+        ...{
+          published: !this.state.company.media2.published,
+        },
+      },
+    };
+    this.setState({
+      company: {
+        ...this.state.company,
+        ...media2,
+      },
+    });
+  };
+
+  handleCheckboxChangeMedia3 = event => {
+    const media3 = {
+      media3: {
+        ...this.state.company.media3,
+        ...{
+          published: !this.state.company.media3.published,
+        },
+      },
+    };
+    this.setState({
+      company: {
+        ...this.state.company,
+        ...media3,
+      },
+    });
+  };
+
+  handleChange = event => {
     this.setState({
       company: {
         ...this.state.company,
@@ -368,6 +477,12 @@ class EditCompany extends React.Component {
           [event.target.name]: event.target.value,
         },
       },
+    });
+  };
+
+  handleModeratorsChange = event => {
+    this.setState({
+      moderators: event.target.value.split(','),
     });
   };
 
@@ -405,10 +520,8 @@ class EditCompany extends React.Component {
     });
   };
   upload = file => {
-    console.log(file.target.files);
     const formData = new FormData();
     formData.append('file', file.target.files[0]);
-    console.log(formData);
     fetch('/upload', {
       // Your POST endpoint
       method: 'POST',
@@ -427,10 +540,8 @@ class EditCompany extends React.Component {
   };
 
   uploadEmployee1Avatar = file => {
-    console.log(file.target.files);
     const formData = new FormData();
     formData.append('file', file.target.files[0]);
-    console.log(formData);
     fetch('/uploadEmployee1Avatar', {
       // Your POST endpoint
       method: 'POST',
@@ -450,10 +561,8 @@ class EditCompany extends React.Component {
   };
 
   uploadEmployee2Avatar = file => {
-    console.log(file.target.files);
     const formData = new FormData();
     formData.append('file', file.target.files[0]);
-    console.log(formData);
     fetch('/uploadEmployee2Avatar', {
       // Your POST endpoint
       method: 'POST',
@@ -473,10 +582,8 @@ class EditCompany extends React.Component {
   };
 
   uploadMedia1Image = file => {
-    console.log(file.target.files);
     const formData = new FormData();
     formData.append('file', file.target.files[0]);
-    console.log(formData);
     fetch('/uploadMedia1Image', {
       // Your POST endpoint
       method: 'POST',
@@ -499,10 +606,8 @@ class EditCompany extends React.Component {
   };
 
   uploadMedia2Image = file => {
-    console.log(file.target.files);
     const formData = new FormData();
     formData.append('file', file.target.files[0]);
-    console.log(formData);
     fetch('/uploadMedia2Image', {
       // Your POST endpoint
       method: 'POST',
@@ -525,10 +630,8 @@ class EditCompany extends React.Component {
   };
 
   uploadMedia3Image = file => {
-    console.log(file.target.files);
     const formData = new FormData();
     formData.append('file', file.target.files[0]);
-    console.log(formData);
     fetch('/uploadMedia3Image', {
       // Your POST endpoint
       method: 'POST',
@@ -551,8 +654,6 @@ class EditCompany extends React.Component {
   };
 
   handleChangeSkills = value => {
-    console.log('skills value', value);
-    console.log('skill state', this.state.skills);
     if (value) {
       this.setState({skills: value, skillsvalid: true});
     } else {
@@ -564,7 +665,6 @@ class EditCompany extends React.Component {
   };
 
   handleChangePerks = value => {
-    console.log('value', value);
     if (value) {
       this.setState({perks: value, perksvalid: true});
     } else {
@@ -609,6 +709,7 @@ class EditCompany extends React.Component {
                $location: geography,
                $skills: [SkillCompany_insert_input!]!
                $perks: [PerkCompany_insert_input!]!
+               $moderators: [Moderator_insert_input]
                ) {
 				  update_Company(where: {id: {_eq: $id}},_set: {
 					ownerId: $ownerId,
@@ -656,7 +757,13 @@ class EditCompany extends React.Component {
 			    returning{Perk}
 
 		}
+delete_Moderator(where: {companyId: {_eq: $id}}){
+    affected_rows
 
+}
+insert_Moderator(objects: $moderators){
+    returning{userEmail}
+}
 			}
 				`,
       headers: {
@@ -665,23 +772,55 @@ class EditCompany extends React.Component {
     };
     let skills = [];
     this.state.skills.map(skill => {
-      console.log(skill);
       skills.push({
         Skill: skill.value.Skill || skill.value,
         CompanyId: this.state.company.id,
       });
     });
     newCompany.skills = skills;
-
+    skills.length > 0
+      ? null
+      : newCompany.skills.push({
+          Skill: 'React.js',
+          CompanyId: this.state.company.id,
+        });
     let perks = [];
     this.state.perks.map(perk => {
-      console.log(perk);
       perks.push({
         Perk: perk.value.Perk || perk.value,
         CompanyId: this.state.company.id,
       });
     });
     newCompany.perks = perks;
+    perks.length > 0
+      ? null
+      : newCompany.perks.push({
+          Perk: 'Healthcare',
+          CompanyId: this.state.company.id,
+        });
+
+    let moderators = [];
+    let stateModerators = this.state.moderators;
+    typeof stateModerators === 'string'
+      ? (stateModerators = stateModerators.split(','))
+      : null;
+    stateModerators.map(moderator => {
+      moderator.trim()
+        ? moderators.push({
+            userEmail: moderator.trim(),
+            companyId: this.state.company.id,
+          })
+        : null;
+    });
+    newCompany.moderators =
+      moderators.length > 0
+        ? moderators
+        : [
+            {
+              userEmail: this.state.currentUser.linkedinEmail,
+              companyId: this.state.company.id,
+            },
+          ];
     newCompany = {...newCompany, ...this.state.fullAddress};
     newCompany.location = {
       type: 'Point',
@@ -692,7 +831,6 @@ class EditCompany extends React.Component {
       headers: createCompanyopts.headers,
     });
 
-    console.log('newcompany', newCompany);
     client.request(createCompanyopts.query, newCompany).then(gdata => {
       this.handleUpdateCallback();
     });
@@ -701,8 +839,6 @@ class EditCompany extends React.Component {
   render(props) {
     const {classes, job} = this.props;
     const i18n = this.i18n;
-    console.log('render i18n');
-    console.log('render t', i18n.t('lol'));
     const {open} = this.state;
     const industries = this.INDUSTRIES;
     const skills = this.SKILLS;
@@ -839,7 +975,7 @@ class EditCompany extends React.Component {
                   </FormControl>
                   <FormControl
                     className={classes.formControl}
-                    error={this.state.company.employeeCountvalid === false}>
+                    error={this.state.employeeCountvalid === false}>
                     <InputLabel htmlFor="employeeCount">
                       {i18n.t('Employee count')}
                     </InputLabel>
@@ -994,6 +1130,34 @@ class EditCompany extends React.Component {
                           )}
                     </FormHelperText>
                   </FormControl>
+                  <FormControl
+                    className={classes.formControl}
+                    error={this.state.namevalid === false}>
+                    <InputLabel htmlFor="moderators">
+                      {i18n.t('editcompany:Moderators')}
+                    </InputLabel>
+                    <Input
+                      id="moderators"
+                      name="moderators"
+                      value={this.state.moderators}
+                      onChange={this.handleModeratorsChange}
+                      onBlur={e => this.handleBlur(e, true)}
+                      onFocus={e => this.handleFocus(e, true)}
+                      placeholder="a@company.com, b@company.com"
+                      required={true}
+                    />
+                    <FormHelperText
+                      id={
+                        this.state.namevalid !== false
+                          ? 'name-helper-text'
+                          : 'name-error-text'
+                      }>
+                      {i18n.t(
+                        'List emails of people who can add and modify jobs. These people must already have an account before they can be added.',
+                      )}
+                    </FormHelperText>
+                  </FormControl>
+
                   {this.state.company.name ? (
                     <>
                       <FormControl
@@ -1172,6 +1336,24 @@ class EditCompany extends React.Component {
                             {i18n.t("Your employee's github")}
                           </FormHelperText>
                         </FormControl>
+
+                        <FormControl
+                          fullWidth={true}
+                          className={classes.formControl}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={this.state.company.employee1.published}
+                                name="published"
+                                value="published"
+                                onChange={this.handleCheckboxChangeEmployee1}
+                                color="primary"
+                              />
+                            }
+                            label={this.i18n.t('newjob:Publish')}
+                          />
+                        </FormControl>
+
                         <FormControl
                           fullWidth={true}
                           className={classes.formControl}
@@ -1339,6 +1521,24 @@ class EditCompany extends React.Component {
                             {i18n.t("Your employee's github")}
                           </FormHelperText>
                         </FormControl>
+
+                        <FormControl
+                          fullWidth={true}
+                          className={classes.formControl}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={this.state.company.employee2.published}
+                                name="published"
+                                value="published"
+                                onChange={this.handleCheckboxChangeEmployee2}
+                                color="primary"
+                              />
+                            }
+                            label={this.i18n.t('newjob:Publish')}
+                          />
+                        </FormControl>
+
                         <FormControl
                           fullWidth={true}
                           className={classes.formControl}
@@ -1376,6 +1576,12 @@ class EditCompany extends React.Component {
                     </Card>
                   ) : null}
                   <Card className={classes.card}>
+                    <CardHeader
+                      title={i18n.t(
+                        'editcompany:Add an image or video to your profile',
+                      )}
+                    />
+
                     <CardActionArea className={classes.cardActionArea}>
                       {this.state.company.media1.hasVideo ? (
                         <ReactPlayer url={this.state.company.media1.url} />
@@ -1434,10 +1640,31 @@ class EditCompany extends React.Component {
                         onClick={() => this.media1FileInput.click()}>
                         {i18n.t('add image instead')}
                       </Button>
+
+                      <FormControl className={classes.formControl}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={this.state.company.media1.published}
+                              name="published"
+                              value="published"
+                              onChange={this.handleCheckboxChangeMedia1}
+                              color="primary"
+                            />
+                          }
+                          label={this.i18n.t('newjob:Publish')}
+                        />
+                      </FormControl>
                     </CardActions>
                   </Card>
 
                   <Card className={classes.card}>
+                    <CardHeader
+                      title={i18n.t(
+                        'editcompany:Add a second image or video to your profile',
+                      )}
+                    />
+
                     <CardActionArea className={classes.cardActionArea}>
                       {this.state.company.media2.hasVideo ? (
                         <ReactPlayer url={this.state.company.media2.url} />
@@ -1496,10 +1723,30 @@ class EditCompany extends React.Component {
                         onClick={() => this.media2FileInput.click()}>
                         {i18n.t('add image instead')}
                       </Button>
+
+                      <FormControl className={classes.formControl}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={this.state.company.media2.published}
+                              name="published"
+                              value="published"
+                              onChange={this.handleCheckboxChangeMedia2}
+                              color="primary"
+                            />
+                          }
+                          label={this.i18n.t('newjob:Publish')}
+                        />
+                      </FormControl>
                     </CardActions>
                   </Card>
 
                   <Card className={classes.card}>
+                    <CardHeader
+                      title={i18n.t(
+                        'editcompany:Add a third image or video to your profile',
+                      )}
+                    />
                     <CardActionArea className={classes.cardActionArea}>
                       {this.state.company.media3.hasVideo ? (
                         <ReactPlayer url={this.state.company.media3.url} />
@@ -1558,6 +1805,21 @@ class EditCompany extends React.Component {
                         onClick={() => this.media3FileInput.click()}>
                         {i18n.t('add image instead')}
                       </Button>
+
+                      <FormControl className={classes.formControl}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={this.state.company.media3.published}
+                              name="published"
+                              value="published"
+                              onChange={this.handleCheckboxChangeMedia3}
+                              color="primary"
+                            />
+                          }
+                          label={this.i18n.t('newjob:Publish')}
+                        />
+                      </FormControl>
                     </CardActions>
                   </Card>
                   <Button
