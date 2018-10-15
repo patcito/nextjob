@@ -124,6 +124,9 @@ app.prepare().then(() => {
                 headers: checkUserRequestopts.headers,
               },
             );
+            console.log(checkUserRequestopts);
+            console.log('gt vars', checkUserRequestVars);
+
             client
               .request(checkUserRequestopts.query, checkUserRequestVars)
               .then(ugdata => {
@@ -151,7 +154,7 @@ app.prepare().then(() => {
                   req.token = token;
                   req.github = true;
                   req.linkedin = false;
-                  req.currentUser = gdata.insert_User.returning[0];
+                  req.currentUser = ugdata.User[0];
                   next();
                   return;
                 }
@@ -202,6 +205,8 @@ app.prepare().then(() => {
                   githubBlogUrl: bodyJson.blog,
                   githubFollowers: bodyJson.followers,
                 };
+                console.log(uopts.query);
+                console.log('gt vars', variables);
                 client.request(uopts.query, variables).then(gdata => {
                   var token = jwt.sign(
                     {
@@ -229,6 +234,9 @@ app.prepare().then(() => {
                   next();
                   return;
                 });
+              })
+              .catch(err => {
+                console.log('err', err);
               });
           });
         } catch (error) {
@@ -278,6 +286,7 @@ app.prepare().then(() => {
               // now body and res.body both will contain decoded content.
               //
               const bodyJson = JSON.parse(body);
+              //              console.log('linkedin', bodyJson.positions.values[0]);
 
               const checkUserRequestopts = {
                 uri: 'http://localhost:8080/v1alpha1/graphql',

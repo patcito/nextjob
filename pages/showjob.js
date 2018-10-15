@@ -126,6 +126,15 @@ const styles = theme => ({
   headerIcons: {
     marginRight: '5px',
   },
+  chiptags: {
+    color: '#fff',
+    marginTop: 10,
+    marginLeft: 20,
+    marginBottom: 10,
+  },
+  chip: {
+    marginRight: 10,
+  },
 });
 
 class ShowJob extends React.Component {
@@ -227,18 +236,36 @@ class ShowJob extends React.Component {
                             IndustryName
 
                   }
+                  Skills {Skill}
                   Company {
-                            id
-                            name
-                      Perks {
-                                  Perk
-
-                      }
-                      Skills {
-                                  Skill
-
-                      }
-
+                  id
+                  description
+                  ownerId
+                  yearFounded
+                  employeeCount
+                  devCount
+                  quote1
+                  quote2
+                  employee1
+                  employee2
+                  media1
+                  media2
+                  media3
+                  Industry
+                  name
+                  url
+                  twitter
+                  Skills{
+                  Skill
+                  }
+                  Perks{Perk}
+                  country
+                  route
+                  street_number
+                  locality
+                  administrative_area_level_1
+                  postal_code
+                  location
                   }
                       SeniorityLevel
                       EmployementType
@@ -266,7 +293,6 @@ class ShowJob extends React.Component {
                       minimumMonthlySalary
                       maximumMonthlySalary
                       hasMonthlySalary
-
               }
 
           }
@@ -287,7 +313,7 @@ class ShowJob extends React.Component {
     } else {
       job = null;
     }
-    return {translations, jobId, userInfo};
+    return {translations, jobId, userInfo, job};
   }
   constructor(props) {
     super(props);
@@ -714,7 +740,220 @@ insert_Moderator(objects: $moderators){
               <MenuList i18n={i18n} />
             </Grid>
             <Grid item xs={12} md={6}>
-              tipi
+              <div style={{background: 'white'}}>
+                <Card className={classes.card}>
+                  <CardHeader
+                    avatar={
+                      <Avatar
+                        aria-label={job.Company.name}
+                        src={
+                          '/' +
+                          job.Company.id +
+                          '-' +
+                          job.Company.ownerId +
+                          '-' +
+                          'logo.png'
+                        }
+                        className={classes.avatar}
+                      />
+                    }
+                    title={
+                      <Typography gutterBottom variant="h3" component="h1">
+                        {job.Company.name}
+                      </Typography>
+                    }
+                    subheader={
+                      <>
+                        <span>Since {job.Company.yearFounded}</span>
+                        <IconButton
+                          disableRipple={true}
+                          disableFocusRipple={true}
+                          className={classes.iconButton}
+                          aria-label="Delete">
+                          <PlaceIcon className={classes.headerIcons} />{' '}
+                          <a
+                            href={
+                              'https://www.google.com/maps/search/' +
+                              this.state.currentAddressDescription
+                            }
+                            style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                            target="_blank">
+                            {job.Company.locality}
+                          </a>
+                        </IconButton>
+                        <IconButton
+                          disableRipple={true}
+                          disableFocusRipple={true}
+                          className={classes.iconButton}
+                          aria-label="Delete">
+                          <PeopleIcon className={classes.headerIcons} />{' '}
+                          {job.Company.employeeCount} employees
+                        </IconButton>
+                        <a href={job.Company.url} target="_blank">
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Delete"
+                            style={{cursor: 'pointer'}}>
+                            <LinkIcon className={classes.headerIcons} />{' '}
+                            {job.Company.url
+                              .replace('http://wwww.', '')
+                              .replace('https://wwww.', '')
+                              .replace('https://', '')
+                              .replace('http://', '')}
+                          </IconButton>
+                        </a>
+                      </>
+                    }
+                  />
+                  <CardActionArea className={classes.cardActionArea}>
+                    {job.Company.media1.published ? (
+                      <>
+                        {job.Company.media1.hasVideo ? (
+                          <ReactPlayer
+                            url={job.Company.media1.url}
+                            width="100%"
+                          />
+                        ) : (
+                          <CardMedia
+                            className={classes.media}
+                            image={
+                              '/' +
+                              job.Company.id +
+                              '-' +
+                              job.Company.ownerId +
+                              '-' +
+                              '1media.png?u=' +
+                              this.state.media1Uploaded
+                            }
+                            title="Contemplative Reptile"
+                            subheader={
+                              <>
+                                <span>Since {job.Company.yearFounded}</span>
+                                <IconButton
+                                  disableRipple={true}
+                                  disableFocusRipple={true}
+                                  className={classes.iconButton}
+                                  aria-label="Delete">
+                                  <PlaceIcon className={classes.headerIcons} />{' '}
+                                  <a
+                                    href={
+                                      'https://www.google.com/maps/search/' +
+                                      this.state.currentAddressDescription
+                                    }
+                                    style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                                    target="_blank">
+                                    {job.Company.locality}
+                                  </a>
+                                </IconButton>
+                                <IconButton
+                                  disableRipple={true}
+                                  disableFocusRipple={true}
+                                  className={classes.iconButton}
+                                  aria-label="Delete">
+                                  <PeopleIcon className={classes.headerIcons} />{' '}
+                                  {job.Company.employeeCount} employees
+                                </IconButton>
+                                <a href={job.Company.url} target="_blank">
+                                  <IconButton
+                                    disableRipple={true}
+                                    disableFocusRipple={true}
+                                    className={classes.iconButton}
+                                    aria-label="Delete"
+                                    style={{cursor: 'pointer'}}>
+                                    <LinkIcon className={classes.headerIcons} />{' '}
+                                    {job.Company.url
+                                      .replace('http://wwww.', '')
+                                      .replace('https://wwww.', '')
+                                      .replace('https://', '')
+                                      .replace('http://', '')}
+                                  </IconButton>
+                                </a>
+                              </>
+                            }
+                          />
+                        )}
+                      </>
+                    ) : null}
+                  </CardActionArea>
+                </Card>
+                <Card className={classes.card}>
+                  <CardHeader
+                    title={
+                      <Typography gutterBottom variant="h3" component="h1">
+                        {job.JobTitle}
+                      </Typography>
+                    }
+                    subheader={
+                      <>
+                        <Chip
+                          avatar={
+                            <Avatar>
+                              <PlaceIcon />
+                            </Avatar>
+                          }
+                          label={job.locality ? job.locality : job.country}
+                          className={classes.chip}
+                        />
+                        <Chip
+                          avatar={
+                            <Avatar>
+                              <EuroSymbolIcon />
+                            </Avatar>
+                          }
+                          label={
+                            job.hasMonthlySalary
+                              ? job.minimumMonthlySalary +
+                                '-' +
+                                job.maximumMonthlySalary
+                              : job.minimumYearlySalary / 1000 +
+                                'k' +
+                                '-' +
+                                job.maximumYearlySalary / 1000 +
+                                'k'
+                          }
+                          className={classes.chip}
+                        />
+                        <Chip
+                          avatar={
+                            <Avatar>
+                              <WorkIcon />
+                            </Avatar>
+                          }
+                          label={
+                            new Date().getFullYear() - job.Company.yearFounded >
+                            3
+                              ? i18n.t('Company (>3 years)')
+                              : i18n.t('Startup (<3 years)')
+                          }
+                          className={classes.chip}
+                        />
+                      </>
+                    }
+                  />
+                  <CardActionArea className={classes.cardActionArea}>
+                    <CardContent>
+                      <Typography component="p">{job.description}</Typography>
+                    </CardContent>
+                    {job.Skills.map(Skill => (
+                      <Chip
+                        key={Skill.Skill}
+                        label={Skill.Skill}
+                        className={classes.chiptags}
+                        color="secondary"
+                      />
+                    ))}
+                  </CardActionArea>
+                  <CardActions>
+                    <Link href={'/jobs/companies/' + job.Company.id}>
+                      <Button size="small" color="primary">
+                        APPLY
+                      </Button>
+                    </Link>
+                  </CardActions>
+                </Card>
+              </div>
             </Grid>
           </Grid>
         </div>

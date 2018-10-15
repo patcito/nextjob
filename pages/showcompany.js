@@ -778,7 +778,11 @@ insert_Moderator(objects: $moderators){
                         className={classes.avatar}
                       />
                     }
-                    title={company.name}
+                    title={
+                      <Typography gutterBottom variant="h3" component="h1">
+                        {company.name}
+                      </Typography>
+                    }
                     subheader={
                       <>
                         <span>Since {company.yearFounded}</span>

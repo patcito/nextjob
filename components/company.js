@@ -39,7 +39,7 @@ const styles = theme => ({
   },
   media: {
     width: '100%',
-    height: 140,
+    height: 200,
   },
 });
 

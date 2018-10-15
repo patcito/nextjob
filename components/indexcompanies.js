@@ -49,7 +49,7 @@ class IndexCompanies extends React.Component {
     return (
       <Grid container spacing={24}>
         {companies.map(company => (
-          <Grid key={company.id} item xs={12} md={3}>
+          <Grid key={company.id} item xs={12} md={6}>
             <Company
               key={company.id}
               query={query}

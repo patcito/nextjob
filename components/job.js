@@ -100,7 +100,7 @@ class Job extends React.Component {
     const {open} = this.state;
 
     return (
-      <Link href="/about">
+      <Link href={'/jobs/' + job.id}>
         <Card className={classes.card} style={{cursor: 'pointer'}}>
           <CardMedia
             className={classes.cover}
