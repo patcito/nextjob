@@ -199,6 +199,7 @@ class EditCompany extends React.Component {
         token: token,
         github: github,
         linkedin: linkedin,
+        currentUser: req.currentUser,
       };
     } else {
       token = localStorage.getItem('token');

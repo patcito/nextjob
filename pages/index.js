@@ -47,6 +47,7 @@ class Index extends React.Component {
     let userId = null;
     let github = false;
     let linkedin = false;
+    let currentUser = {};
 
     const companyId = query.companyId || null;
     if (req) {
@@ -59,12 +60,20 @@ class Index extends React.Component {
         token: token,
         github: github,
         linkedin: linkedin,
+        currentUser: req.currentUser,
       };
     } else {
       token = localStorage.getItem('token');
       localStorage.getItem('currentUser')
         ? (userId = localStorage.getItem('currentUser').id)
         : (userId = null);
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      userInfo = {
+        token: token,
+        github: currentUser ? !!currentUser.githubEmail : false,
+        linkedin: currentUser ? !!currentUser.linkedinEmail : false,
+        currentUser: currentUser,
+      };
     }
     const translations = await getTranslation(
       lang,
@@ -176,11 +185,14 @@ class Index extends React.Component {
     }
   };
   render(props) {
+    let userInfo;
+    console.log('userInfoCheck', this.props.userInfo);
+    userInfo = this.props.userInfo;
     const i18n = this.i18n;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
-          <AppBarTop i18n={this.i18n} userInfo={this.props.userInfo}/>
+          <AppBarTop i18n={this.i18n} userInfo={userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
               <MenuList i18n={i18n} />

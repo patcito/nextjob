@@ -569,6 +569,7 @@ $hasMonthlySalary: Boolean,
         token: token,
         github: github,
         linkedin: linkedin,
+        currentUser: req.currentUser,
       };
     } else {
       token = localStorage.getItem('token');

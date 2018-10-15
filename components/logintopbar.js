@@ -82,47 +82,23 @@ class LoginAppBarTop extends React.Component {
       window.location &&
       window.location.search
     ) {
-      const currentUser =
-        localStorage.getItem('currentUser') === null
-          ? false
-          : JSON.parse(localStorage.getItem('currentUser'));
-
-      if (!currentUser) {
-        const ocode = window.location.search
-          .substring(1)
-          .split('&')[0]
-          .split('code=')[1];
-        if (ocode) {
-          // call Graphcool authenticateGithubUser mutation
-          (async () => {
-            const rawResponse = await fetch('/auth', {
-              method: 'POST',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ocode: ocode}),
-            });
-            const content = await rawResponse.json();
-            localStorage.setItem('token', content.token);
-            document.cookie = 'token=' + content.token;
-            localStorage.setItem('currentUser', JSON.stringify(content.user));
-            this.setState({
-              token: content.token,
-              currentUser: content.user,
-            });
-          })();
-        }
-      } else {
+      if (props.token && props.currentUser) {
         this.setState({
-          currentUser: currentUser,
-          token: localStorage.getItem('token'),
+          currentUser: props.userInfo.currentUser,
+          token: props.userInfo.token,
         });
+        localStorage.setItem('token', props.userInfo.token);
+        document.cookie = 'token=' + props.userInfo.token;
+        localStorage.setItem(
+          'currentUser',
+          JSON.stringify(props.userInfo.currentUser),
+        );
       }
     }
   }
 
   componentDidMount(props) {
+    console.log('props', this.props);
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const user = localStorage.getItem('currentUser');
@@ -131,32 +107,27 @@ class LoginAppBarTop extends React.Component {
           currentUser: JSON.parse(localStorage.getItem('currentUser')),
           token: localStorage.getItem('token'),
         });
-        (async () => {
-          const rawResponse = await fetch('/checksession', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': token,
-            },
-          });
-          const content = await rawResponse.json();
-          if (content !== 'ok') {
-            this.setState({
-              currentUser: null,
-              token: null,
-            });
-            localStorage.clear();
-          }
-        })();
+      } else if (this.props.userInfo.token && this.props.userInfo.currentUser) {
+        this.setState({
+          currentUser: this.props.userInfo.currentUser,
+          token: this.props.userInfo.token,
+        });
+        localStorage.setItem('token', this.props.userInfo.token);
+        document.cookie = 'token=' + this.props.userInfo.token;
+        localStorage.setItem(
+          'currentUser',
+          JSON.stringify(this.props.userInfo.currentUser),
+        );
       }
     }
   }
 
   render(props) {
     const isLoggedIn = this.props.userInfo
-      ? (this.props.userInfo.github || this.props.userInfo.linkedin) && !this.state.loggedOut
+      ? (this.props.userInfo.github || this.props.userInfo.linkedin) &&
+        !this.state.loggedOut
       : false;
-	  console.log(this.props.userInfo)
+    console.log('userinfo', this.props.userInfo);
     const isRecruiter =
       this.state.currentUser && this.state.currentUser.recruiter;
     const {classes} = this.props;
@@ -179,8 +150,7 @@ class LoginAppBarTop extends React.Component {
             ReactEurope Jobs
           </Typography>
         </Link>
-        {!isLoggedIn ||
-        (this.props.userInfo.github) ? (
+        {!isLoggedIn || this.props.userInfo.linkedin ? (
           <Link href="/newjob">
             <Button
               variant="contained"

@@ -31,17 +31,21 @@ app.prepare().then(() => {
   );
 
   checkToken = (req, res, next) => {
+    console.log('cookies', req.cookies);
     const token = req.cookies.token;
     if (!token) {
+      console.log('no token');
       next();
       return;
     }
 
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
+        console.log('token not ok', err);
         next();
         return;
       } else {
+        console.log('token ok', decoded);
         req.userId = decoded.userId;
         req.token = token;
         req.github = decoded.github;
@@ -53,10 +57,10 @@ app.prepare().then(() => {
   };
   server.use(checkToken);
 
-  server.post('/auth', async (req, res) => {
+  auth = async (req, res, next) => {
     const originalRes = res;
-    if (req && req.body && req.body.ocode) {
-      if (req.body.ocode.length < 30) {
+    if (req && req.query && req.query.code) {
+      if (req.query.code.length < 30) {
         //github oauth
         const oauth2 = SimpleOauth2.create({
           client: {
@@ -69,7 +73,7 @@ app.prepare().then(() => {
             authorizePath: '/login/oauth/authorize',
           },
         });
-        const options = {code: req.body.ocode};
+        const options = {code: req.query.code};
 
         try {
           const result = await oauth2.authorizationCode.getToken(options);
@@ -138,11 +142,18 @@ app.prepare().then(() => {
                       expiresIn: '200 days', // expires in 24 hours
                     },
                   );
-                  return originalRes.status(200).send({
+                  /*return originalRes.status(200).send({
                     auth: true,
                     token: token,
                     user: currentUser,
-                  });
+                  });*/
+                  req.userId = currentUser.id;
+                  req.token = token;
+                  req.github = true;
+                  req.linkedin = false;
+                  req.currentUser = gdata.insert_User.returning[0];
+                  next();
+                  return;
                 }
                 var uopts = {
                   uri: 'http://localhost:8080/v1alpha1/graphql',
@@ -204,19 +215,28 @@ app.prepare().then(() => {
                       expiresIn: 864000, // expires in 24 hours
                     },
                   );
-                  return originalRes.status(200).send({
+                  /*return originalRes.status(200).send({
                     auth: true,
                     token: token,
                     user: gdata.insert_User.returning[0],
-                  });
+                  });*/
+                  req.userId = gdata.insert_User.returning[0].id;
+                  req.token = token;
+                  req.github = true;
+                  req.linkedin = false;
+                  req.currentUser = gdata.insert_User.returning[0];
+
+                  next();
+                  return;
                 });
               });
           });
         } catch (error) {
           console.error('Access Token Error', error.message);
+          next();
           return res.status(500).json('Authentication failed');
         }
-      } else if (req.body.ocode.length > 30) {
+      } else if (req.query.code.length > 30) {
         console.log('linkedin');
         //github oauth
         const oauth2 = SimpleOauth2.create({
@@ -230,7 +250,7 @@ app.prepare().then(() => {
             authorizePath: '/oauth/v2/authorization',
           },
         });
-        const options = {code: req.body.ocode};
+        const options = {code: req.query.code};
 
         try {
           const opts = {
@@ -307,11 +327,19 @@ app.prepare().then(() => {
                       },
                     );
                     currentUser.recruiter = true;
-                    return originalRes.status(200).send({
+                    /*return originalRes.status(200).send({
                       auth: true,
                       token: token,
                       user: currentUser,
-                    });
+                    });*/
+                    req.userId = currentUser.id;
+                    req.token = token;
+                    req.github = false;
+                    req.linkedin = true;
+                    req.currentUser = currentUser;
+
+                    next();
+                    return;
                   }
                   const uopts = {
                     uri: 'http://localhost:8080/v1alpha1/graphql',
@@ -380,11 +408,18 @@ app.prepare().then(() => {
                       },
                     );
 
-                    return originalRes.status(200).send({
+                    /*return originalRes.status(200).send({
                       auth: true,
                       token: token,
                       user: currentUser,
-                    });
+                    });*/
+                    req.userId = currentUser.id;
+                    req.token = token;
+                    req.github = false;
+                    req.linkedin = true;
+                    req.currentUser = currentUser;
+                    next();
+                    return;
                   });
                 });
             });
@@ -392,13 +427,20 @@ app.prepare().then(() => {
           });
         } catch (error) {
           console.error('Access Token Error Linkedin', error.message);
+          next();
           return res.status(500).json('Authentication failed');
         }
       }
     } else {
-      res.json({});
+      next();
+      return;
     }
+  };
+  server.use(auth);
+  server.get('/auth', (req, res) => {
+    return originalRes.status(200).json({});
   });
+
   server.get('/checksession', (req, res) => {
     var token = req.headers['x-access-token'];
     if (!token)
@@ -424,7 +466,6 @@ app.prepare().then(() => {
       const x = {
         'X-Hasura-Role': 'anon',
       };
-      console.log(req.headers, 'ok', x);
       return res.status(200).json(x);
     }
 
@@ -435,14 +476,12 @@ app.prepare().then(() => {
         };
         return res.status(200).send(x);
       } else {
-        console.log('decode token', decoded);
         const x = {
           'X-Hasura-User-Id': decoded.userId + '',
           'X-Hasura-Role': decoded.userId ? 'user' : 'anon',
           'X-Hasura-Access-Key': process.env.JWT_SECRET,
           'X-Hasura-Custom': 'custom value',
         };
-        console.log(req.headers, 'ok', x);
         return res.status(200).json(x);
       }
     });
@@ -468,6 +507,13 @@ app.prepare().then(() => {
     return app.render(req, res, '/showcompany', {
       companyId: req.params.companyId,
       action: 'showCompany',
+    });
+  });
+
+  server.get('/jobs/:jobId', (req, res) => {
+    return app.render(req, res, '/showjob', {
+      jobId: req.params.jobId,
+      action: 'showJob',
     });
   });
 
