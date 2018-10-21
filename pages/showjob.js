@@ -27,20 +27,11 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '../components/menu';
 
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormLabel from '@material-ui/core/FormLabel';
-
-import SingleSelect from '../components/select';
-import DownshiftSelect from '../components/downshift';
-import MultipleDownshiftSelect from '../components/multipledownshift';
 
 import Router from 'next/router';
 
@@ -78,6 +69,13 @@ import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
 import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Snackbar from '@material-ui/core/Snackbar';
 
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -139,7 +137,8 @@ const styles = theme => ({
 
 class ShowJob extends React.Component {
   state = {
-    open: false,
+    hasResumePdf: false,
+    apply: false,
     skills: [],
     industry: {},
     moderators: [],
@@ -172,12 +171,61 @@ class ShowJob extends React.Component {
       media3: {url: '', published: false},
     },
   };
-  handleBlurIndustry = (value, required) => {
-    this.setState({
-      industryvalid: value || !required ? true : false,
+  handleClickApply = () => {
+    this.setState({apply: true});
+  };
+  handleClose = () => {
+    this.setState({apply: false});
+  };
+  handleSendApplication = () => {
+    this.setState({apply: false});
+    const upsertApplicationopts = {
+      uri: 'http://localhost:8080/v1alpha1/graphql',
+      json: true,
+      query: `
+				mutation upsert_application($jobId: Int, $applicantId: Int,
+				$coverLetter: String, $hasResumePdf: Boolean) {
+				  insert_JobApplication(
+					objects: [
+					  {jobId: $jobId, applicantId: $applicantId,
+						coverLetter: $coverLetter, hasResumePdf: $hasResumePdf}
+					],
+					on_conflict: {
+					  constraint: JobApplication_pkey,
+					  update_columns: [coverLetter, hasResumePdf]
+					}
+				  ) {
+					affected_rows
+					returning{
+					  coverLetter, hasResumePdf
+					}
+				  }
+				}
+        `,
+      headers: {
+        'x-access-token': Cookies.get('token'),
+      },
+    };
+    let vars = {
+      jobId: this.props.job.id,
+      applicantId: this.props.userInfo.userId,
+      coverLetter: this.state.coverLetter,
+      hasResumePdf: this.state.hasResumePdf,
+    };
+    console.log('lolappli', upsertApplicationopts, vars);
+
+    const client = new grequest.GraphQLClient(upsertApplicationopts.uri, {
+      headers: upsertApplicationopts.headers,
+    });
+
+    client.request(upsertApplicationopts.query, vars).then(gdata => {
+      this.upload();
+      this.setState({
+        apply: false,
+      });
+      this.handleUpdateCallback();
     });
   };
-
   static async getInitialProps({req, query}) {
     const translations = await getTranslation(
       lang,
@@ -205,7 +253,7 @@ class ShowJob extends React.Component {
       github = req.github;
       linkedin = req.linkedin;
       userInfo = {
-        userId: userId,
+        userId: req.userId,
         token: token,
         github: github,
         linkedin: linkedin,
@@ -333,396 +381,44 @@ class ShowJob extends React.Component {
         : (user = null);
     }
   }
-
-  handleBlur = (event, required) => {
-    this.setState({
-      [event.target.name + 'valid']:
-        event.target.value || !required ? true : false,
-    });
+  handleChange = event => {
+    this.setState({[event.target.name]: event.target.value});
   };
 
-  handleFocus = (event, required) => {
-    this.setState({
-      [event.target.name + 'valid']: true,
-    });
+  upload = () => {
+    console.log(this.state.file);
+    if (this.state.file && this.state.file.length > 0) {
+      const formData = new FormData();
+      formData.append('file', this.state.file[0]);
+      console.log(formData);
+      fetch('/uploadResume', {
+        // Your POST endpoint
+        method: 'POST',
+        headers: {
+          applicantId: this.props.userInfo.userId,
+          jobId: this.props.job.id,
+        },
+        body: formData, // This is your file object
+      })
+        .then(
+          response => response.json(), // if the response is a JSON object
+        )
+        .then(
+          success => console.log(success), // Handle the success response object
+        )
+        .catch(
+          error => console.log(error), // Handle the error response object
+        );
+    }
   };
 
   handleUpdateCallback = () => {
     this.setState({openNotification: true});
   };
 
-  handleChangeIndustry = value => {
-    if (value) {
-      this.setState({industry: value, industryvalid: true});
-    } else {
-      this.setState({industry: value, industryvalid: false});
-    }
-  };
-
-  handleChange = event => {
+  handleCheckboxHasResumePdf = event => {
     this.setState({
-      company: {
-        ...this.state.company,
-        ...{
-          [event.target.name]: event.target.value,
-        },
-      },
-    });
-  };
-
-  handleModeratorsChange = event => {
-    this.setState({
-      moderators: event.target.value.split(','),
-    });
-  };
-
-  handleChangeEmployee1 = event => {
-    const employee1 = {
-      employee1: {
-        ...this.state.company.employee1,
-        ...{
-          [event.target.name]: event.target.value,
-        },
-      },
-    };
-    this.setState({
-      company: {
-        ...this.state.company,
-        ...employee1,
-      },
-    });
-  };
-
-  handleChangeEmployee2 = event => {
-    const employee2 = {
-      employee2: {
-        ...this.state.company.employee2,
-        ...{
-          [event.target.name]: event.target.value,
-        },
-      },
-    };
-    this.setState({
-      company: {
-        ...this.state.company,
-        ...employee2,
-      },
-    });
-  };
-  upload = file => {
-    const formData = new FormData();
-    formData.append('file', file.target.files[0]);
-    fetch('/upload', {
-      // Your POST endpoint
-      method: 'POST',
-      headers: {companyId: this.props.companyId},
-      body: formData, // This is your file object
-    })
-      .then(
-        response => response.json(), // if the response is a JSON object
-      )
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
-      .catch(
-        error => console.log(error), // Handle the error response object
-      );
-  };
-
-  uploadEmployee1Avatar = file => {
-    const formData = new FormData();
-    formData.append('file', file.target.files[0]);
-    fetch('/uploadEmployee1Avatar', {
-      // Your POST endpoint
-      method: 'POST',
-      headers: {companyId: this.props.companyId},
-      body: formData, // This is your file object
-    })
-      .then(response => {
-        response.json(); // if the response is a JSON object
-        setTimeout(() => this.setState({employee1Uploaded: new Date()}), 1000);
-      })
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
-      .catch(
-        error => console.log(error), // Handle the error response object
-      );
-  };
-
-  uploadEmployee2Avatar = file => {
-    const formData = new FormData();
-    formData.append('file', file.target.files[0]);
-    fetch('/uploadEmployee2Avatar', {
-      // Your POST endpoint
-      method: 'POST',
-      headers: {companyId: this.props.companyId},
-      body: formData, // This is your file object
-    })
-      .then(response => {
-        response.json(); // if the response is a JSON object
-        setTimeout(() => this.setState({employee2Uploaded: new Date()}), 1000);
-      })
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
-      .catch(
-        error => console.log(error), // Handle the error response object
-      );
-  };
-
-  uploadMedia1Image = file => {
-    const formData = new FormData();
-    formData.append('file', file.target.files[0]);
-    fetch('/uploadMedia1Image', {
-      // Your POST endpoint
-      method: 'POST',
-      headers: {companyId: this.props.companyId},
-      body: formData, // This is your file object
-    })
-      .then(response => {
-        response.json(); // if the response is a JSON object
-        const company = this.state.company;
-        company.media1.hasVideo = false;
-        this.setState({media1Uploaded: new Date(), company: company});
-        setTimeout(() => this.setState({media1Uploaded: new Date()}), 1000);
-      })
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
-      .catch(
-        error => console.log(error), // Handle the error response object
-      );
-  };
-
-  uploadMedia2Image = file => {
-    const formData = new FormData();
-    formData.append('file', file.target.files[0]);
-    fetch('/uploadMedia2Image', {
-      // Your POST endpoint
-      method: 'POST',
-      headers: {companyId: this.props.companyId},
-      body: formData, // This is your file object
-    })
-      .then(response => {
-        response.json(); // if the response is a JSON object
-        const company = this.state.company;
-        company.media2.hasVideo = false;
-        this.setState({media2Uploaded: new Date(), company: company});
-        setTimeout(() => this.setState({media2Uploaded: new Date()}), 1000);
-      })
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
-      .catch(
-        error => console.log(error), // Handle the error response object
-      );
-  };
-
-  uploadMedia3Image = file => {
-    const formData = new FormData();
-    formData.append('file', file.target.files[0]);
-    fetch('/uploadMedia3Image', {
-      // Your POST endpoint
-      method: 'POST',
-      headers: {companyId: this.props.companyId},
-      body: formData, // This is your file object
-    })
-      .then(response => {
-        response.json(); // if the response is a JSON object
-        const company = this.state.company;
-        company.media3.hasVideo = false;
-        this.setState({media3Uploaded: new Date(), company: company});
-        setTimeout(() => this.setState({media3Uploaded: new Date()}), 1000);
-      })
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
-      .catch(
-        error => console.log(error), // Handle the error response object
-      );
-  };
-
-  handleChangeSkills = value => {
-    if (value) {
-      this.setState({skills: value, skillsvalid: true});
-    } else {
-      this.setState({
-        skills: this.state.skills,
-        skillsvalid: false,
-      });
-    }
-  };
-
-  handleChangePerks = value => {
-    if (value) {
-      this.setState({perks: value, perksvalid: true});
-    } else {
-      this.setState({
-        perks: this.state.perks,
-        perksvalid: false,
-      });
-    }
-  };
-  saveCompany = () => {
-    let newCompany = {
-      ...this.state.company,
-      ...{Industry: this.state.industry.value},
-    };
-    const that = this;
-    const createCompanyopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
-      json: true,
-      query: `mutation update_Company($ownerId: Int!,
-                $id: Int!,
-    			$name: String!,
-			    $url: String!,
-			    $description: String!,
-			    $yearFounded: Int!,
-			    $employeeCount: Int,
-			    $devCount: Int,
-                $media1: json,
-                $media2: json,
-                $media3: json,
-                $quote1: json,
-                $quote2: json,
-                $employee1: json,
-                $employee2: json,
-				$Industry: String!,
-                $twitter: String,
-               $country: String,
-               $route: String,
-               $street_number: String,
-               $locality: String,
-               $administrative_area_level_1: String,
-               $postal_code: String,
-               $location: geography,
-               $skills: [SkillCompany_insert_input!]!
-               $perks: [PerkCompany_insert_input!]!
-               $moderators: [Moderator_insert_input]
-               ) {
-				  update_Company(where: {id: {_eq: $id}},_set: {
-					ownerId: $ownerId,
-					name: $name,
-					url: $url,
-					description: $description,
-					yearFounded: $yearFounded,
-					Industry: $Industry,
-                    employeeCount: $employeeCount,
-                twitter: $twitter,
-			    devCount:$devCount,
-                media1:$media1,
-                media2:$media2,
-                media3:$media3,
-                quote1:$quote1,
-                quote2:$quote2,
-                employee1:$employee1,
-                employee2:$employee2,
-               country: $country,
-               route: $route,
-               street_number: $street_number,
-               locality: $locality,
-               administrative_area_level_1: $administrative_area_level_1,
-               postal_code: $postal_code,
-                location: $location,
-				}){
-					returning{
-					  id
-					  name
-			}
-			}
-  delete_SkillCompany(where: {CompanyId: {_eq: $id}}){
-    affected_rows
-
-}
-		insert_SkillCompany(objects: $skills){
-			    returning{Skill}
-
-		}
-  delete_PerkCompany(where: {CompanyId: {_eq: $id}}){
-    affected_rows
-
-}
-		insert_PerkCompany(objects: $perks){
-			    returning{Perk}
-
-		}
-delete_Moderator(where: {companyId: {_eq: $id}}){
-    affected_rows
-
-}
-insert_Moderator(objects: $moderators){
-    returning{userEmail}
-}
-			}
-				`,
-      headers: {
-        'x-access-token': Cookies.get('token'),
-      },
-    };
-    let skills = [];
-    this.state.skills.map(skill => {
-      skills.push({
-        Skill: skill.value.Skill || skill.value,
-        CompanyId: this.state.company.id,
-      });
-    });
-    newCompany.skills = skills;
-    skills.length > 0
-      ? null
-      : newCompany.skills.push({
-          Skill: 'React.js',
-          CompanyId: this.state.company.id,
-        });
-    let perks = [];
-    this.state.perks.map(perk => {
-      perks.push({
-        Perk: perk.value.Perk || perk.value,
-        CompanyId: this.state.company.id,
-      });
-    });
-    newCompany.perks = perks;
-    perks.length > 0
-      ? null
-      : newCompany.perks.push({
-          Perk: 'Healthcare',
-          CompanyId: this.state.company.id,
-        });
-
-    let moderators = [];
-    let stateModerators = this.state.moderators;
-    typeof stateModerators === 'string'
-      ? (stateModerators = stateModerators.split(','))
-      : null;
-    stateModerators.map(moderator => {
-      moderator.trim()
-        ? moderators.push({
-            userEmail: moderator.trim(),
-            companyId: this.state.company.id,
-          })
-        : null;
-    });
-    newCompany.moderators =
-      moderators.length > 0
-        ? moderators
-        : [
-            {
-              userEmail: this.state.currentUser.linkedinEmail,
-              companyId: this.state.company.id,
-            },
-          ];
-    newCompany = {...newCompany, ...this.state.fullAddress};
-    newCompany.location = {
-      type: 'Point',
-      coordinates: [this.state.coordinates.lat, this.state.coordinates.lng],
-    };
-
-    const client = new grequest.GraphQLClient(createCompanyopts.uri, {
-      headers: createCompanyopts.headers,
-    });
-
-    client.request(createCompanyopts.query, newCompany).then(gdata => {
-      this.handleUpdateCallback();
+      hasResumePdf: !this.state.hasResumePdf,
     });
   };
 
@@ -808,7 +504,7 @@ insert_Moderator(objects: $moderators){
                     }
                   />
                   <CardActionArea className={classes.cardActionArea}>
-                    {job.Company.media1.published ? (
+                    {job.Company.media1 && job.Company.media1.published ? (
                       <>
                         {job.Company.media1.hasVideo ? (
                           <ReactPlayer
@@ -883,6 +579,29 @@ insert_Moderator(objects: $moderators){
                     title={
                       <Typography gutterBottom variant="h3" component="h1">
                         {job.JobTitle}
+                        {job.applyDirectly ? (
+                          <a
+                            style={{
+                              textDecoration: 'none',
+                            }}
+                            href={job.applicationUrl}
+                            target="_blank">
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              style={{color: '#FFF', marginLeft: '15px'}}>
+                              Apply On Company Site
+                            </Button>
+                          </a>
+                        ) : (
+                          <Button
+                            onClick={this.handleClickApply}
+                            variant="contained"
+                            color="secondary"
+                            style={{color: '#FFF', marginLeft: '15px'}}>
+                            APPLY NOW
+                          </Button>
+                        )}
                       </Typography>
                     }
                     subheader={
@@ -946,16 +665,171 @@ insert_Moderator(objects: $moderators){
                     ))}
                   </CardActionArea>
                   <CardActions>
-                    <Link href={'/jobs/companies/' + job.Company.id}>
-                      <Button size="small" color="primary">
-                        APPLY
+                    {job.applyDirectly ? (
+                      <a
+                        style={{
+                          textDecoration: 'none',
+                        }}
+                        href={job.applicationUrl}
+                        target="_blank">
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          style={{color: '#FFF', marginLeft: '15px'}}>
+                          Apply On Company Site
+                        </Button>
+                      </a>
+                    ) : (
+                      <Button
+                        onClick={this.handleClickApply}
+                        variant="contained"
+                        color="secondary"
+                        style={{color: '#FFF', marginLeft: '15px'}}>
+                        APPLY NOW
                       </Button>
-                    </Link>
+                    )}
                   </CardActions>
                 </Card>
               </div>
             </Grid>
           </Grid>
+          <Dialog
+            open={this.state.apply}
+            onClose={this.handleClose}
+            fullScreen="true"
+            aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">
+              Apply for {job.JobTitle} @ {job.Company.name}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                A link to your{' '}
+                <a href="/profile" target="_blank">
+                  profile
+                </a>{' '}
+                and cover letter will be sent to {job.Company.name}
+              </DialogContentText>
+              <FormControl
+                className={classes.formControl}
+                error={this.state.namevalid === false}>
+                <Input
+                  id="logo-simple"
+                  name="file"
+                  type="file"
+                  onChange={e => {
+                    console.log(e.target.files);
+                    this.setState({file: e.target.files, hasResumePdf: true});
+                  }}
+                />
+                <FormHelperText
+                  id={
+                    this.state.namevalid !== false
+                      ? 'name-helper-text'
+                      : 'name-error-text'
+                  }>
+                  {i18n.t("Your resume's pdf (optional)")}
+                </FormHelperText>
+              </FormControl>
+
+              <FormControl fullWidth={true} className={classes.formControl}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={this.state.hasResumePdf}
+                      name="hasResumePdf"
+                      value="hasResumePdf"
+                      onChange={this.handleCheckboxHasResumePdf}
+                      color="primary"
+                    />
+                  }
+                  label={this.i18n.t('Include resume pdf')}
+                />
+              </FormControl>
+
+              <FormControl
+                fullWidth={true}
+                className={classes.formControl}
+                error={this.state.coverLettervalid === false}>
+                <InputLabel htmlFor="name-simple">
+                  {i18n.t('Cover letter')}
+                </InputLabel>
+                <Input
+                  id="coverLetter"
+                  value={this.state.coverLetter}
+                  onChange={this.handleChange}
+                  name="coverLetter"
+                  required={true}
+                  multiline={true}
+                  rows={20}
+                  fullWidth={true}
+                />
+
+                <FormHelperText
+                  id={
+                    this.state.coverLettervalid !== false
+                      ? 'coverLetter-helper-text'
+                      : 'coverLetter-error-text'
+                  }>
+                  {this.state.coverLettervalid !== false
+                    ? i18n.t(
+                        'Write a cover letter about what your company is about',
+                      )
+                    : i18n.t(
+                        'Writing a cover letter about what your company is about is required',
+                      )}
+                </FormHelperText>
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleClose} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={this.handleSendApplication} color="primary">
+                Send application
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={this.state.openNotification}
+            autoHideDuration={6000}
+            onClose={() => {
+              this.setState({openNotification: false});
+            }}
+            ContentProps={{
+              'aria-describedby': 'message-id',
+            }}
+            message={
+              <span id="message-id">
+                {this.i18n.t('Your application has been sent!')}
+              </span>
+            }
+            action={[
+              /*  TODO implement undo save company
+                <Button
+                  key="undo"
+                  color="secondary"
+                  size="small"
+                  onClick={() => {
+                    this.setState({openNotification: false});
+                  }}>
+                  UNDO
+                </Button>,*/
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                className={styles.close}
+                onClick={() => {
+                  this.setState({openNotification: false});
+                }}>
+                <CloseIcon />
+              </IconButton>,
+            ]}
+          />
         </div>
       </I18nextProvider>
     );

@@ -150,6 +150,16 @@ class LoginAppBarTop extends React.Component {
             ReactEurope Jobs
           </Typography>
         </Link>
+        {isLoggedIn && this.props.userInfo.github ? (
+          <Link href="/profile">
+            <Button
+              variant="contained"
+              color="secondary"
+              style={{color: '#FFF', marginLeft: '15px'}}>
+              {i18n.t('My profile')}
+            </Button>
+          </Link>
+        ) : null}
         {!isLoggedIn || this.props.userInfo.linkedin ? (
           <Link href="/newjob">
             <Button

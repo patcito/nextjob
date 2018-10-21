@@ -35,6 +35,10 @@ app.prepare().then(() => {
     const token = req.cookies.token;
     if (!token) {
       console.log('no token');
+      req.userId = null;
+      req.token = null;
+      req.github = null;
+      req.linkedin = null;
       next();
       return;
     }
@@ -42,10 +46,14 @@ app.prepare().then(() => {
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
         console.log('token not ok', err);
+        req.userId = null;
+        req.token = null;
+        req.github = null;
+        req.linkedin = null;
         next();
         return;
       } else {
-        console.log('token ok', decoded);
+        console.log('token ok', decoded.userId);
         req.userId = decoded.userId;
         req.token = token;
         req.github = decoded.github;
@@ -81,93 +89,206 @@ app.prepare().then(() => {
           const otoken = oauth2.accessToken.create(result);
           const githubToken = result.access_token;
           var opts = {
-            uri: 'https://api.github.com/user',
-            gzip: true,
+            uri: 'https://api.github.com/graphql',
+            json: true,
             headers: {
-              Authorization: 'token ' + result.access_token,
-              'User-Agent': 'patcito',
+              Authorization: 'bearer ' + githubToken,
             },
-          };
-          request(opts, function(err, res, body) {
-            // now body and res.body both will contain decoded content.
-            //
-            const bodyJson = JSON.parse(body);
+            query: `
+			  query getUser{
+  viewer {
+    login
+    name
+	bio
+	  email
+	  databaseId
+	  avatarUrl
+	  url
+	  websiteUrl
+	  followers {
+      totalCount
+}
+pullRequests(last: 100, states: MERGED, orderBy: {direction: DESC, field: CREATED_AT}){
+  nodes{
+    url
+	title
+    repository{
+      url
+      nameWithOwner
+	  owner{
+        avatarUrl
+	  }
+      name
+	  description
+  stargazers{
+    totalCount
+  }
+   primaryLanguage{
+    name
+    id
+}
+      languages(first: 100){
+        nodes{
+          name
+          id
+        }
+      }
+    }
+    mergedBy{
+      avatarUrl
+      login
+      url
 
-            const checkUserRequestopts = {
-              uri: 'http://localhost:8080/v1alpha1/graphql',
-              json: true,
-              query: `query User($githubId: String!){
-  						User(where: {githubId: {_eq: $githubId}}) {
-						  id
-						  githubEmail
-						  name
-						  Companies {
-							id
-							name
-							description
-							url
-							Industry
-							yearFounded
-						  }
+    }
+  }
+}
+repositoriesContributedTo(first: 100, orderBy: {direction: DESC, field: STARGAZERS}){
+totalCount
+nodes {
+  id
+  name
+  primaryLanguage{
+    name
+    id
+}
+	  owner{
+        avatarUrl
+
+	}
+  nameWithOwner
+description
+  url
+  stargazers{
+    totalCount
+  }
+  viewerCanAdminister
+		languages(first: 25) {
+          totalCount
+		  edges {
+			node {
+              id
+              name
+              color
+
+}
+
+}
+
+}
+
+}
+
+}
+
+}
+
+}
+
+`,
+          };
+          const client = new grequest.GraphQLClient(opts.uri, {
+            headers: opts.headers,
+            'User-Agent': 'patcito',
+          });
+
+          client
+            .request(opts.query, {})
+            .catch(err => {
+              console.log(err, opts);
+            })
+            .then(data => {
+              // now body and res.body both will contain decoded content.
+              //
+              console.log('viewerrrrrr', data);
+              const bodyJson = data.viewer;
+
+              const checkUserRequestopts = {
+                uri: 'http://localhost:8080/v1alpha1/graphql',
+                json: true,
+                query: `mutation User($githubId: String!, $token: String!,
+									  $githubRepositories: jsonb, $pullRequests: jsonb,
+									  $bio: String, $githubBlogUrl: String){
+						  update_User(where: {githubId: {_eq: $githubId}},
+							_set: {bio: $bio, githubBlogUrl: $githubBlogUrl, githubAccessToken: $token, githubRepositories: $githubRepositories, pullRequests: $pullRequests}) {
+							returning {
+							  id
+							  githubEmail
+									  name
+									  Companies {
+								id
+								name
+								description
+										url
+										Industry
+										yearFounded
+						}
+
+						}
 						}
 						}`,
-              headers: {
-                'X-Hasura-Access-Key': process.env.HASURA_SECRET,
-              },
-            };
-            const checkUserRequestVars = {
-              githubId: bodyJson.id + '',
-            };
-            const client = new grequest.GraphQLClient(
-              checkUserRequestopts.uri,
-              {
-                headers: checkUserRequestopts.headers,
-              },
-            );
-            console.log(checkUserRequestopts);
-            console.log('gt vars', checkUserRequestVars);
+                headers: {
+                  'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+                },
+              };
+              const checkUserRequestVars = {
+                githubId: bodyJson.databaseId + '',
+                token: githubToken,
+                githubRepositories: bodyJson.repositoriesContributedTo,
+                pullRequests: bodyJson.pullRequests,
+                bio: bodyJson.bio,
+                githubBlogUrl: bodyJson.websiteUrl,
+              };
+              const client = new grequest.GraphQLClient(
+                checkUserRequestopts.uri,
+                {
+                  headers: checkUserRequestopts.headers,
+                },
+              );
+              console.log(checkUserRequestopts);
+              console.log('gt vars', checkUserRequestVars);
 
-            client
-              .request(checkUserRequestopts.query, checkUserRequestVars)
-              .then(ugdata => {
-                const currentUser = ugdata.User[0];
-                if (currentUser && currentUser.id) {
-                  currentUser.recruiter = true;
-                  var token = jwt.sign(
-                    {
-                      token: otoken,
-                      userId: currentUser.id,
-                      github: true,
-                      linkedin: false,
-                    },
-                    process.env.JWT_SECRET,
-                    {
-                      expiresIn: '200 days', // expires in 24 hours
-                    },
-                  );
-                  /*return originalRes.status(200).send({
+              client
+                .request(checkUserRequestopts.query, checkUserRequestVars)
+                .then(ugdata => {
+                  const currentUser = ugdata.update_User.returning[0];
+                  if (currentUser && currentUser.id) {
+                    currentUser.recruiter = true;
+                    var token = jwt.sign(
+                      {
+                        token: otoken,
+                        userId: currentUser.id,
+                        github: true,
+                        linkedin: false,
+                      },
+                      process.env.JWT_SECRET,
+                      {
+                        expiresIn: '200 days', // expires in 24 hours
+                      },
+                    );
+                    /*return originalRes.status(200).send({
                     auth: true,
                     token: token,
                     user: currentUser,
                   });*/
-                  req.userId = currentUser.id;
-                  req.token = token;
-                  req.github = true;
-                  req.linkedin = false;
-                  req.currentUser = ugdata.User[0];
-                  next();
-                  return;
-                }
-                var uopts = {
-                  uri: 'http://localhost:8080/v1alpha1/graphql',
-                  json: true,
-                  query: `mutation insert_User($name: String,
+                    req.userId = currentUser.id;
+                    req.token = token;
+                    req.github = true;
+                    req.linkedin = false;
+                    req.currentUser = currentUser;
+                    next();
+                    return;
+                  }
+                  var uopts = {
+                    uri: 'http://localhost:8080/v1alpha1/graphql',
+                    json: true,
+                    query: `mutation insert_User($name: String,
 							$githubEmail: String!,
 							$githubId: String,
 							$githubAvatarUrl: String,
 							  $githubUsername: String,
 							 $githubAccessToken: String,
 							 $githubBlogUrl: String,
+							$githubRepositories: jsonb,
 							 $githubFollowers: Int )
 							{insert_User(objects: {
 							name: $name,
@@ -177,7 +298,8 @@ app.prepare().then(() => {
 							githubUsername:  $githubUsername,
 							githubAccessToken: $githubAccessToken,
 							githubBlogUrl: $githubBlogUrl,
-							githubFollowers: $githubFollowers
+							githubFollowers: $githubFollowers,
+							githubRepositories: $githubRepositories
 
 											}){
 										returning{
@@ -187,58 +309,59 @@ app.prepare().then(() => {
 
 							}
 									}}`,
-                  headers: {
-                    'X-Hasura-Access-Key': process.env.HASURA_SECRET,
-                  },
-                };
-                const client = new grequest.GraphQLClient(uopts.uri, {
-                  headers: uopts.headers,
-                });
-                bodyJson.id += '';
-                const variables = {
-                  name: bodyJson.name,
-                  githubEmail: bodyJson.email,
-                  githubId: bodyJson.id,
-                  githubAvatarUrl: bodyJson.avatar_url,
-                  githubUsername: bodyJson.login,
-                  githubAccessToken: githubToken,
-                  githubBlogUrl: bodyJson.blog,
-                  githubFollowers: bodyJson.followers,
-                };
-                console.log(uopts.query);
-                console.log('gt vars', variables);
-                client.request(uopts.query, variables).then(gdata => {
-                  var token = jwt.sign(
-                    {
-                      token: otoken,
-                      userId: gdata.insert_User.returning.id,
-                      github: true,
-                      linkedin: false,
+                    headers: {
+                      'X-Hasura-Access-Key': process.env.HASURA_SECRET,
                     },
-                    process.env.JWT_SECRET,
-                    {
-                      expiresIn: 864000, // expires in 24 hours
-                    },
-                  );
-                  /*return originalRes.status(200).send({
+                  };
+                  const client = new grequest.GraphQLClient(uopts.uri, {
+                    headers: uopts.headers,
+                  });
+                  bodyJson.id += '';
+                  const variables = {
+                    name: bodyJson.name,
+                    githubEmail: bodyJson.email,
+                    githubId: bodyJson.id,
+                    githubAvatarUrl: bodyJson.avatariUrl,
+                    githubUsername: bodyJson.login,
+                    githubAccessToken: githubToken,
+                    githubBlogUrl: bodyJson.url,
+                    githubFollowers: bodyJson.followers.totalCount,
+                    githubRepositories: bodyJson.repositoriesContributedTo,
+                  };
+                  console.log(uopts.query);
+                  console.log('gt vars', variables);
+                  client.request(uopts.query, variables).then(gdata => {
+                    var token = jwt.sign(
+                      {
+                        token: otoken,
+                        userId: gdata.insert_User.returning.id,
+                        github: true,
+                        linkedin: false,
+                      },
+                      process.env.JWT_SECRET,
+                      {
+                        expiresIn: 864000, // expires in 24 hours
+                      },
+                    );
+                    /*return originalRes.status(200).send({
                     auth: true,
                     token: token,
                     user: gdata.insert_User.returning[0],
                   });*/
-                  req.userId = gdata.insert_User.returning[0].id;
-                  req.token = token;
-                  req.github = true;
-                  req.linkedin = false;
-                  req.currentUser = gdata.insert_User.returning[0];
+                    req.userId = gdata.insert_User.returning[0].id;
+                    req.token = token;
+                    req.github = true;
+                    req.linkedin = false;
+                    req.currentUser = gdata.insert_User.returning[0];
 
-                  next();
-                  return;
+                    next();
+                    return;
+                  });
+                })
+                .catch(err => {
+                  console.log('err', err);
                 });
-              })
-              .catch(err => {
-                console.log('err', err);
-              });
-          });
+            });
         } catch (error) {
           console.error('Access Token Error', error.message);
           next();
@@ -273,6 +396,7 @@ app.prepare().then(() => {
               'Content-Type': 'x-www-form-urlencoded',
             },
           };
+
           request(opts, function(err, res, body) {
             const otoken = JSON.parse(body).access_token;
             const aopts = {
@@ -287,11 +411,49 @@ app.prepare().then(() => {
               //
               const bodyJson = JSON.parse(body);
               //              console.log('linkedin', bodyJson.positions.values[0]);
+              if (req.github === true) {
+                console.log('userId!', req.userId);
+                const setLinkedinProfilopts = {
+                  uri: 'http://localhost:8080/v1alpha1/graphql',
+                  json: true,
+                  query: `mutation uu($id: Int, $linkedinProfile: jsonb!) {
+				  update_User(where: {id: {_eq:
+					  $id}}, _set: {linkedinProfile: $linkedinProfile}){
+					  returning{
+						        id
+						        linkedinProfile
 
-              const checkUserRequestopts = {
-                uri: 'http://localhost:8080/v1alpha1/graphql',
-                json: true,
-                query: `query User($linkedinId: String!){
+					  }
+
+				  }
+
+				}`,
+                  headers: {
+                    'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+                  },
+                };
+                const setLinkedinProfileVars = {
+                  linkedinProfile: bodyJson,
+                  id: req.userId,
+                };
+                const client = new grequest.GraphQLClient(
+                  setLinkedinProfilopts.uri,
+                  {
+                    headers: setLinkedinProfilopts.headers,
+                  },
+                );
+                client
+                  .request(setLinkedinProfilopts.query, setLinkedinProfileVars)
+                  .then(ugdata => {
+                    next();
+                    return;
+                  });
+                return;
+              } else {
+                const checkUserRequestopts = {
+                  uri: 'http://localhost:8080/v1alpha1/graphql',
+                  json: true,
+                  query: `query User($linkedinId: String!){
   						User(where: {linkedinId: {_eq: $linkedinId}}) {
 						  id
 						  linkedinEmail
@@ -305,55 +467,55 @@ app.prepare().then(() => {
 							yearFounded
 						  }	}
 						}`,
-                headers: {
-                  'X-Hasura-Access-Key': process.env.HASURA_SECRET,
-                },
-              };
-              const checkUserRequestVars = {
-                linkedinId: bodyJson.id,
-              };
-              const client = new grequest.GraphQLClient(
-                checkUserRequestopts.uri,
-                {
-                  headers: checkUserRequestopts.headers,
-                },
-              );
-              client
-                .request(checkUserRequestopts.query, checkUserRequestVars)
-                .then(ugdata => {
-                  const currentUser = ugdata.User[0];
-                  if (currentUser && currentUser.id) {
-                    const token = jwt.sign(
-                      {
-                        token: otoken,
-                        userId: currentUser.id,
-                        github: false,
-                        linkedin: true,
-                      },
-                      process.env.JWT_SECRET,
-                      {
-                        expiresIn: 86400, // expires in 24 hours
-                      },
-                    );
-                    currentUser.recruiter = true;
-                    /*return originalRes.status(200).send({
+                  headers: {
+                    'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+                  },
+                };
+                const checkUserRequestVars = {
+                  linkedinId: bodyJson.id,
+                };
+                const client = new grequest.GraphQLClient(
+                  checkUserRequestopts.uri,
+                  {
+                    headers: checkUserRequestopts.headers,
+                  },
+                );
+                client
+                  .request(checkUserRequestopts.query, checkUserRequestVars)
+                  .then(ugdata => {
+                    const currentUser = ugdata.User[0];
+                    if (currentUser && currentUser.id) {
+                      const token = jwt.sign(
+                        {
+                          token: otoken,
+                          userId: currentUser.id,
+                          github: false,
+                          linkedin: true,
+                        },
+                        process.env.JWT_SECRET,
+                        {
+                          expiresIn: 86400, // expires in 24 hours
+                        },
+                      );
+                      currentUser.recruiter = true;
+                      /*return originalRes.status(200).send({
                       auth: true,
                       token: token,
                       user: currentUser,
                     });*/
-                    req.userId = currentUser.id;
-                    req.token = token;
-                    req.github = false;
-                    req.linkedin = true;
-                    req.currentUser = currentUser;
+                      req.userId = currentUser.id;
+                      req.token = token;
+                      req.github = false;
+                      req.linkedin = true;
+                      req.currentUser = currentUser;
 
-                    next();
-                    return;
-                  }
-                  const uopts = {
-                    uri: 'http://localhost:8080/v1alpha1/graphql',
-                    json: true,
-                    query: `mutation insert_User($name: String,
+                      next();
+                      return;
+                    }
+                    const uopts = {
+                      uri: 'http://localhost:8080/v1alpha1/graphql',
+                      json: true,
+                      query: `mutation insert_User($name: String,
 					$linkedinEmail: String!,
 					$linkedinId: String,
 					$linkedinAvatarUrl: String,
@@ -384,53 +546,55 @@ app.prepare().then(() => {
 						  name
 					}
 					}}`,
-                    headers: {
-                      'X-Hasura-Access-Key': process.env.HASURA_SECRET,
-                    },
-                  };
-                  const variables = {
-                    name: bodyJson.formattedName,
-                    linkedinEmail: bodyJson.emailAddress,
-                    linkedinId: bodyJson.id,
-                    linkedinAvatarUrl: bodyJson.pictureUrl,
-                    linkedinAccessToken: otoken,
-                    firstName: bodyJson.firstName,
-                    lastName: bodyJson.lastName,
-                    headlineLinkedin: bodyJson.headline,
-                    industryLinkedin: bodyJson.industry,
-                    companyLinkedin: bodyJson.positions.values[0].company.name,
-                    linkedinUrl: bodyJson.siteStandardProfileRequest.url,
-                  };
-                  client.request(uopts.query, variables).then(gdata => {
-                    const currentUser = gdata.insert_User.returning[0];
-                    currentUser.recruiter = true;
-                    const token = jwt.sign(
-                      {
-                        token: otoken,
-                        userId: currentUser.id,
-                        github: false,
-                        linkedin: true,
+                      headers: {
+                        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
                       },
-                      process.env.JWT_SECRET,
-                      {
-                        expiresIn: 86400, // expires in 24 hours
-                      },
-                    );
+                    };
+                    const variables = {
+                      name: bodyJson.formattedName,
+                      linkedinEmail: bodyJson.emailAddress,
+                      linkedinId: bodyJson.id,
+                      linkedinAvatarUrl: bodyJson.pictureUrl,
+                      linkedinAccessToken: otoken,
+                      firstName: bodyJson.firstName,
+                      lastName: bodyJson.lastName,
+                      headlineLinkedin: bodyJson.headline,
+                      industryLinkedin: bodyJson.industry,
+                      companyLinkedin:
+                        bodyJson.positions.values[0].company.name,
+                      linkedinUrl: bodyJson.siteStandardProfileRequest.url,
+                    };
+                    client.request(uopts.query, variables).then(gdata => {
+                      const currentUser = gdata.insert_User.returning[0];
+                      currentUser.recruiter = true;
+                      const token = jwt.sign(
+                        {
+                          token: otoken,
+                          userId: currentUser.id,
+                          github: false,
+                          linkedin: true,
+                        },
+                        process.env.JWT_SECRET,
+                        {
+                          expiresIn: 86400, // expires in 24 hours
+                        },
+                      );
 
-                    /*return originalRes.status(200).send({
+                      /*return originalRes.status(200).send({
                       auth: true,
                       token: token,
                       user: currentUser,
                     });*/
-                    req.userId = currentUser.id;
-                    req.token = token;
-                    req.github = false;
-                    req.linkedin = true;
-                    req.currentUser = currentUser;
-                    next();
-                    return;
+                      req.userId = currentUser.id;
+                      req.token = token;
+                      req.github = false;
+                      req.linkedin = true;
+                      req.currentUser = currentUser;
+                      next();
+                      return;
+                    });
                   });
-                });
+              }
             });
             //    return originalRes.status(500).json(body);
           });
@@ -530,6 +694,29 @@ app.prepare().then(() => {
     return app.render(req, res, '/editcompany', {
       companyId: req.params.companyId,
       action: 'editCompany',
+    });
+  });
+
+  server.post('/uploadResume', function(req, res) {
+    if (!req.files) return res.status(400).json('No files were uploaded.');
+    let sampleFile = req.files.file;
+
+    sampleFile = req.files.file;
+
+    uploadPath =
+      __dirname +
+      '/uploads/' +
+      req.get('jobId') +
+      '-' +
+      req.get('applicantId') +
+      '-resume.pdf';
+
+    sampleFile.mv(uploadPath, function(err) {
+      if (err) {
+        return res.status(500).json(err);
+      }
+
+      res.send('ok');
     });
   });
 

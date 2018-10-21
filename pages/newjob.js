@@ -79,7 +79,7 @@ const styles = theme => ({
     marginTop: theme.spacing.unit,
     marginRight: theme.spacing.unit,
   },
-  actionsContainer: {
+  howctionsContainer: {
     marginBottom: theme.spacing.unit * 2,
   },
   resetContainer: {
@@ -104,7 +104,6 @@ class NewJob extends React.Component {
     selectedSeniorityLevel: '',
     activeStep: 0,
     addNewCompany: false,
-    hasApplicationEmail: true,
     minSalary: 10,
     maxSalary: 10,
   };
@@ -137,6 +136,8 @@ class NewJob extends React.Component {
   saveJob = () => {
     const vars = {
       isPublished: this.state.isPublished,
+      applicationEmail: this.state.applicationEmail,
+      applicationUrl: this.state.applicationUrl,
       remote: this.state.remote,
       companyId: this.state.selectedCompany,
       applyDirectly: !this.state.hasApplicationEmail,
@@ -181,7 +182,8 @@ $hasMonthlySalary: Boolean,
       $maximumYearlySalary: Int,
       $maximumMonthlySalary: Int,
       $minimumMonthlySalary: Int,
-
+    $applicationEmail: String,
+      $applicationUrl: String,
  $ownerId: Int,
   $location: geography,
   $street_number: String,
@@ -208,6 +210,8 @@ hasMonthlySalary: $hasMonthlySalary,
       maximumYearlySalary: $maximumYearlySalary,
       maximumMonthlySalary: $maximumMonthlySalary,
       minimumMonthlySalary: $minimumMonthlySalary,
+    applicationEmail:  $applicationEmail,
+      applicationUrl:  $applicationUrl ,
 
 				    location: $location,
 		  				street_number: $street_number,
@@ -608,7 +612,8 @@ $hasMonthlySalary: Boolean,
       maximumMonthlySalary
       minimumMonthlySalary
 
-
+		applicationEmail
+		applicationUrl
 		location
         street_number
         route
@@ -693,8 +698,12 @@ $hasMonthlySalary: Boolean,
         const jobState = {
           isPublished: job.isPublished,
           remote: job.remote,
+          applicationEmail: job.applicationEmail,
+          applicationUrl: job.applicationUrl,
+          applyDirectly: job.applyDirectly,
+
           selectedCompany: job.companyId,
-          hasApplicationEmail: job.applyDirectly,
+          hasApplicationEmail: !job.applyDirectly,
           yearsExperienceRange: [
             job.minimumExperienceYears,
             job.maximumExperienceYears,
@@ -850,24 +859,26 @@ $hasMonthlySalary: Boolean,
 
   upload = companyId => {
     console.log(this.state.file);
-    const formData = new FormData();
-    formData.append('file', this.state.file[0]);
-    console.log(formData);
-    fetch('/upload', {
-      // Your POST endpoint
-      method: 'POST',
-      headers: {companyId: companyId},
-      body: formData, // This is your file object
-    })
-      .then(
-        response => response.json(), // if the response is a JSON object
-      )
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
-      .catch(
-        error => console.log(error), // Handle the error response object
-      );
+    if (this.state.file && this.state.file.length > 0) {
+      const formData = new FormData();
+      formData.append('file', this.state.file[0]);
+      console.log(formData);
+      fetch('/upload', {
+        // Your POST endpoint
+        method: 'POST',
+        headers: {companyId: companyId},
+        body: formData, // This is your file object
+      })
+        .then(
+          response => response.json(), // if the response is a JSON object
+        )
+        .then(
+          success => console.log(success), // Handle the success response object
+        )
+        .catch(
+          error => console.log(error), // Handle the error response object
+        );
+    }
   };
 
   checkActiveStepValidity = activeStep => {
@@ -1081,7 +1092,9 @@ $hasMonthlySalary: Boolean,
                     </FormControl>
                     <FormControlLabel
                       value="male"
-                      control={<Radio />}
+                      control={
+                        <Radio checked={!this.state.hasApplicationEmail} />
+                      }
                       label={this.i18n.t(
                         'newjob:Direct applicants to an external site to apply',
                       )}
