@@ -88,6 +88,7 @@ class LoginAppBarTop extends React.Component {
           token: props.userInfo.token,
         });
         localStorage.setItem('token', props.userInfo.token);
+        localStorage.setItem('userInfo', JSON.stringify(props.userInfo));
         document.cookie = 'token=' + props.userInfo.token;
         localStorage.setItem(
           'currentUser',
@@ -113,6 +114,7 @@ class LoginAppBarTop extends React.Component {
           token: this.props.userInfo.token,
         });
         localStorage.setItem('token', this.props.userInfo.token);
+        localStorage.setItem('userInfo', JSON.stringify(this.props.userInfo));
         document.cookie = 'token=' + this.props.userInfo.token;
         localStorage.setItem(
           'currentUser',

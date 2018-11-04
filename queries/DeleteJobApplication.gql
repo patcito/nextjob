@@ -1,0 +1,8 @@
+mutation delete_application($applicationId: Int) {
+  delete_Message(where: {applicationId: {_eq: $applicationId}}) {
+    affected_rows
+  }
+  delete_JobApplication(where: {id: {_eq: $applicationId}}) {
+    affected_rows
+  }
+}

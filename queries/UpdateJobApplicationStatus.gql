@@ -1,0 +1,8 @@
+mutation upsert_application($id: Int, $status: Boolean) {
+  update_JobApplication(
+    where: {id: {_eq: $id}}
+    _set: {status: $status}
+  ) {
+    affected_rows
+  }
+}

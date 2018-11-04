@@ -249,7 +249,7 @@ class EditCompany extends React.Component {
 	}
           `,
       headers: {
-        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+        'x-access-token': token,
       },
     };
     const client = new grequest.GraphQLClient(queryOpts.uri, {

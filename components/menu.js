@@ -95,12 +95,14 @@ class MenuList extends React.Component {
         </List>
         <Divider />
         <List component="nav">
-          <ListItem button>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary={i18n.t('Applicants')} />
-          </ListItem>
+          <a href="/applications">
+            <ListItem button>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary={i18n.t('Applicants')} />
+            </ListItem>
+          </a>
           <ListItem button>
             <ListItemIcon>
               <InboxIcon />

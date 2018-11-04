@@ -204,6 +204,7 @@ class ShowJob extends React.Component {
         `,
       headers: {
         'x-access-token': Cookies.get('token'),
+        'x-access-role': 'userType',
       },
     };
     let vars = {
@@ -346,7 +347,7 @@ class ShowJob extends React.Component {
           }
                     `,
       headers: {
-        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+        'x-access-token': token,
       },
     };
     const client = new grequest.GraphQLClient(queryOpts.uri, {

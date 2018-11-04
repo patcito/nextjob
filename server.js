@@ -53,7 +53,6 @@ app.prepare().then(() => {
         next();
         return;
       } else {
-        console.log('token ok', decoded.userId);
         req.userId = decoded.userId;
         req.token = token;
         req.github = decoded.github;
@@ -649,9 +648,19 @@ description
         };
         return res.status(200).send(x);
       } else {
+        var role = req.headers['x-access-role'];
+        if (!role) {
+          role = decoded.userId ? 'user' : 'anon';
+        } else if (role === 'userType') {
+          if (decoded.github) {
+            role = 'user-candidate';
+          } else {
+            role = 'user-hr';
+          }
+        }
         const x = {
           'X-Hasura-User-Id': decoded.userId + '',
-          'X-Hasura-Role': decoded.userId ? 'user' : 'anon',
+          'X-Hasura-Role': role,
           'X-Hasura-Access-Key': process.env.JWT_SECRET,
           'X-Hasura-Custom': 'custom value',
         };
