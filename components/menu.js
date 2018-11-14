@@ -24,6 +24,11 @@ const styles = theme => ({
   root: {
     flexGrow: 1,
   },
+  drawer: {
+    '@media (max-width: 992px)': {
+      display: 'none',
+    },
+  },
   flex: {
     flexGrow: 1,
   },
@@ -72,10 +77,12 @@ class MenuList extends React.Component {
     const {classes} = this.props;
     const {open} = this.state;
     const i18n = this.props.i18n;
-
+    const isLoggedIn = this.props.userInfo && this.props.userInfo.userId;
     return (
       <div className={classes.root}>
-        <List component="nav">
+        <List
+          component="nav"
+          className={this.props.drawer ? null : classes.drawer}>
           <Link href="/">
             <ListItem button>
               <ListItemIcon>
@@ -93,37 +100,33 @@ class MenuList extends React.Component {
             </ListItem>
           </Link>
         </List>
-        <Divider />
-        <List component="nav">
-          <a href="/applications">
-            <ListItem button>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary={i18n.t('Applicants')} />
-            </ListItem>
-          </a>
-          <ListItem button>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary={i18n.t('Messages')} />
-          </ListItem>
-          <Link href="/me/companies">
-            <ListItem button>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary={i18n.t('Company details')} />
-            </ListItem>
-          </Link>
-          <ListItem button>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary={i18n.t('Resumes')} />
-          </ListItem>
-        </List>
+        {isLoggedIn ? (
+          <>
+            <Divider className={this.props.drawer ? null : classes.drawer} />
+            <List
+              component="nav"
+              className={this.props.drawer ? null : classes.drawer}>
+              <Link href="/applications">
+                <ListItem button>
+                  <ListItemIcon>
+                    <InboxIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={i18n.t('Applicants')} />
+                </ListItem>
+              </Link>
+              {this.props.userInfo.linkedin ? (
+                <Link href="/me/companies">
+                  <ListItem button>
+                    <ListItemIcon>
+                      <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={i18n.t('Company details')} />
+                  </ListItem>
+                </Link>
+              ) : null}
+            </List>
+          </>
+        ) : null}
       </div>
     );
   }

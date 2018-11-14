@@ -175,7 +175,6 @@ class ShowCompany extends React.Component {
       [
         'common',
         'namespace1',
-        'industries',
         'newjob',
         'jobstitles',
         'jobfunctions',
@@ -196,7 +195,7 @@ class ShowCompany extends React.Component {
       github = req.github;
       linkedin = req.linkedin;
       userInfo = {
-        userId: userId,
+        userId: req.userId ? req.userId : null,
         token: token,
         github: github,
         linkedin: linkedin,
@@ -748,7 +747,6 @@ insert_Moderator(objects: $moderators){
     const {classes, job} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
-    const industries = this.INDUSTRIES;
     const company = this.props.company.company;
     const skills = this.props.company.skills;
     const perks = this.props.company.perks;
@@ -758,7 +756,7 @@ insert_Moderator(objects: $moderators){
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} />
+              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
             </Grid>
             <Grid item xs={12} md={6}>
               <div style={{background: 'white'}}>
@@ -785,7 +783,9 @@ insert_Moderator(objects: $moderators){
                     }
                     subheader={
                       <>
-                        <span>Since {company.yearFounded}</span>
+                        <span>
+                          {i18n.t('Since')} {company.yearFounded}
+                        </span>
                         <IconButton
                           disableRipple={true}
                           disableFocusRipple={true}
@@ -808,7 +808,7 @@ insert_Moderator(objects: $moderators){
                           className={classes.iconButton}
                           aria-label="Delete">
                           <PeopleIcon className={classes.headerIcons} />{' '}
-                          {company.employeeCount} employees
+                          {company.employeeCount} {i18n.t('employees')}
                         </IconButton>
                         <a href={company.url} target="_blank">
                           <IconButton
@@ -857,7 +857,7 @@ insert_Moderator(objects: $moderators){
                     </CardContent>
                     <CardActions>
                       <Link href={'/jobs/companies/' + company.id}>
-                        <Button>Jobs</Button>
+                        <Button>{i18n.t('JOBS')}</Button>
                       </Link>
                       <a href={'https://twitter.com/' + company.twitter}>
                         <Button>Twitter</Button>
@@ -874,8 +874,8 @@ insert_Moderator(objects: $moderators){
                         spacing={24}
                         style={{textAlign: 'center'}}>
                         <Grid item xs={12} md={6}>
-                          <Typography component="h3" variant="h1">
-                            Number of devs
+                          <Typography component="h3" variant="h3">
+                            {i18n.t('Number of devs')}
                           </Typography>
                           <Typography
                             component="h1"
@@ -892,15 +892,15 @@ insert_Moderator(objects: $moderators){
                           style={{background: '#f50057', color: '#fff'}}>
                           <Typography
                             component="h3"
-                            variant="h1"
+                            variant="h4"
                             style={{marginBottom: '20px'}}>
-                            Techs we use
+                            {i18n.t('Techs we use')}
                           </Typography>
                           {skills.map(skill => (
                             <Typography
                               key={skill.value}
-                              component="h1"
-                              variant="h1"
+                              variant="h4"
+                              component="h4"
                               style={{fontSize: '40', textAlign: 'left'}}>
                               ✓ {skill.value}
                             </Typography>
@@ -944,15 +944,15 @@ insert_Moderator(objects: $moderators){
                           style={{background: '#4caf50', color: '#fff'}}>
                           <Typography
                             component="h3"
-                            variant="h1"
+                            variant="h4"
                             style={{marginBottom: '20px'}}>
-                            Perks we provide
+                            {i18n.t('Perks we provide')}
                           </Typography>
                           {(perks || []).map(perk => (
                             <Typography
                               component="h1"
                               key={perk.label}
-                              variant="h1"
+                              variant="h4"
                               style={{fontSize: '40'}}>
                               ✓ {perk.label}
                             </Typography>

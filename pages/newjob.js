@@ -582,6 +582,7 @@ $applicationEmail: String,
       localStorage.getItem('currentUser')
         ? (userId = localStorage.getItem('currentUser').id)
         : (userId = null);
+      userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
 
     const createCompanyopts = {
@@ -1504,9 +1505,12 @@ $applicationEmail: String,
                   }}>
                   <Button color="primary" className={classes.button}>
                     {this.state.hasMonthlySalary
-                      ? this.i18n.t('Switch to a yearly salary range instead')
-                      : this.i18n.t('Switch to a monthly salary range instead')}
-                    )
+                      ? this.i18n.t(
+                          'newjob:Switch to a yearly salary range instead',
+                        )
+                      : this.i18n.t(
+                          'newjob:Switch to a monthly salary range instead',
+                        )}
                   </Button>
                 </a>
               </Typography>

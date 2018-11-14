@@ -225,6 +225,7 @@ class Profile extends React.Component {
       localStorage.getItem('currentUser')
         ? (userId = JSON.parse(localStorage.getItem('currentUser')).id)
         : (userId = null);
+      userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
     const queryOpts = {
       uri: 'http://localhost:8080/v1alpha1/graphql',
@@ -255,12 +256,15 @@ class Profile extends React.Component {
 						}
 						}`,
       headers: {
-        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+        'x-access-token': userInfo.token,
       },
     };
     const client = new grequest.GraphQLClient(queryOpts.uri, {
       headers: queryOpts.headers,
     });
+    if (query && query.userProfileId && query.userProfileId !== null) {
+      userId = query.userProfileId;
+    }
     let user = await client.request(queryOpts.query, {
       id: userId,
     });
@@ -270,7 +274,8 @@ class Profile extends React.Component {
     } else {
       user = null;
     }
-    return {translations, userId, userInfo, user};
+    const isCurrentUserProfile = user.id === userInfo.userId;
+    return {translations, userId, userInfo, user, isCurrentUserProfile};
   }
   constructor(props) {
     super(props);
@@ -300,7 +305,7 @@ class Profile extends React.Component {
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} />
+              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
             </Grid>
             <Grid item xs={12} md={6}>
               <div style={{background: 'white'}}>
@@ -368,8 +373,8 @@ class Profile extends React.Component {
                 <Card className={classes.card}>
                   <CardContent>
                     <Typography
-                      variant="h2"
-                      component="h2"
+                      variant="h4"
+                      gutterBottom
                       className={classes.title}>
                       Positions
                     </Typography>
@@ -400,16 +405,22 @@ class Profile extends React.Component {
                         </List>
                       ))
                     ) : (
-                      <CardActions>
-                        <a href="https://www.linkedin.com/oauth/v2/authorization?client_id=86in1o0kvqc348&response_type=code&redirect_uri=http://localhost:4000&scope=r_basicprofile%20r_emailaddress">
-                          Connect to linkedin to fill your positions
-                          automatically
-                        </a>
-                      </CardActions>
+                      <>
+                        {this.props.isCurrentUserProfile ? (
+                          <CardActions>
+                            <a href="https://www.linkedin.com/oauth/v2/authorization?client_id=86in1o0kvqc348&response_type=code&redirect_uri=http://localhost:4000&scope=r_basicprofile%20r_emailaddress">
+                              Connect to linkedin to fill your positions
+                              automatically
+                            </a>
+                          </CardActions>
+                        ) : (
+                          'This user has not filled their profile yet.'
+                        )}
+                      </>
                     )}
                     <Typography
-                      variant="h2"
-                      component="h2"
+                      variant="h4"
+                      gutterBottom
                       className={classes.title}>
                       Open Source Contributions
                     </Typography>
@@ -423,86 +434,100 @@ class Profile extends React.Component {
                       as previous positions and education.
                     </Typography>
                     <p />
-                    <Typography
-                      variant="h3"
-                      component="h3"
-                      className={classes.title}>
-                      Repositories contributed to
-                    </Typography>
-                    {user.githubRepositories.nodes.map(repo => (
+                    {user.githubRepositories &&
+                    user.githubRepositories.nodes &&
+                    user.githubRepositories.nodes.length > 0 ? (
                       <>
-                        <List key={repo.nameWithOwner} dense={true}>
-                          <ListItem>
-                            <ListItemAvatar>
-                              <Avatar src={repo.owner.avatarUrl} />
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={
-                                <>
-                                  [{repo.primaryLanguage.name}]{' '}
-                                  {repo.nameWithOwner} (
-                                  {repo.stargazers.totalCount} ⭐'s)
-                                </>
-                              }
-                              secondary={repo.description}
-                            />
-                            <ListItemSecondaryAction>
-                              <a
-                                href={
-                                  repo.url +
-                                  '/commits?author=' +
-                                  user.githubUsername
-                                }
-                                target="_blank">
-                                <IconButton aria-label="Delete">
-                                  <OpenInNew />
-                                </IconButton>
-                              </a>
-                            </ListItemSecondaryAction>
-                          </ListItem>
-                        </List>
+                        <Typography
+                          variant="h4"
+                          gutterBottom
+                          className={classes.title}>
+                          Repositories contributed to
+                        </Typography>
+                        {user.githubRepositories.nodes.map(repo => (
+                          <>
+                            <List key={repo.nameWithOwner} dense={true}>
+                              <ListItem>
+                                <ListItemAvatar>
+                                  <Avatar src={repo.owner.avatarUrl} />
+                                </ListItemAvatar>
+                                <ListItemText
+                                  primary={
+                                    <>
+                                      [{repo.primaryLanguage.name}]{' '}
+                                      {repo.nameWithOwner} (
+                                      {repo.stargazers.totalCount} ⭐'s)
+                                    </>
+                                  }
+                                  secondary={repo.description}
+                                />
+                                <ListItemSecondaryAction>
+                                  <a
+                                    href={
+                                      repo.url +
+                                      '/commits?author=' +
+                                      user.githubUsername
+                                    }
+                                    target="_blank">
+                                    <IconButton aria-label="Delete">
+                                      <OpenInNew />
+                                    </IconButton>
+                                  </a>
+                                </ListItemSecondaryAction>
+                              </ListItem>
+                            </List>
+                          </>
+                        ))}
                       </>
-                    ))}
-                    <Typography
-                      variant="h3"
-                      component="h3"
-                      className={classes.title}>
-                      Merged Pull Requests
-                    </Typography>
-                    {user.pullRequests.nodes.map(pr => (
+                    ) : null}
+                    {user.pullRequests &&
+                    user.pullRequests.nodes &&
+                    user.pullRequests.nodes.length > 0 ? (
                       <>
-                        <List key={pr.id} dense={true}>
-                          <ListItem>
-                            <ListItemAvatar>
-                              <Avatar src={pr.repository.owner.avatarUrl} />
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={
-                                <>
-                                  {pr.repository.primaryLanguage ? (
-                                    <>[{pr.repository.primaryLanguage.name}] </>
-                                  ) : null}
-                                  {pr.title} merged in{' '}
-                                  {pr.repository.nameWithOwner}
-                                </>
-                              }
-                              secondary={
-                                pr.mergedBy
-                                  ? 'Merged by @' + pr.mergedBy.login
-                                  : null
-                              }
-                            />
-                            <ListItemSecondaryAction>
-                              <a href={pr.url} target="_blank">
-                                <IconButton aria-label="Open">
-                                  <OpenInNew />
-                                </IconButton>
-                              </a>
-                            </ListItemSecondaryAction>
-                          </ListItem>
-                        </List>
+                        <Typography
+                          variant="h4"
+                          gutterBottom
+                          className={classes.title}>
+                          Merged Pull Requests
+                        </Typography>
+                        {user.pullRequests.nodes.map(pr => (
+                          <>
+                            <List key={pr.id} dense={true}>
+                              <ListItem>
+                                <ListItemAvatar>
+                                  <Avatar src={pr.repository.owner.avatarUrl} />
+                                </ListItemAvatar>
+                                <ListItemText
+                                  primary={
+                                    <>
+                                      {pr.repository.primaryLanguage ? (
+                                        <>
+                                          [{pr.repository.primaryLanguage.name}]{' '}
+                                        </>
+                                      ) : null}
+                                      {pr.title} merged in{' '}
+                                      {pr.repository.nameWithOwner}
+                                    </>
+                                  }
+                                  secondary={
+                                    pr.mergedBy
+                                      ? 'Merged by @' + pr.mergedBy.login
+                                      : null
+                                  }
+                                />
+                                <ListItemSecondaryAction>
+                                  <a href={pr.url} target="_blank">
+                                    <IconButton aria-label="Open">
+                                      <OpenInNew />
+                                    </IconButton>
+                                  </a>
+                                </ListItemSecondaryAction>
+                              </ListItem>
+                            </List>
+                          </>
+                        ))}
                       </>
-                    ))}
+                    ) : null}
                   </CardContent>
                 </Card>
               </div>

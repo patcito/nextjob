@@ -434,7 +434,7 @@ class ShowJob extends React.Component {
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} />
+              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
             </Grid>
             <Grid item xs={12} md={6}>
               <div style={{background: 'white'}}>
@@ -461,7 +461,9 @@ class ShowJob extends React.Component {
                     }
                     subheader={
                       <>
-                        <span>Since {job.Company.yearFounded}</span>
+                        <span>
+                          {i18n.t('Since')} {job.Company.yearFounded}
+                        </span>
                         <IconButton
                           disableRipple={true}
                           disableFocusRipple={true}
@@ -484,7 +486,7 @@ class ShowJob extends React.Component {
                           className={classes.iconButton}
                           aria-label="Delete">
                           <PeopleIcon className={classes.headerIcons} />{' '}
-                          {job.Company.employeeCount} employees
+                          {job.Company.employeeCount} {i18n.t('employees')}
                         </IconButton>
                         <a href={job.Company.url} target="_blank">
                           <IconButton
@@ -595,13 +597,18 @@ class ShowJob extends React.Component {
                             </Button>
                           </a>
                         ) : (
-                          <Button
-                            onClick={this.handleClickApply}
-                            variant="contained"
-                            color="secondary"
-                            style={{color: '#FFF', marginLeft: '15px'}}>
-                            APPLY NOW
-                          </Button>
+                          <>
+                            {this.props.userInfo === null ||
+                            this.props.userInfo.github ? (
+                              <Button
+                                onClick={this.handleClickApply}
+                                variant="contained"
+                                color="secondary"
+                                style={{color: '#FFF', marginLeft: '15px'}}>
+                                {i18n.t('APPLY NOW')}
+                              </Button>
+                            ) : null}
+                          </>
                         )}
                       </Typography>
                     }
@@ -681,13 +688,18 @@ class ShowJob extends React.Component {
                         </Button>
                       </a>
                     ) : (
-                      <Button
-                        onClick={this.handleClickApply}
-                        variant="contained"
-                        color="secondary"
-                        style={{color: '#FFF', marginLeft: '15px'}}>
-                        APPLY NOW
-                      </Button>
+                      <>
+                        {this.props.userInfo === null ||
+                        this.props.userInfo.github ? (
+                          <Button
+                            onClick={this.handleClickApply}
+                            variant="contained"
+                            color="secondary"
+                            style={{color: '#FFF', marginLeft: '15px'}}>
+                            {i18n.t('APPLY NOW')}
+                          </Button>
+                        ) : null}
+                      </>
                     )}
                   </CardActions>
                 </Card>
@@ -700,15 +712,15 @@ class ShowJob extends React.Component {
             fullScreen="true"
             aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">
-              Apply for {job.JobTitle} @ {job.Company.name}
+              {i18n.t('common:Apply for')} {i18n.t('jobstitles:'+job.JobTitle)} @{' '}
+              {job.Company.name}
             </DialogTitle>
             <DialogContent>
               <DialogContentText>
-                A link to your{' '}
                 <a href="/profile" target="_blank">
-                  profile
+                  {i18n.t('common:A link to your profile')}
                 </a>{' '}
-                and cover letter will be sent to {job.Company.name}
+                {i18n.t('common:and cover letter will be sent to')} {' '}
               </DialogContentText>
               <FormControl
                 className={classes.formControl}
@@ -773,20 +785,20 @@ class ShowJob extends React.Component {
                   }>
                   {this.state.coverLettervalid !== false
                     ? i18n.t(
-                        'Write a cover letter about what your company is about',
+                        'common:Write a cover letter detailing your motivations',
                       )
                     : i18n.t(
-                        'Writing a cover letter about what your company is about is required',
+                        'common:Writing a cover letter is required',
                       )}
                 </FormHelperText>
               </FormControl>
             </DialogContent>
             <DialogActions>
               <Button onClick={this.handleClose} color="primary">
-                Cancel
+                {i18n.t('common:Cancel')}
               </Button>
               <Button onClick={this.handleSendApplication} color="primary">
-                Send application
+                {i18n.t('common:Send application')}
               </Button>
             </DialogActions>
           </Dialog>
@@ -805,7 +817,7 @@ class ShowJob extends React.Component {
             }}
             message={
               <span id="message-id">
-                {this.i18n.t('Your application has been sent!')}
+                {this.i18n.t('common:Your application has been sent!')}
               </span>
             }
             action={[

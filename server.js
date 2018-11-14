@@ -53,6 +53,7 @@ app.prepare().then(() => {
         next();
         return;
       } else {
+        console.log('req.userid CheckToken', decoded.userId, req.userId);
         req.userId = decoded.userId;
         req.token = token;
         req.github = decoded.github;
@@ -187,7 +188,6 @@ description
           };
           const client = new grequest.GraphQLClient(opts.uri, {
             headers: opts.headers,
-            'User-Agent': 'patcito',
           });
 
           client
@@ -277,6 +277,7 @@ description
                     next();
                     return;
                   }
+
                   var uopts = {
                     uri: 'http://localhost:8080/v1alpha1/graphql',
                     json: true,
@@ -288,7 +289,9 @@ description
 							 $githubAccessToken: String,
 							 $githubBlogUrl: String,
 							$githubRepositories: jsonb,
-							 $githubFollowers: Int )
+							 $githubFollowers: Int,
+							$pullRequests: jsonb,
+							$bio: String )
 							{insert_User(objects: {
 							name: $name,
 							githubEmail: $githubEmail,
@@ -298,7 +301,9 @@ description
 							githubAccessToken: $githubAccessToken,
 							githubBlogUrl: $githubBlogUrl,
 							githubFollowers: $githubFollowers,
-							githubRepositories: $githubRepositories
+							githubRepositories: $githubRepositories,
+							pullRequests: $pullRequests,
+							bio: $bio
 
 											}){
 										returning{
@@ -319,43 +324,65 @@ description
                   const variables = {
                     name: bodyJson.name,
                     githubEmail: bodyJson.email,
-                    githubId: bodyJson.id,
-                    githubAvatarUrl: bodyJson.avatariUrl,
+                    githubId: bodyJson.databaseId + '',
+                    githubAvatarUrl: bodyJson.avatarUrl,
                     githubUsername: bodyJson.login,
                     githubAccessToken: githubToken,
-                    githubBlogUrl: bodyJson.url,
+                    githubBlogUrl: bodyJson.websiteUrl,
+                    pullRequests: bodyJson.pullRequests,
+                    bio: bodyJson.bio,
                     githubFollowers: bodyJson.followers.totalCount,
                     githubRepositories: bodyJson.repositoriesContributedTo,
                   };
                   console.log(uopts.query);
                   console.log('gt vars', variables);
-                  client.request(uopts.query, variables).then(gdata => {
-                    var token = jwt.sign(
-                      {
-                        token: otoken,
-                        userId: gdata.insert_User.returning.id,
-                        github: true,
-                        linkedin: false,
-                      },
-                      process.env.JWT_SECRET,
-                      {
-                        expiresIn: 864000, // expires in 24 hours
-                      },
-                    );
-                    /*return originalRes.status(200).send({
+                  try {
+                    const opts = {
+                      uri:
+                        'https://api.github.com/user/emails?access_token=' +
+                        githubToken,
+                      headers: {'User-Agent': 'patcito'},
+                    };
+
+                    request(opts, function(err, res, body) {
+                      console.log('github email', body);
+                      const email = JSON.parse(body)[0].email;
+                      variables.githubEmail = email;
+                      client.request(uopts.query, variables).then(gdata => {
+                        console.log('GDATA', gdata);
+                        var token = jwt.sign(
+                          {
+                            token: otoken,
+                            userId: gdata.insert_User.returning[0].id,
+                            github: true,
+                            linkedin: false,
+                          },
+                          process.env.JWT_SECRET,
+                          {
+                            expiresIn: 864000, // expires in 24 hours
+                          },
+                        );
+                        /*return originalRes.status(200).send({
                     auth: true,
                     token: token,
                     user: gdata.insert_User.returning[0],
                   });*/
-                    req.userId = gdata.insert_User.returning[0].id;
-                    req.token = token;
-                    req.github = true;
-                    req.linkedin = false;
-                    req.currentUser = gdata.insert_User.returning[0];
-
+                        req.userId = gdata.insert_User.returning[0].id;
+                        req.token = token;
+                        req.github = true;
+                        req.linkedin = false;
+                        req.currentUser = gdata.insert_User.returning[0];
+                        console.log('userid', req.userId);
+                        next();
+                        return;
+                      });
+                    });
+                  } catch (err) {
+                    console.log(err);
                     next();
                     return;
-                  });
+                  }
+                  //end client request
                 })
                 .catch(err => {
                   console.log('err', err);
@@ -703,6 +730,13 @@ description
     return app.render(req, res, '/editcompany', {
       companyId: req.params.companyId,
       action: 'editCompany',
+    });
+  });
+
+  server.get('/profile/:userProfileId', (req, res) => {
+    return app.render(req, res, '/profile', {
+      userProfileId: req.params.userProfileId,
+      action: 'userProfile',
     });
   });
 

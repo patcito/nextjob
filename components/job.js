@@ -111,7 +111,8 @@ class Job extends React.Component {
             <CardContent className={classes.content}>
               <Typography variant="headline">{job.title}</Typography>
               <Typography variant="subheading" color="textSecondary">
-                @ {job.Company.name} is looking for a {job.JobTitle}
+                @ {job.Company.name} {i18n.t('is looking for a')}{' '}
+                {i18n.t('jobstitles:' + job.JobTitle)}
               </Typography>
               <Typography>{job.Company.description}</Typography>
               <Grid item>
@@ -172,6 +173,12 @@ class Job extends React.Component {
                 <div className={classes.root}>
                   {job.Skills.map(Skill => (
                     <Chip
+                      /*onClick={e => {
+                        Router.push({
+                          pathname: Router.pathname,
+                          query: {...Router.query, ...{skill: Skill.Skill}},
+                        });
+                      }}*/
                       key={Skill.Skill}
                       label={Skill.Skill}
                       className={classes.chiptags}

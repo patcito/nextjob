@@ -868,7 +868,7 @@ insert_Moderator(objects: $moderators){
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} />
+              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
             </Grid>
             <Grid item xs={12} md={6}>
               <div style={{background: 'white'}}>

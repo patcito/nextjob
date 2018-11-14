@@ -9,6 +9,9 @@ const EMPLOYEMENTTYPES = [
     type: 'Contract',
   },
   {
+    type: 'Permanent',
+  },
+  {
     type: 'Temporary',
   },
   {

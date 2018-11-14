@@ -61,8 +61,11 @@ class AppBarTop extends React.Component {
 
     return (
       <AppBar position="static">
-        <LoginAppBarTop i18n={i18n} userInfo={this.props.userInfo}/>
-        <SearchFilters i18n={i18n} />
+        <LoginAppBarTop i18n={i18n} userInfo={this.props.userInfo} />
+        <SearchFilters
+          i18n={i18n}
+          group_by_location={this.props.group_by_location}
+        />
       </AppBar>
     );
   }

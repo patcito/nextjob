@@ -184,7 +184,11 @@ class IndexApplications extends React.Component {
   };
 
   handleClickDeleteApplication = (e, jobApplication) => {
-    let rm = confirm('Are you sure you want to delete this application?');
+    let rm = confirm(
+      this.i18n.t(
+        'applications:Are you sure you want to delete this application?',
+      ),
+    );
     if (rm) {
       const deleteApplicationopts = {
         uri: 'http://localhost:8080/v1alpha1/graphql',
@@ -205,14 +209,20 @@ class IndexApplications extends React.Component {
 
       client.request(deleteApplicationopts.query, vars).then(gdata => {
         this.handleUpdateCallback(
-          'Your application has been deleted successfully',
+          this.i18n.t(
+            'applications:Your application has been deleted successfully',
+          ),
         );
       });
     }
   };
 
   handleClickAcceptApplication = (e, jobApplication) => {
-    let rm = confirm('Are you sure you want to accept this application?');
+    let rm = confirm(
+      this.i18n.t(
+        'applications:Are you sure you want to accept this application?',
+      ),
+    );
     if (rm) {
       const acceptApplicationopts = {
         uri: 'http://localhost:8080/v1alpha1/graphql',
@@ -234,14 +244,20 @@ class IndexApplications extends React.Component {
 
       client.request(acceptApplicationopts.query, vars).then(gdata => {
         this.handleUpdateCallback(
-          'This application has been accepted successfully',
+          this.i18n.t(
+            'applications:This application has been accepted successfully',
+          ),
         );
       });
     }
   };
 
   handleClickRejectApplication = (e, jobApplication) => {
-    let rm = confirm('Are you sure you want to decline this application?');
+    let rm = confirm(
+      this.i18n.t(
+        'applications:Are you sure you want to decline this application?',
+      ),
+    );
     if (rm) {
       const acceptApplicationopts = {
         uri: 'http://localhost:8080/v1alpha1/graphql',
@@ -263,7 +279,9 @@ class IndexApplications extends React.Component {
 
       client.request(acceptApplicationopts.query, vars).then(gdata => {
         this.handleUpdateCallback(
-          'This application has been declined successfully',
+          this.i18n.t(
+            'applications:This application has been declined successfully',
+          ),
         );
       });
     }
@@ -315,10 +333,10 @@ class IndexApplications extends React.Component {
     client.request(inserMessageopts.query, vars).then(gdata => {
       this.setState({
         message: false,
-        openNotification: true,
-        notification: 'message sent',
       });
-      this.handleUpdateCallback('Your message has been sent successfully.');
+      this.handleUpdateCallback(
+        this.i18n.t('applications:Your message has been sent successfully'),
+      );
     });
   };
   handleSendApplication = () => {
@@ -368,7 +386,9 @@ class IndexApplications extends React.Component {
         apply: false,
       });
       this.handleUpdateCallback(
-        'Your application has been updated successfully.',
+        this.i18n.t(
+          'applications:Your application has been updated successfully',
+        ),
       );
     });
   };
@@ -384,6 +404,7 @@ class IndexApplications extends React.Component {
         'jobfunctions',
         'employementtypes',
         'senioritylevels',
+        'applications',
       ],
       'http://localhost:4000/static/locales/',
     );
@@ -554,7 +575,7 @@ githubAvatarUrl
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} />
+              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
             </Grid>
             <Grid item xs={12} md={6}>
               <div style={{background: 'white'}}>
@@ -567,9 +588,9 @@ githubAvatarUrl
                     indicatorColor="primary"
                     textColor="primary"
                     fullWidth>
-                    <Tab label="Reviewing" />
-                    <Tab label="Accepted" />
-                    <Tab label="Declined" />
+                    <Tab label={i18n.t('applications:Reviewing')} />
+                    <Tab label={i18n.t('applications:Accepted')} />
+                    <Tab label={i18n.t('applications:Declined')} />
                   </Tabs>
                 </AppBar>
                 <SwipeableViews
@@ -578,7 +599,7 @@ githubAvatarUrl
                   onChangeIndex={this.handleChangeIndex}>
                   <>
                     {applications.map(application => (
-                      <>
+                      <div key={application.jobId + application.applicantId}>
                         {application.status === null ? (
                           <Card
                             className={classes.card}
@@ -592,15 +613,18 @@ githubAvatarUrl
                                 />
                               }
                               title={
-                                <Typography
-                                  gutterBottom
-                                  variant="h3"
-                                  component="h3">
-                                  <Link href="/profile">
-                                    {application.Applicant.name}
+                                <Typography variant="h5" gutterBottom>
+                                  <Link
+                                    href={
+                                      '/profile/' + application.Applicant.id
+                                    }>
+                                    <a>{application.Applicant.name}</a>
                                   </Link>{' '}
-                                  applied for {application.Job.JobTitle} @{' '}
-                                  {application.Job.Company.name}
+                                  {i18n.t('applications:applied for')}{' '}
+                                  {i18n.t(
+                                    'jobstitles:' + application.Job.JobTitle,
+                                  )}{' '}
+                                  @ {application.Job.Company.name}
                                 </Typography>
                               }
                               subheader={application.coverLetter}
@@ -613,7 +637,7 @@ githubAvatarUrl
                                   this.handleClickMessage(e, application)
                                 }
                                 style={{color: '#FFF', marginLeft: '15px'}}>
-                                Message
+                                {i18n.t('applications:Message')}
                               </Button>
                               {this.props.userInfo.github ? (
                                 <>
@@ -627,7 +651,7 @@ githubAvatarUrl
                                       )
                                     }
                                     style={{color: '#FFF', marginLeft: '15px'}}>
-                                    edit
+                                    {i18n.t('common:edit')}
                                   </Button>
                                   <Button
                                     onClick={e =>
@@ -639,7 +663,7 @@ githubAvatarUrl
                                     variant="contained"
                                     color="secondary"
                                     style={{color: '#FFF', marginLeft: '15px'}}>
-                                    delete
+                                    {i18n.t('common:delete')}
                                   </Button>
                                 </>
                               ) : (
@@ -658,7 +682,7 @@ githubAvatarUrl
                                         color: '#FFF',
                                         marginLeft: '15px',
                                       }}>
-                                      ✓ Got it
+                                      ✓ {i18n.t('applications:Got it')}
                                     </Button>
                                   ) : null}
                                   {application.status ||
@@ -676,7 +700,7 @@ githubAvatarUrl
                                         color: '#FFF',
                                         marginLeft: '15px',
                                       }}>
-                                      ✘ Not a fit
+                                      ✘ {i18n.t('applications:Not a fit')}
                                     </Button>
                                   ) : null}
                                 </>
@@ -697,12 +721,12 @@ githubAvatarUrl
                             </CardActions>
                           </Card>
                         ) : null}
-                      </>
+                      </div>
                     ))}
                   </>
                   <>
                     {applications.map(application => (
-                      <>
+                      <div key={application.jobId + application.applicantId}>
                         {application.status ? (
                           <Card
                             className={classes.card}
@@ -716,15 +740,18 @@ githubAvatarUrl
                                 />
                               }
                               title={
-                                <Typography
-                                  gutterBottom
-                                  variant="h3"
-                                  component="h3">
-                                  <Link href="/profile">
-                                    {application.Applicant.name}
+                                <Typography variant="h5" gutterBottom>
+                                  <Link
+                                    href={
+                                      '/profile/' + application.Applicant.id
+                                    }>
+                                    <a>{application.Applicant.name}</a>
                                   </Link>{' '}
-                                  applied for {application.Job.JobTitle} @{' '}
-                                  {application.Job.Company.name}
+                                  {i18n.t('applications:applied for')}{' '}
+                                  {i18n.t(
+                                    'jobstitles:' + application.Job.JobTitle,
+                                  )}{' '}
+                                  @ {application.Job.Company.name}
                                 </Typography>
                               }
                               subheader={application.coverLetter}
@@ -737,7 +764,7 @@ githubAvatarUrl
                                   this.handleClickMessage(e, application)
                                 }
                                 style={{color: '#FFF', marginLeft: '15px'}}>
-                                Message
+                                {i18n.t('applications:Message')}
                               </Button>
                               {this.props.userInfo.github ? (
                                 <>
@@ -751,7 +778,7 @@ githubAvatarUrl
                                       )
                                     }
                                     style={{color: '#FFF', marginLeft: '15px'}}>
-                                    edit
+                                    {i18n.t('common:edit')}
                                   </Button>
                                   <Button
                                     onClick={e =>
@@ -763,7 +790,7 @@ githubAvatarUrl
                                     variant="contained"
                                     color="secondary"
                                     style={{color: '#FFF', marginLeft: '15px'}}>
-                                    delete
+                                    {i18n.t('common:delete')}
                                   </Button>
                                 </>
                               ) : (
@@ -782,7 +809,7 @@ githubAvatarUrl
                                         color: '#FFF',
                                         marginLeft: '15px',
                                       }}>
-                                      ✓ Got it
+                                      ✓ {i18n.t('applications:Got it')}
                                     </Button>
                                   ) : null}
                                   {application.status ||
@@ -800,7 +827,7 @@ githubAvatarUrl
                                         color: '#FFF',
                                         marginLeft: '15px',
                                       }}>
-                                      ✘ Not a fit
+                                      ✘ {i18n.t('applications:Not a fit')}
                                     </Button>
                                   ) : null}
                                 </>
@@ -821,12 +848,12 @@ githubAvatarUrl
                             </CardActions>
                           </Card>
                         ) : null}
-                      </>
+                      </div>
                     ))}
                   </>
                   <>
                     {applications.map(application => (
-                      <>
+                      <div key={application.jobId + application.applicantId}>
                         {application.status === false ? (
                           <Card
                             className={classes.card}
@@ -842,10 +869,13 @@ githubAvatarUrl
                               title={
                                 <Typography
                                   gutterBottom
-                                  variant="h3"
-                                  component="h3">
-                                  <Link href="/profile">
-                                    {application.Applicant.name}
+                                  variant="h5"
+                                  gutterBottom>
+                                  <Link
+                                    href={
+                                      '/profile/' + application.Applicant.id
+                                    }>
+                                    <a>{application.Applicant.name}</a>
                                   </Link>{' '}
                                   applied for {application.Job.JobTitle} @{' '}
                                   {application.Job.Company.name}
@@ -861,7 +891,7 @@ githubAvatarUrl
                                   this.handleClickMessage(e, application)
                                 }
                                 style={{color: '#FFF', marginLeft: '15px'}}>
-                                Message
+                                {i18n.t('applications:Message')}
                               </Button>
                               {this.props.userInfo.github ? (
                                 <>
@@ -875,7 +905,7 @@ githubAvatarUrl
                                       )
                                     }
                                     style={{color: '#FFF', marginLeft: '15px'}}>
-                                    edit
+                                    {i18n.t('common:edit')}
                                   </Button>
                                   <Button
                                     onClick={e =>
@@ -887,7 +917,7 @@ githubAvatarUrl
                                     variant="contained"
                                     color="secondary"
                                     style={{color: '#FFF', marginLeft: '15px'}}>
-                                    delete
+                                    {i18n.t('common:delete')}
                                   </Button>
                                 </>
                               ) : (
@@ -906,7 +936,7 @@ githubAvatarUrl
                                         color: '#FFF',
                                         marginLeft: '15px',
                                       }}>
-                                      ✓ Got it
+                                      ✓ {i18n.t('applications:Got it')}
                                     </Button>
                                   ) : null}
                                   {application.status ||
@@ -924,7 +954,7 @@ githubAvatarUrl
                                         color: '#FFF',
                                         marginLeft: '15px',
                                       }}>
-                                      ✘ Not a fit
+                                      ✘ {i18n.t('applications:Not a fit')}
                                     </Button>
                                   ) : null}
                                 </>
@@ -945,7 +975,7 @@ githubAvatarUrl
                             </CardActions>
                           </Card>
                         ) : null}
-                      </>
+                      </div>
                     ))}
                   </>
                 </SwipeableViews>
@@ -955,18 +985,21 @@ githubAvatarUrl
           <Dialog
             open={this.state.message}
             onClose={this.handleClose}
-            fullScreen="true"
+            fullScreen={true}
             aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">
-              Message{' '}
+              {i18n.t('applications:messageTo')}{' '}
               {this.props.userInfo.github
                 ? this.state.currentJobApplication.Job.Company.name
                 : this.state.currentJobApplication.Applicant.name}{' '}
-              about {this.state.currentJobApplication.Job.JobTitle}
+              {i18n.t('applications:about')}{' '}
+              {i18n.t(
+                'jobstitles:' + this.state.currentJobApplication.Job.JobTitle,
+              )}
             </DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Send a message about this application
+                {i18n.t('applications:Send a message about this application')}
               </DialogContentText>
               <form>
                 <FormControl
@@ -997,10 +1030,10 @@ githubAvatarUrl
                     }>
                     {this.state.bodyvalid !== false
                       ? i18n.t(
-                          'Send a message about any question you may have about this application.',
+                          'applications:Send a message about any question you may have about this application',
                         )
                       : i18n.t(
-                          'Please make sure to include some text before sending.',
+                          'applications:Please make sure to include some text before sending',
                         )}
                   </FormHelperText>
                 </FormControl>
@@ -1008,13 +1041,13 @@ githubAvatarUrl
             </DialogContent>
             <DialogActions>
               <Button onClick={this.handleClose} color="primary">
-                Cancel
+                {i18n.t('common:Cancel')}
               </Button>
               <Button
                 disabled={!this.state.bodyvalid}
                 onClick={this.handleSendMessage}
                 color="primary">
-                Send message
+                {i18n.t('applications:Send message')}
               </Button>
             </DialogActions>{' '}
             {this.state.currentJobApplication.Messages &&
@@ -1061,11 +1094,7 @@ githubAvatarUrl
             ContentProps={{
               'aria-describedby': 'message-id',
             }}
-            message={
-              <span id="message-id">
-                {this.i18n.t(this.state.notification)}
-              </span>
-            }
+            message={<span id="message-id">{this.state.notification}</span>}
             action={[
               /*  TODO implement undo save company
                 <Button
@@ -1092,20 +1121,21 @@ githubAvatarUrl
           <Dialog
             open={this.state.apply}
             onClose={() => this.setState({apply: false})}
-            fullScreen="true"
+            fullScreen={true}
             aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">
-              Update your application for{' '}
-              {this.state.currentJobApplication.Job.JobTitle} @{' '}
-              {this.state.currentJobApplication.Job.Company.name}
+              {i18n.t('applications:Update your application for')}{' '}
+              {i18n.t(
+                'jobstitles:' + this.state.currentJobApplication.Job.JobTitle,
+              )}{' '}
+              @ {this.state.currentJobApplication.Job.Company.name}
             </DialogTitle>
             <DialogContent>
               <DialogContentText>
-                A link to your{' '}
                 <a href="/profile" target="_blank">
-                  profile
+                  {i18n.t('common:A link to your profile')}
                 </a>{' '}
-                and cover letter will be sent to{' '}
+                {i18n.t('common:and cover letter will be sent to')} {' '}
                 {this.state.currentJobApplication.Job.Company.name}
               </DialogContentText>
               <FormControl
@@ -1125,7 +1155,7 @@ githubAvatarUrl
                       ? 'name-helper-text'
                       : 'name-error-text'
                   }>
-                  {i18n.t("Your resume's pdf (optional)")}
+                  {i18n.t("common:Your resume's pdf (optional)")}
                 </FormHelperText>
               </FormControl>
 
@@ -1140,7 +1170,7 @@ githubAvatarUrl
                       color="primary"
                     />
                   }
-                  label={this.i18n.t('Include resume pdf')}
+                  label={this.i18n.t('common:Include resume pdf')}
                 />
               </FormControl>
 
@@ -1151,7 +1181,7 @@ githubAvatarUrl
                   this.state.currentJobApplication.coverLettervalid === false
                 }>
                 <InputLabel htmlFor="name-simple">
-                  {i18n.t('Cover letter')}
+                  {i18n.t('common:Cover letter')}
                 </InputLabel>
                 <Input
                   id="coverLetter"
@@ -1179,10 +1209,10 @@ githubAvatarUrl
                   }>
                   {this.state.currentJobApplication.coverLettervalid !== false
                     ? i18n.t(
-                        'Write a cover letter about what your company is about',
+                        'common:Write a cover letter detailing your motivations',
                       )
                     : i18n.t(
-                        'Writing a cover letter about what your company is about is required',
+                        'common:Writing a cover letter is required',
                       )}
                 </FormHelperText>
               </FormControl>
@@ -1191,10 +1221,10 @@ githubAvatarUrl
               <Button
                 onClick={() => this.setState({apply: false})}
                 color="primary">
-                Cancel
+                {i18n.t('common:Cancel')}
               </Button>
               <Button onClick={this.handleSendApplication} color="primary">
-                Update application
+                {i18n.t('common:Update application')}
               </Button>
             </DialogActions>
           </Dialog>

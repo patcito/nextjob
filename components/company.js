@@ -105,19 +105,19 @@ class Company extends React.Component {
         <CardActions>
           <Link href={'/jobs/companies/' + company.id}>
             <Button size="small" color="primary">
-              JOBS
+              {i18n.t('JOBS')}
             </Button>
           </Link>
           {query.me ? (
             <Link href={'/companies/' + company.id + '/edit'}>
               <Button size="small" color="primary">
-                Edit
+                {i18n.t('edit')}
               </Button>
             </Link>
           ) : (
             <Link href={'/jobs/companies/' + company.id}>
               <Button size="small" color="primary">
-                Learn More
+                {i18n.t('common:Learn More')}
               </Button>
             </Link>
           )}

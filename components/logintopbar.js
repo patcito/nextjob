@@ -9,10 +9,14 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import MenuList from '../components/menu';
 import MenuIcon from '@material-ui/icons/Menu';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import pink from '@material-ui/core/colors/pink';
 import Link from 'next/link';
+import Drawer from '@material-ui/core/Drawer';
+import Router from 'next/router';
+
 import SearchFilters from '../components/search';
 
 const styles = theme => ({
@@ -46,9 +50,9 @@ class LoginAppBarTop extends React.Component {
     });
   };
 
-  handleClick = () => {
+  toggleDrawer = () => {
     this.setState({
-      open: true,
+      open: !this.state.open,
     });
   };
 
@@ -72,6 +76,7 @@ class LoginAppBarTop extends React.Component {
         .replace(/^ +/, '')
         .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
     });
+    Router.push('/');
   };
 
   constructor(props) {
@@ -136,66 +141,76 @@ class LoginAppBarTop extends React.Component {
     const {open} = this.state;
     const i18n = this.props.i18n;
     return (
-      <Toolbar>
-        <IconButton
-          className={classes.menuButton}
-          color="inherit"
-          aria-label="Menu">
-          <MenuIcon />
-        </IconButton>
-        <Link href="/">
-          <Typography
-            variant="title"
+      <>
+        <Toolbar>
+          <IconButton
+            onClick={this.toggleDrawer}
+            className={classes.menuButton}
             color="inherit"
-            className={classes.flex}
-            style={{cursor: 'pointer'}}>
-            ReactEurope Jobs
-          </Typography>
-        </Link>
-        {isLoggedIn && this.props.userInfo.github ? (
-          <Link href="/profile">
-            <Button
-              variant="contained"
-              color="secondary"
-              style={{color: '#FFF', marginLeft: '15px'}}>
-              {i18n.t('My profile')}
-            </Button>
+            aria-label="Menu">
+            <MenuIcon />
+          </IconButton>
+          <Link href="/">
+            <Typography
+              variant="title"
+              color="inherit"
+              className={classes.flex}
+              style={{cursor: 'pointer'}}>
+              ReactEurope Jobs
+            </Typography>
           </Link>
-        ) : null}
-        {!isLoggedIn || this.props.userInfo.linkedin ? (
-          <Link href="/newjob">
-            <Button
-              variant="contained"
-              color="secondary"
-              style={{color: '#FFF', marginLeft: '15px'}}>
-              {i18n.t('Post a job')}
-            </Button>
-          </Link>
-        ) : null}
-        <Button
-          variant="contained"
-          style={{
-            marginLeft: '15px',
-            backgroundColor: '#f50057',
-            color: '#FFF',
-          }}>
-          {i18n.t('Latest jobs')}
-        </Button>
-        {isLoggedIn ? (
-          <Button color="inherit" onClick={this.handleLogoutClick}>
-            Logout
+          {isLoggedIn && this.props.userInfo.github ? (
+            <Link href="/profile">
+              <Button
+                variant="contained"
+                color="secondary"
+                style={{color: '#FFF', marginLeft: '15px'}}>
+                {i18n.t('My Profile')}
+              </Button>
+            </Link>
+          ) : null}
+          {isLoggedIn && this.props.userInfo.linkedin ? (
+            <Link href="/newjob">
+              <Button
+                variant="contained"
+                color="secondary"
+                style={{color: '#FFF', marginLeft: '15px'}}>
+                {i18n.t('Post a job')}
+              </Button>
+            </Link>
+          ) : null}
+          <Button
+            variant="contained"
+            style={{
+              marginLeft: '15px',
+              backgroundColor: '#f50057',
+              color: '#FFF',
+            }}>
+            {i18n.t('Latest jobs')}
           </Button>
-        ) : (
-          <>
-            <a href="https://github.com/login/oauth/authorize?client_id=e11e3938d18bb98dda68&scope=user">
-              <Button color="inherit">Login with Github</Button>
-            </a>
-            <a href="https://www.linkedin.com/oauth/v2/authorization?client_id=86in1o0kvqc348&response_type=code&redirect_uri=http://localhost:4000&scope=r_basicprofile%20r_emailaddress">
-              <Button color="inherit">Login with Linkedin</Button>
-            </a>
-          </>
-        )}
-      </Toolbar>
+          {isLoggedIn ? (
+            <Button color="inherit" onClick={this.handleLogoutClick}>
+              {i18n.t('Logout')}
+            </Button>
+          ) : (
+            <>
+              <a href="https://github.com/login/oauth/authorize?client_id=e11e3938d18bb98dda68&scope=user">
+                <Button color="inherit">
+                  {i18n.t('common:Login as Applicant')}
+                </Button>
+              </a>
+              <a href="https://www.linkedin.com/oauth/v2/authorization?client_id=86in1o0kvqc348&response_type=code&redirect_uri=http://localhost:4000&scope=r_basicprofile%20r_emailaddress">
+                <Button color="inherit">
+                  {i18n.t('common:Login as HR to post a job')}
+                </Button>
+              </a>
+            </>
+          )}
+        </Toolbar>
+        <Drawer open={this.state.open} onClose={this.toggleDrawer}>
+          <MenuList i18n={i18n} userInfo={this.props.userInfo} drawer={true} />
+        </Drawer>
+      </>
     );
   }
 }
