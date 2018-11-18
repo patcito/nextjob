@@ -121,8 +121,10 @@ class Index extends React.Component {
           $description: String
           $remote: Boolean
           $employementType: [String]
+          $nocompany: String
         ) {
-          Company(where: {ownerId: {_eq: $ownerId}}) {
+          Company(where: {_and: [{ownerId: {_eq: $ownerId}},
+            {name: {_eq: $nocompany}} ]}) {
             id
             description
             ownerId
@@ -264,6 +266,7 @@ class Index extends React.Component {
       employementType: employementType,
       country: country,
       locality: locality,
+      nocompany: query.companies ? null : '_no_company_',
     });
     return {translations, jobsAndCompanies, query, userInfo};
   }

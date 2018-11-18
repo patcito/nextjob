@@ -1597,6 +1597,7 @@ $applicationEmail: String,
     const employementtypes = this.EMPLOYEMENTTYPES;
     const senioritylevels = this.SENIORITYLEVELS;
     const skills = this.SKILLS;
+    console.log('CI', this.state.companyIndustries);
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>

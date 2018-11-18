@@ -178,6 +178,8 @@ class EditCompany extends React.Component {
         'jobfunctions',
         'employementtypes',
         'senioritylevels',
+        'editcompany',
+        'perks',
       ],
       'http://localhost:4000/static/locales/',
     );
@@ -265,6 +267,9 @@ class EditCompany extends React.Component {
     } else {
       company = null;
     }
+    if (!company.devCount) {
+      company.devCount = 5;
+    }
     return {translations, company, companyId, userInfo};
   }
   constructor(props) {
@@ -280,7 +285,7 @@ class EditCompany extends React.Component {
     }));
     this.PERKS = PERKS.map(suggestion => ({
       value: suggestion.title,
-      label: suggestion.title,
+      label: this.i18n.t('perks:' + suggestion.title),
     }));
   }
 
@@ -350,7 +355,7 @@ class EditCompany extends React.Component {
       })),
       perks: company.Perks.map(suggestion => ({
         value: suggestion.Perk,
-        label: suggestion.Perk,
+        label: this.i18n.t('perks:' + suggestion.Perk),
       })),
       coordinates: {
         lat: company.location ? company.location.coordinates[0] : 0,
@@ -1010,7 +1015,7 @@ insert_Moderator(objects: $moderators){
                           : 'employeeCount-error-text'
                       }>
                       {this.state.employeeCountvalid !== false
-                        ? i18n.t('How many employees do you have')
+                        ? i18n.t('editcompany:How many employees do you have')
                         : i18n.t('This field is required')}
                     </FormHelperText>
                   </FormControl>
@@ -1036,7 +1041,7 @@ insert_Moderator(objects: $moderators){
                           : 'twitter-error-text'
                       }>
                       {this.state.twittervalid !== false
-                        ? i18n.t('How many employees do you have')
+                        ? i18n.t("editcompany:Your company's Twitter account")
                         : i18n.t('This field is required')}
                     </FormHelperText>
                   </FormControl>
@@ -1044,7 +1049,7 @@ insert_Moderator(objects: $moderators){
                     className={classes.formControl}
                     error={this.state.company.devCountvalid === false}>
                     <InputLabel htmlFor="devCount">
-                      {i18n.t('Employee count')}
+                      {i18n.t('Dev count')}
                     </InputLabel>
                     <Input
                       id="devCount"
@@ -1065,7 +1070,7 @@ insert_Moderator(objects: $moderators){
                           : 'devCount-error-text'
                       }>
                       {this.state.devCountvalid !== false
-                        ? i18n.t('How many developpers do you have')
+                        ? i18n.t('editcompany:How many developers do you have')
                         : i18n.t('This field is required')}
                     </FormHelperText>
                   </FormControl>
@@ -1165,7 +1170,7 @@ insert_Moderator(objects: $moderators){
                           : 'name-error-text'
                       }>
                       {i18n.t(
-                        'List emails of people who can add and modify jobs. These people must already have an account before they can be added.',
+                        'editcompany:List emails of people who can add and modify jobs, these people must already have an account before they can be added',
                       )}
                     </FormHelperText>
                   </FormControl>
@@ -1180,10 +1185,10 @@ insert_Moderator(objects: $moderators){
                           suggestions={skills}
                           selectedItems={this.state.skills}
                           label={i18n.t(
-                            'List the techs being used at your company',
+                            'editcompany:List the techs being used at your company',
                           )}
                           placeholder={i18n.t(
-                            'newjob:Select multiple skills (up to 25)',
+                            'editcompany:Select multiple techs (up to 25)',
                           )}
                           handleParentChange={this.handleChangeSkills}
                           name="skills"
@@ -1203,9 +1208,11 @@ insert_Moderator(objects: $moderators){
                           suggestions={perks}
                           selectedItems={this.state.perks}
                           label={i18n.t(
-                            'List the techs being used at your company',
+                            'editcompany:List perks available at your company',
                           )}
-                          placeholder={i18n.t('newjob:Select multiple perks')}
+                          placeholder={i18n.t(
+                            'editcompany:Select multiple perks',
+                          )}
                           handleParentChange={this.handleChangePerks}
                           name="perks"
                           id="perks"
@@ -1213,7 +1220,9 @@ insert_Moderator(objects: $moderators){
                           required={true}
                         />
                         <FormHelperText>
-                          {i18n.t('newjob:Select skills required for the job')}
+                          {i18n.t(
+                            'editcompany:Select perks your company offers',
+                          )}
                         </FormHelperText>
                       </FormControl>
                     </>
@@ -1224,11 +1233,11 @@ insert_Moderator(objects: $moderators){
                         <Typography
                           className={classes.title}
                           color="textSecondary">
-                          {i18n.t('Featured employee #1')}
+                          {i18n.t('editcompany:Featured employee #1')}
                         </Typography>
                         <Typography component="h2">
                           {i18n.t(
-                            'Add details about an employee you think could encourage people to work at your company',
+                            'editcompany:Add details about an employee you think could encourage people to work at your company',
                           )}
                         </Typography>
                         <Avatar
@@ -1254,7 +1263,7 @@ insert_Moderator(objects: $moderators){
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="name-simple">
-                            {i18n.t("Employee's Name")}
+                            {i18n.t("editcompany:Employee's Name")}
                           </InputLabel>
                           <Input
                             id="name-simple"
@@ -1272,15 +1281,17 @@ insert_Moderator(objects: $moderators){
                                 : 'name-error-text'
                             }>
                             {this.state.namevalid !== false
-                              ? i18n.t("Your employee's name")
-                              : i18n.t("Your employee's name is required")}
+                              ? i18n.t("editcompany:Your employee's name")
+                              : i18n.t(
+                                  "editcompany:Your employee's name is required",
+                                )}
                           </FormHelperText>
                         </FormControl>
                         <FormControl
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="title-simple">
-                            {i18n.t("Employee's title")}
+                            {i18n.t("editcompany:Employee's title")}
                           </InputLabel>
                           <Input
                             id="title-simple"
@@ -1297,14 +1308,14 @@ insert_Moderator(objects: $moderators){
                                 ? 'name-helper-text'
                                 : 'name-error-text'
                             }>
-                            {i18n.t("Your employee's title")}
+                            {i18n.t("editcompany:Your employee's title")}
                           </FormHelperText>
                         </FormControl>
                         <FormControl
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="name-simple">
-                            {i18n.t("Employee's Twitter")}
+                            {i18n.t("editcompany:Employee's Twitter")}
                           </InputLabel>
                           <Input
                             id="twitter-simple"
@@ -1321,14 +1332,14 @@ insert_Moderator(objects: $moderators){
                                 ? 'name-helper-text'
                                 : 'name-error-text'
                             }>
-                            {i18n.t("Your employee's twitter")}
+                            {i18n.t("editcompany:Your employee's twitter")}
                           </FormHelperText>
                         </FormControl>
                         <FormControl
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="name-simple">
-                            {i18n.t("Employee's Github")}
+                            {i18n.t("editcompany:Employee's Github")}
                           </InputLabel>
                           <Input
                             id="github-simple"
@@ -1345,7 +1356,7 @@ insert_Moderator(objects: $moderators){
                                 ? 'name-helper-text'
                                 : 'name-error-text'
                             }>
-                            {i18n.t("Your employee's github")}
+                            {i18n.t("editcompany:Your employee's github")}
                           </FormHelperText>
                         </FormControl>
 
@@ -1394,9 +1405,9 @@ insert_Moderator(objects: $moderators){
                             }>
                             {this.state.biovalid !== false
                               ? i18n.t(
-                                  'Write a bio about your employee and what they do',
+                                  'editcompany:Write a bio about your employee and what they do',
                                 )
-                              : i18n.t('A bio is required')}
+                              : i18n.t('editcompany:A bio is required')}
                           </FormHelperText>
                         </FormControl>
                       </CardContent>
@@ -1408,11 +1419,11 @@ insert_Moderator(objects: $moderators){
                         <Typography
                           className={classes.title}
                           color="textSecondary">
-                          {i18n.t('Featured employee #2')}
+                          {i18n.t('editcompany:Featured employee #2')}
                         </Typography>
                         <Typography component="h2">
                           {i18n.t(
-                            'Add details about an employee you think could encourage people to work at your company',
+                            'editcompany:Add details about an employee you think could encourage people to work at your company',
                           )}
                         </Typography>
                         <Avatar
@@ -1439,7 +1450,7 @@ insert_Moderator(objects: $moderators){
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="name-simple">
-                            {i18n.t("Employee's Name")}
+                            {i18n.t("editcompany:Employee's Name")}
                           </InputLabel>
                           <Input
                             id="name-simple"
@@ -1457,15 +1468,17 @@ insert_Moderator(objects: $moderators){
                                 : 'name-error-text'
                             }>
                             {this.state.namevalid !== false
-                              ? i18n.t("Your employee's name")
-                              : i18n.t("Your employee's name is required")}
+                              ? i18n.t("editcompany:Your employee's name")
+                              : i18n.t(
+                                  "editcompany:Your employee's name is required",
+                                )}
                           </FormHelperText>
                         </FormControl>
                         <FormControl
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="title-simple">
-                            {i18n.t("Employee's title")}
+                            {i18n.t("editcompany:Employee's title")}
                           </InputLabel>
                           <Input
                             id="title-simple"
@@ -1482,14 +1495,14 @@ insert_Moderator(objects: $moderators){
                                 ? 'name-helper-text'
                                 : 'name-error-text'
                             }>
-                            {i18n.t("Your employee's title")}
+                            {i18n.t("editcompany:Your employee's title")}
                           </FormHelperText>
                         </FormControl>
                         <FormControl
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="name-simple">
-                            {i18n.t("Employee's Twitter")}
+                            {i18n.t("editcompany:Employee's Twitter")}
                           </InputLabel>
                           <Input
                             id="twitter-simple"
@@ -1506,14 +1519,14 @@ insert_Moderator(objects: $moderators){
                                 ? 'name-helper-text'
                                 : 'name-error-text'
                             }>
-                            {i18n.t("Your employee's twitter")}
+                            {i18n.t("editcompany:Your employee's twitter")}
                           </FormHelperText>
                         </FormControl>
                         <FormControl
                           className={classes.formControl}
                           error={this.state.namevalid === false}>
                           <InputLabel htmlFor="name-simple">
-                            {i18n.t("Employee's Github")}
+                            {i18n.t("editcompany:Employee's Github")}
                           </InputLabel>
                           <Input
                             id="github-simple"
@@ -1530,7 +1543,7 @@ insert_Moderator(objects: $moderators){
                                 ? 'name-helper-text'
                                 : 'name-error-text'
                             }>
-                            {i18n.t("Your employee's github")}
+                            {i18n.t("editcompany:Your employee's github")}
                           </FormHelperText>
                         </FormControl>
 
@@ -1579,9 +1592,9 @@ insert_Moderator(objects: $moderators){
                             }>
                             {this.state.biovalid !== false
                               ? i18n.t(
-                                  'Write a bio about your employee and what they do',
+                                  'editcompany:Write a bio about your employee and what they do',
                                 )
-                              : i18n.t('A bio is required')}
+                              : i18n.t('editcompany:A bio is required')}
                           </FormHelperText>
                         </FormControl>
                       </CardContent>
@@ -1626,7 +1639,9 @@ insert_Moderator(objects: $moderators){
                       <TextField
                         id="standard-bare"
                         value={this.state.company.media1.url}
-                        placeholder={i18n.t('Paste your video URL here')}
+                        placeholder={i18n.t(
+                          'editcompany:Paste your video URL here',
+                        )}
                         margin="normal"
                         onChange={e => {
                           const company = this.state.company;
@@ -1644,13 +1659,13 @@ insert_Moderator(objects: $moderators){
                             this.setState({company: company});
                           }
                         }}>
-                        {i18n.t('add video')}
+                        {i18n.t('editcompany:add video')}
                       </Button>
                       <Button
                         size="small"
                         color="primary"
                         onClick={() => this.media1FileInput.click()}>
-                        {i18n.t('add image instead')}
+                        {i18n.t('editcompany:add image instead')}
                       </Button>
 
                       <FormControl className={classes.formControl}>
@@ -1709,7 +1724,9 @@ insert_Moderator(objects: $moderators){
                       <TextField
                         id="standard-bare"
                         value={this.state.company.media2.url}
-                        placeholder={i18n.t('Paste your video URL here')}
+                        placeholder={i18n.t(
+                          'editcompany:Paste your video URL here',
+                        )}
                         margin="normal"
                         onChange={e => {
                           const company = this.state.company;
@@ -1727,13 +1744,13 @@ insert_Moderator(objects: $moderators){
                             this.setState({company: company});
                           }
                         }}>
-                        {i18n.t('add video')}
+                        {i18n.t('editcompany:add video')}
                       </Button>
                       <Button
                         size="small"
                         color="primary"
                         onClick={() => this.media2FileInput.click()}>
-                        {i18n.t('add image instead')}
+                        {i18n.t('editcompany:add image instead')}
                       </Button>
 
                       <FormControl className={classes.formControl}>
@@ -1791,7 +1808,9 @@ insert_Moderator(objects: $moderators){
                       <TextField
                         id="standard-bare"
                         value={this.state.company.media3.url}
-                        placeholder={i18n.t('Paste your video URL here')}
+                        placeholder={i18n.t(
+                          'editcompany:Paste your video URL here',
+                        )}
                         margin="normal"
                         onChange={e => {
                           const company = this.state.company;
@@ -1809,13 +1828,13 @@ insert_Moderator(objects: $moderators){
                             this.setState({company: company});
                           }
                         }}>
-                        {i18n.t('add video')}
+                        {i18n.t('editcompany:add video')}
                       </Button>
                       <Button
                         size="small"
                         color="primary"
                         onClick={() => this.media3FileInput.click()}>
-                        {i18n.t('add image instead')}
+                        {i18n.t('editcompany:add image instead')}
                       </Button>
 
                       <FormControl className={classes.formControl}>

@@ -202,7 +202,7 @@ description
               const bodyJson = data.viewer;
 
               const checkUserRequestopts = {
-                uri: 'http://localhost:8080/v1alpha1/graphql',
+                uri: 'process.env.HASURA',
                 json: true,
                 query: `mutation User($githubId: String!, $token: String!,
 									  $githubRepositories: jsonb, $pullRequests: jsonb,
@@ -279,7 +279,7 @@ description
                   }
 
                   var uopts = {
-                    uri: 'http://localhost:8080/v1alpha1/graphql',
+                    uri: 'process.env.HASURA',
                     json: true,
                     query: `mutation insert_User($name: String,
 							$githubEmail: String!,
@@ -440,7 +440,7 @@ description
               if (req.github === true) {
                 console.log('userId!', req.userId);
                 const setLinkedinProfilopts = {
-                  uri: 'http://localhost:8080/v1alpha1/graphql',
+                  uri: 'process.env.HASURA',
                   json: true,
                   query: `mutation uu($id: Int, $linkedinProfile: jsonb!) {
 				  update_User(where: {id: {_eq:
@@ -477,7 +477,7 @@ description
                 return;
               } else {
                 const checkUserRequestopts = {
-                  uri: 'http://localhost:8080/v1alpha1/graphql',
+                  uri: 'process.env.HASURA',
                   json: true,
                   query: `query User($linkedinId: String!){
   						User(where: {linkedinId: {_eq: $linkedinId}}) {
@@ -539,7 +539,7 @@ description
                       return;
                     }
                     const uopts = {
-                      uri: 'http://localhost:8080/v1alpha1/graphql',
+                      uri: 'process.env.HASURA',
                       json: true,
                       query: `mutation insert_User($name: String,
 					$linkedinEmail: String!,

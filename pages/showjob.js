@@ -233,7 +233,6 @@ class ShowJob extends React.Component {
       [
         'common',
         'namespace1',
-        'industries',
         'newjob',
         'jobstitles',
         'jobfunctions',
@@ -427,7 +426,6 @@ class ShowJob extends React.Component {
     const {classes, job} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
-    const industries = this.INDUSTRIES;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
@@ -712,15 +710,15 @@ class ShowJob extends React.Component {
             fullScreen="true"
             aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">
-              {i18n.t('common:Apply for')} {i18n.t('jobstitles:'+job.JobTitle)} @{' '}
-              {job.Company.name}
+              {i18n.t('common:Apply for')}{' '}
+              {i18n.t('jobstitles:' + job.JobTitle)} @ {job.Company.name}
             </DialogTitle>
             <DialogContent>
               <DialogContentText>
                 <a href="/profile" target="_blank">
                   {i18n.t('common:A link to your profile')}
                 </a>{' '}
-                {i18n.t('common:and cover letter will be sent to')} {' '}
+                {i18n.t('common:and cover letter will be sent to')}{' '}
               </DialogContentText>
               <FormControl
                 className={classes.formControl}
@@ -787,9 +785,7 @@ class ShowJob extends React.Component {
                     ? i18n.t(
                         'common:Write a cover letter detailing your motivations',
                       )
-                    : i18n.t(
-                        'common:Writing a cover letter is required',
-                      )}
+                    : i18n.t('common:Writing a cover letter is required')}
                 </FormHelperText>
               </FormControl>
             </DialogContent>
