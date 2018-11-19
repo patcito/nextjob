@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
+import getConfig from 'next/config';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -92,9 +93,8 @@ import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 
 const TooltipRange = createSliderWithTooltip(Range);
+const {publicRuntimeConfig} = getConfig();
 
-// get language from query parameter or url path
-const lang = 'fr';
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -167,6 +167,16 @@ class EditCompany extends React.Component {
   };
 
   static async getInitialProps({req, query}) {
+    let lang = '';
+    if (req && req.locale && req.locale.language) {
+      lang = req.locale.language;
+    } else if (window && window.navigator && window.navigator.language) {
+      lang = window.navigator.language.split('-')[0];
+    }
+    if (lang !== 'en' && lang !== 'fr') {
+      lang = 'en';
+    }
+
     const translations = await getTranslation(
       lang,
       [
@@ -211,7 +221,7 @@ class EditCompany extends React.Component {
     }
 
     const queryOpts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `query JobCompanies($ownerId: Int, $companyId: Int){
               Company(where: {_and: [{id: {_eq: $companyId}},
@@ -274,7 +284,7 @@ class EditCompany extends React.Component {
   }
   constructor(props) {
     super(props);
-    this.i18n = startI18n(props.translations, lang);
+    this.i18n = startI18n(props.translations, this.props.lang);
     this.INDUSTRIES = INDUSTRIES.map(suggestion => ({
       value: suggestion.industry,
       label: this.i18n.t('industries:' + suggestion.industry),
@@ -698,7 +708,7 @@ class EditCompany extends React.Component {
     };
     const that = this;
     const createCompanyopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `mutation update_Company($ownerId: Int!,
                 $id: Int!,

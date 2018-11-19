@@ -16,6 +16,7 @@ import Link from 'next/link';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
+import CardActions from '@material-ui/core/CardActions';
 
 import Chip from '@material-ui/core/Chip';
 import DoneIcon from '@material-ui/icons/Face';
@@ -111,8 +112,10 @@ class Job extends React.Component {
             <CardContent className={classes.content}>
               <Typography variant="headline">{job.title}</Typography>
               <Typography variant="subheading" color="textSecondary">
-                @ {job.Company.name} {i18n.t('is looking for a')}{' '}
-                {i18n.t('jobstitles:' + job.JobTitle)}
+                <>
+                  @ {job.Company.name} {i18n.t('is looking for a')}{' '}
+                  {i18n.t('jobstitles:' + job.JobTitle)}{' '}
+                </>
               </Typography>
               <Typography>{job.Company.description}</Typography>
               <Grid item>
@@ -188,6 +191,13 @@ class Job extends React.Component {
                 </div>
               </Grid>
             </CardContent>
+            {this.props.query.team ? (
+              <CardActions>
+                <Button size="small">
+                  <Link href={'/jobs/update/' + job.id}>{i18n.t('edit')}</Link>
+                </Button>
+              </CardActions>
+            ) : null}
           </div>
         </Card>
       </Link>

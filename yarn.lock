@@ -2612,6 +2612,11 @@ dot-wild@^2.2.5:
     clone "^2.1.1"
     is-plain-object "^2.0.3"
 
+dotenv@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.1.0.tgz#9853b6ca98292acb7dec67a95018fa40bccff42c"
+  integrity sha512-/veDn2ztgRlB7gKmE3i9f6CmDIyXAy6d5nBq+whO9SLX+Zs1sXEgFLPi+aSuWqUuusMfbi84fT8j34fs1HaYUw==
+
 downshift@^1.22.5:
   version "1.31.16"
   resolved "https://registry.yarnpkg.com/downshift/-/downshift-1.31.16.tgz#acd81631539502d4112d01bd573654419fd9f640"
@@ -2882,6 +2887,13 @@ express-fileupload@^1.0.0-alpha.1:
     busboy "^0.2.14"
     md5 "^2.2.1"
     streamifier "^0.1.1"
+
+express-locale@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/express-locale/-/express-locale-1.0.5.tgz#465254ed4bdeeec00e77cbd5e75a3e56a93de2ed"
+  integrity sha512-T4nOikzDKRklusQEJxGiOdAz4pAJ46z/O6j1j3kqgOhV2X2/w1Lr2SWbtDk9BmQLHQZJecUU6rOfDyN+0XYTUg==
+  dependencies:
+    babel-runtime "^6.26.0"
 
 express@^4.16.3:
   version "4.16.3"

@@ -13,6 +13,7 @@ import {withStyles} from '@material-ui/core/styles';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Grid from '@material-ui/core/Grid';
 import {Parallax} from 'react-parallax';
+import getConfig from 'next/config';
 
 import {I18nextProvider} from 'react-i18next';
 import startI18n from '../tools/startI18n';
@@ -84,9 +85,8 @@ import updateJobApplicationStatus from '../queries/UpdateJobApplicationStatus.gq
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const TooltipRange = createSliderWithTooltip(Range);
+const {publicRuntimeConfig} = getConfig();
 
-// get language from query parameter or url path
-const lang = 'fr';
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -191,7 +191,7 @@ class IndexApplications extends React.Component {
     );
     if (rm) {
       const deleteApplicationopts = {
-        uri: 'http://localhost:8080/v1alpha1/graphql',
+        uri: publicRuntimeConfig.hasura,
         json: true,
         query: deleteJobApplication.loc.source.body,
         headers: {
@@ -225,7 +225,7 @@ class IndexApplications extends React.Component {
     );
     if (rm) {
       const acceptApplicationopts = {
-        uri: 'http://localhost:8080/v1alpha1/graphql',
+        uri: publicRuntimeConfig.hasura,
         json: true,
         query: updateJobApplicationStatus.loc.source.body,
         headers: {
@@ -260,7 +260,7 @@ class IndexApplications extends React.Component {
     );
     if (rm) {
       const acceptApplicationopts = {
-        uri: 'http://localhost:8080/v1alpha1/graphql',
+        uri: publicRuntimeConfig.hasura,
         json: true,
         query: updateJobApplicationStatus.loc.source.body,
         headers: {
@@ -303,7 +303,7 @@ class IndexApplications extends React.Component {
   handleSendMessage = () => {
     this.setState({apply: false});
     const inserMessageopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `
 				mutation insert_Message($body: String!,
@@ -342,7 +342,7 @@ class IndexApplications extends React.Component {
   handleSendApplication = () => {
     this.setState({apply: false});
     const upsertApplicationopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `
 				mutation upsert_application($jobId: Int, $applicantId: Int,
@@ -393,6 +393,16 @@ class IndexApplications extends React.Component {
     });
   };
   static async getInitialProps({req, query}) {
+    let lang = '';
+    if (req && req.locale && req.locale.language) {
+      lang = req.locale.language;
+    } else if (window && window.navigator && window.navigator.language) {
+      lang = window.navigator.language.split('-')[0];
+    }
+    if (lang !== 'en' && lang !== 'fr') {
+      lang = 'en';
+    }
+
     const translations = await getTranslation(
       lang,
       [
@@ -436,7 +446,7 @@ class IndexApplications extends React.Component {
       userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
     const queryOpts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `query Applications($userId: Int){
 				  JobApplication(where: {_or: [{Job: {Company: {Moderators:
@@ -503,7 +513,7 @@ githubAvatarUrl
   }
   constructor(props) {
     super(props);
-    this.i18n = startI18n(props.translations, lang);
+    this.i18n = startI18n(props.translations, this.props.lang);
   }
 
   componentDidMount(props) {
@@ -1135,7 +1145,7 @@ githubAvatarUrl
                 <a href="/profile" target="_blank">
                   {i18n.t('common:A link to your profile')}
                 </a>{' '}
-                {i18n.t('common:and cover letter will be sent to')} {' '}
+                {i18n.t('common:and cover letter will be sent to')}{' '}
                 {this.state.currentJobApplication.Job.Company.name}
               </DialogContentText>
               <FormControl
@@ -1211,9 +1221,7 @@ githubAvatarUrl
                     ? i18n.t(
                         'common:Write a cover letter detailing your motivations',
                       )
-                    : i18n.t(
-                        'common:Writing a cover letter is required',
-                      )}
+                    : i18n.t('common:Writing a cover letter is required')}
                 </FormHelperText>
               </FormControl>
             </DialogContent>

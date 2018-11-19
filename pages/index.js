@@ -12,9 +12,10 @@ import startI18n from '../tools/startI18n';
 import {getTranslation} from '../tools/translationHelpers';
 import IndexJobs from '../components/indexjobs';
 import IndexCompanies from '../components/indexcompanies';
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig();
 const grequest = require('graphql-request');
-// get language from query parameter or url path
-const lang = 'fr';
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -36,12 +37,20 @@ class Index extends React.Component {
   constructor(props) {
     super(props);
 
-    this.i18n = startI18n(props.translations, 'fr');
+    this.i18n = startI18n(props.translations, this.props.lang);
   }
 
   static async getInitialProps({req, query}) {
     //console.log('index', stories);
-    console.log('companyid', query.companyId);
+    let lang = '';
+    if (req && req.locale && req.locale.language) {
+      lang = req.locale.language;
+    } else if (window && window.navigator && window.navigator.language) {
+      lang = window.navigator.language.split('-')[0];
+    }
+    if (lang !== 'en' && lang !== 'fr') {
+      lang = 'en';
+    }
     let userInfo = {};
     let token = null;
     let userId = null;
@@ -109,7 +118,7 @@ class Index extends React.Component {
     }
 
     const getJobsopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `
         query JobCompanies(
@@ -268,7 +277,8 @@ class Index extends React.Component {
       locality: locality,
       nocompany: query.companies ? null : '_no_company_',
     });
-    return {translations, jobsAndCompanies, query, userInfo};
+    console.log('query', query);
+    return {translations, jobsAndCompanies, query, userInfo, lang};
   }
 
   content = () => {
@@ -285,7 +295,11 @@ class Index extends React.Component {
       return null;
     } else {
       return (
-        <IndexJobs i18n={this.i18n} jobs={this.props.jobsAndCompanies.Job} />
+        <IndexJobs
+          i18n={this.i18n}
+          query={this.props.query}
+          jobs={this.props.jobsAndCompanies.Job}
+        />
       );
     }
   };

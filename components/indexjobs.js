@@ -38,11 +38,11 @@ class IndexJobs extends React.Component {
   componentWillUnmount() {}
   render(props) {
     const i18n = this.props.i18n;
-    const {page, url, jobs} = this.props;
+    const {page, url, jobs, query} = this.props;
     return (
       <>
         {jobs.map(job => (
-          <Job key={job.id} i18n={i18n} job={job} />
+          <Job key={job.id} i18n={i18n} query={query} job={job} />
         ))}
       </>
     );

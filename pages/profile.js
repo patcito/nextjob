@@ -4,6 +4,8 @@ import React from 'react';
 import AppBarTop from '../components/appbar';
 import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig();
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -94,8 +96,6 @@ const createSliderWithTooltip = Slider.createSliderWithTooltip;
 
 const TooltipRange = createSliderWithTooltip(Range);
 
-// get language from query parameter or url path
-const lang = 'fr';
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -188,6 +188,16 @@ class Profile extends React.Component {
   };
 
   static async getInitialProps({req, query}) {
+    let lang = '';
+    if (req && req.locale && req.locale.language) {
+      lang = req.locale.language;
+    } else if (window && window.navigator && window.navigator.language) {
+      lang = window.navigator.language.split('-')[0];
+    }
+    if (lang !== 'en' && lang !== 'fr') {
+      lang = 'en';
+    }
+
     const translations = await getTranslation(
       lang,
       [
@@ -228,7 +238,7 @@ class Profile extends React.Component {
       userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
     const queryOpts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `query User($id: Int!){
   						User(where: {id: {_eq: $id}}) {
@@ -279,7 +289,7 @@ class Profile extends React.Component {
   }
   constructor(props) {
     super(props);
-    this.i18n = startI18n(props.translations, lang);
+    this.i18n = startI18n(props.translations, this.props.lang);
     this.PERKS = PERKS.map(suggestion => ({
       value: suggestion.title,
       label: suggestion.title,

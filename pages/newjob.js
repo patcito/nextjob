@@ -59,14 +59,14 @@ const PlacesSelect = dynamic(import('../components/placesselect'), {
 import {withRouter} from 'next/router';
 import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig();
 
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 
 const TooltipRange = createSliderWithTooltip(Range);
 
-// get language from query parameter or url path
-const lang = 'fr';
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -310,7 +310,7 @@ $applicationEmail: String,
 		`;
 
     const saveJobopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: this.props.job ? updateQuery : insertQuery,
       headers: {
@@ -356,7 +356,7 @@ $applicationEmail: String,
       };
 
       const saveJobExtrasopts = {
-        uri: 'http://localhost:8080/v1alpha1/graphql',
+        uri: publicRuntimeConfig.hasura,
         json: true,
         query: `
 		mutation insert_extras($id: Int, $skills: [SkillJob_insert_input!]!,
@@ -544,6 +544,16 @@ $applicationEmail: String,
   };
 
   static async getInitialProps({req, query}) {
+    let lang = '';
+    if (req && req.locale && req.locale.language) {
+      lang = req.locale.language;
+    } else if (window && window.navigator && window.navigator.language) {
+      lang = window.navigator.language.split('-')[0];
+    }
+    if (lang !== 'en' && lang !== 'fr') {
+      lang = 'en';
+    }
+
     const translations = await getTranslation(
       lang,
       [
@@ -586,7 +596,7 @@ $applicationEmail: String,
     }
 
     const createCompanyopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `query Job($id: Int){
 			Job(where: {id: {_eq: $id}}){
@@ -657,7 +667,7 @@ $applicationEmail: String,
   constructor(props) {
     super(props);
     const {router, job} = this.props;
-    this.i18n = startI18n(props.translations, lang);
+    this.i18n = startI18n(props.translations, this.props.lang);
 
     this.classes = this.props;
     this.INDUSTRIES = INDUSTRIES.map(suggestion => ({
@@ -814,7 +824,7 @@ $applicationEmail: String,
     };
     const that = this;
     const createCompanyopts = {
-      uri: 'http://localhost:8080/v1alpha1/graphql',
+      uri: publicRuntimeConfig.hasura,
       json: true,
       query: `mutation insert_Company($ownerId: Int!,
     			$name: String!,

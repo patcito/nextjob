@@ -103,23 +103,32 @@ class Company extends React.Component {
           </CardActionArea>
         </Link>
         <CardActions>
-          <Link href={'/jobs/companies/' + company.id}>
-            <Button size="small" color="primary">
-              {i18n.t('JOBS')}
-            </Button>
-          </Link>
           {query.me ? (
-            <Link href={'/companies/' + company.id + '/edit'}>
-              <Button size="small" color="primary">
-                {i18n.t('edit')}
-              </Button>
-            </Link>
+            <>
+              <Link href={'/jobs/companies/' + company.id + '/team'}>
+                <Button size="small" color="primary">
+                  {i18n.t('JOBS')}
+                </Button>
+              </Link>
+              <Link href={'/companies/' + company.id + '/edit'}>
+                <Button size="small" color="primary">
+                  {i18n.t('edit')}
+                </Button>
+              </Link>
+            </>
           ) : (
-            <Link href={'/jobs/companies/' + company.id}>
-              <Button size="small" color="primary">
-                {i18n.t('common:Learn More')}
-              </Button>
-            </Link>
+            <>
+              <Link href={'/jobs/companies/' + company.id}>
+                <Button size="small" color="primary">
+                  {i18n.t('JOBS')}
+                </Button>
+              </Link>
+              <Link href={'/jobs/companies/' + company.id}>
+                <Button size="small" color="primary">
+                  {i18n.t('common:Learn More')}
+                </Button>
+              </Link>
+            </>
           )}
         </CardActions>
       </Card>

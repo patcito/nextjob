@@ -13,6 +13,7 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const sharp = require('sharp');
 const acceptWebp = require('accept-webp');
+const createLocaleMiddleware = require('express-locale');
 
 app.prepare().then(() => {
   const server = express();
@@ -24,6 +25,7 @@ app.prepare().then(() => {
   server.use(bodyParser.json());
   server.use(cookieParser());
   server.use(fileUpload());
+  server.use(createLocaleMiddleware());
   server.use(
     bodyParser.urlencoded({
       extended: true,
@@ -202,7 +204,7 @@ description
               const bodyJson = data.viewer;
 
               const checkUserRequestopts = {
-                uri: 'process.env.HASURA',
+                uri: process.env.HASURA,
                 json: true,
                 query: `mutation User($githubId: String!, $token: String!,
 									  $githubRepositories: jsonb, $pullRequests: jsonb,
@@ -279,7 +281,7 @@ description
                   }
 
                   var uopts = {
-                    uri: 'process.env.HASURA',
+                    uri: process.env.HASURA,
                     json: true,
                     query: `mutation insert_User($name: String,
 							$githubEmail: String!,
@@ -440,7 +442,7 @@ description
               if (req.github === true) {
                 console.log('userId!', req.userId);
                 const setLinkedinProfilopts = {
-                  uri: 'process.env.HASURA',
+                  uri: process.env.HASURA,
                   json: true,
                   query: `mutation uu($id: Int, $linkedinProfile: jsonb!) {
 				  update_User(where: {id: {_eq:
@@ -477,7 +479,7 @@ description
                 return;
               } else {
                 const checkUserRequestopts = {
-                  uri: 'process.env.HASURA',
+                  uri: process.env.HASURA,
                   json: true,
                   query: `query User($linkedinId: String!){
   						User(where: {linkedinId: {_eq: $linkedinId}}) {
@@ -539,7 +541,7 @@ description
                       return;
                     }
                     const uopts = {
-                      uri: 'process.env.HASURA',
+                      uri: process.env.HASURA,
                       json: true,
                       query: `mutation insert_User($name: String,
 					$linkedinEmail: String!,
@@ -662,6 +664,7 @@ description
   server.get('/api', (req, res) => {
     var token = req.headers['x-access-token'];
     if (!token) {
+      console.log('anon');
       const x = {
         'X-Hasura-Role': 'anon',
       };
@@ -670,6 +673,7 @@ description
 
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
+        console.log('anon 2');
         const x = {
           'X-Hasura-Role': 'anon',
         };
@@ -685,6 +689,7 @@ description
             role = 'user-hr';
           }
         }
+        console.log('role', role);
         const x = {
           'X-Hasura-User-Id': decoded.userId + '',
           'X-Hasura-Role': role,
@@ -702,6 +707,13 @@ description
 
   server.get('/jobs/companies/:companyId', (req, res) => {
     return app.render(req, res, '/', {companyId: req.params.companyId});
+  });
+
+  server.get('/jobs/companies/:companyId/team', (req, res) => {
+    return app.render(req, res, '/', {
+      companyId: req.params.companyId,
+      team: true,
+    });
   });
 
   server.get('/companies', (req, res) => {
