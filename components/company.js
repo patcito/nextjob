@@ -27,6 +27,9 @@ import PlaceIcon from '@material-ui/icons/Place';
 import PeopleIcon from '@material-ui/icons/People';
 import EuroSymbolIcon from '@material-ui/icons/EuroSymbol';
 import WorkIcon from '@material-ui/icons/Work';
+import getConfig from 'next/config';
+
+const {publicRuntimeConfig} = getConfig();
 const styles = theme => ({
   card: {
     width: '100%',
@@ -89,7 +92,13 @@ class Company extends React.Component {
             <CardMedia
               className={classes.media}
               image={
-                '/' + company.id + '-' + company.ownerId + '-' + 'logo.png'
+                publicRuntimeConfig.cdn +
+                company.id +
+                '-' +
+                company.ownerId +
+                '-' +
+                'logo.png?updatedAt=' +
+                company.updatedAt
               }
               title="Contemplative Reptile"
             />

@@ -135,6 +135,7 @@ class Index extends React.Component {
           Company(where: {_and: [{ownerId: {_eq: $ownerId}},
             {name: {_eq: $nocompany}} ]}) {
             id
+            updatedAt
             description
             ownerId
             yearFounded
@@ -194,6 +195,7 @@ class Index extends React.Component {
               name
               description
               yearFounded
+              updatedAt
             }
             ownerId
             remote

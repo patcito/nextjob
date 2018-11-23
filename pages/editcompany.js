@@ -229,6 +229,7 @@ class EditCompany extends React.Component {
                   id
                   description
                   ownerId
+				  updatedAt
                   yearFounded
                   employeeCount
                   devCount
@@ -558,9 +559,10 @@ class EditCompany extends React.Component {
       .then(
         response => response.json(), // if the response is a JSON object
       )
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
+      .then(success => {
+        console.log(success); // Handle the success response object
+        this.touchCompany();
+      })
       .catch(
         error => console.log(error), // Handle the error response object
       );
@@ -577,10 +579,13 @@ class EditCompany extends React.Component {
     })
       .then(response => {
         response.json(); // if the response is a JSON object
-        setTimeout(() => this.setState({employee1Uploaded: new Date()}), 1000);
+        setTimeout(() => this.setState({employee1Uploaded: new Date()}), 4000);
       })
       .then(
-        success => console.log(success), // Handle the success response object
+        success => {
+          console.log(success);
+          this.touchCompany();
+        }, // Handle the success response object
       )
       .catch(
         error => console.log(error), // Handle the error response object
@@ -598,10 +603,13 @@ class EditCompany extends React.Component {
     })
       .then(response => {
         response.json(); // if the response is a JSON object
-        setTimeout(() => this.setState({employee2Uploaded: new Date()}), 1000);
+        setTimeout(() => this.setState({employee2Uploaded: new Date()}), 4000);
       })
       .then(
-        success => console.log(success), // Handle the success response object
+        success => {
+          console.log(success);
+          this.touchCompany();
+        }, // Handle the success response object
       )
       .catch(
         error => console.log(error), // Handle the error response object
@@ -622,11 +630,12 @@ class EditCompany extends React.Component {
         const company = this.state.company;
         company.media1.hasVideo = false;
         this.setState({media1Uploaded: new Date(), company: company});
-        setTimeout(() => this.setState({media1Uploaded: new Date()}), 1000);
+        setTimeout(() => this.setState({media1Uploaded: new Date()}), 4000);
       })
-      .then(
-        success => console.log(success), // Handle the success response object
-      )
+      .then(success => {
+        console.log(success); // Handle the success response object
+        this.touchCompany();
+      })
       .catch(
         error => console.log(error), // Handle the error response object
       );
@@ -646,10 +655,13 @@ class EditCompany extends React.Component {
         const company = this.state.company;
         company.media2.hasVideo = false;
         this.setState({media2Uploaded: new Date(), company: company});
-        setTimeout(() => this.setState({media2Uploaded: new Date()}), 1000);
+        setTimeout(() => this.setState({media2Uploaded: new Date()}), 4000);
       })
       .then(
-        success => console.log(success), // Handle the success response object
+        success => {
+          this.touchCompany();
+          console.log(success);
+        }, // Handle the success response object
       )
       .catch(
         error => console.log(error), // Handle the error response object
@@ -670,10 +682,13 @@ class EditCompany extends React.Component {
         const company = this.state.company;
         company.media3.hasVideo = false;
         this.setState({media3Uploaded: new Date(), company: company});
-        setTimeout(() => this.setState({media3Uploaded: new Date()}), 1000);
+        setTimeout(() => this.setState({media3Uploaded: new Date()}), 4000);
       })
       .then(
-        success => console.log(success), // Handle the success response object
+        success => {
+          this.touchCompany();
+          console.log(success);
+        }, // Handle the success response object
       )
       .catch(
         error => console.log(error), // Handle the error response object
@@ -701,6 +716,40 @@ class EditCompany extends React.Component {
       });
     }
   };
+  touchCompany = () => {
+    const createCompanyopts = {
+      uri: publicRuntimeConfig.hasura,
+      json: true,
+      query: `
+        mutation update_Company($updatedAt: timestamptz, $id: Int) {
+          update_Company(
+            where: {id: {_eq: $id}}
+            _set: {updatedAt: $updatedAt}
+          ) {
+            returning {
+              id
+              name
+              updatedAt
+            }
+          }
+        }
+      `,
+      headers: {
+        'x-access-token': Cookies.get('token'),
+      },
+    };
+    const client = new grequest.GraphQLClient(createCompanyopts.uri, {
+      headers: createCompanyopts.headers,
+    });
+
+    client
+      .request(createCompanyopts.query, {
+        id: this.state.company.id,
+        updatedAt: 'now',
+      })
+      .then(gdata => {});
+  };
+
   saveCompany = () => {
     let newCompany = {
       ...this.state.company,
@@ -710,89 +759,97 @@ class EditCompany extends React.Component {
     const createCompanyopts = {
       uri: publicRuntimeConfig.hasura,
       json: true,
-      query: `mutation update_Company($ownerId: Int!,
-                $id: Int!,
-    			$name: String!,
-			    $url: String!,
-			    $description: String!,
-			    $yearFounded: Int!,
-			    $employeeCount: Int,
-			    $devCount: Int,
-                $media1: json,
-                $media2: json,
-                $media3: json,
-                $quote1: json,
-                $quote2: json,
-                $employee1: json,
-                $employee2: json,
-				$Industry: String!,
-                $twitter: String,
-               $country: String,
-               $route: String,
-               $street_number: String,
-               $locality: String,
-               $administrative_area_level_1: String,
-               $postal_code: String,
-               $location: geography,
-               $skills: [SkillCompany_insert_input!]!
-               $perks: [PerkCompany_insert_input!]!
-               $moderators: [Moderator_insert_input]
-               ) {
-				  update_Company(where: {id: {_eq: $id}},_set: {
-					ownerId: $ownerId,
-					name: $name,
-					url: $url,
-					description: $description,
-					yearFounded: $yearFounded,
-					Industry: $Industry,
-                    employeeCount: $employeeCount,
-                twitter: $twitter,
-			    devCount:$devCount,
-                media1:$media1,
-                media2:$media2,
-                media3:$media3,
-                quote1:$quote1,
-                quote2:$quote2,
-                employee1:$employee1,
-                employee2:$employee2,
-               country: $country,
-               route: $route,
-               street_number: $street_number,
-               locality: $locality,
-               administrative_area_level_1: $administrative_area_level_1,
-               postal_code: $postal_code,
-                location: $location,
-				}){
-					returning{
-					  id
-					  name
-			}
-			}
-  delete_SkillCompany(where: {CompanyId: {_eq: $id}}){
-    affected_rows
-
-}
-		insert_SkillCompany(objects: $skills){
-			    returning{Skill}
-
-		}
-  delete_PerkCompany(where: {CompanyId: {_eq: $id}}){
-    affected_rows
-
-}
-		insert_PerkCompany(objects: $perks){
-			    returning{Perk}
-
-		}
-delete_Moderator(where: {companyId: {_eq: $id}}){
-    affected_rows
-
-}
-insert_Moderator(objects: $moderators){
-    returning{userEmail}
-}
-			}
-				`,
+      query: `
+        mutation update_Company(
+          $ownerId: Int!
+          $id: Int!
+          $name: String!
+          $url: String!
+          $description: String!
+          $yearFounded: Int!
+          $updatedAt: timestamptz
+          $employeeCount: Int
+          $devCount: Int
+          $media1: json
+          $media2: json
+          $media3: json
+          $quote1: json
+          $quote2: json
+          $employee1: json
+          $employee2: json
+          $Industry: String!
+          $twitter: String
+          $country: String
+          $route: String
+          $street_number: String
+          $locality: String
+          $administrative_area_level_1: String
+          $postal_code: String
+          $location: geography
+          $skills: [SkillCompany_insert_input!]!
+          $perks: [PerkCompany_insert_input!]!
+          $moderators: [Moderator_insert_input]
+        ) {
+          update_Company(
+            where: {id: {_eq: $id}}
+            _set: {
+              ownerId: $ownerId
+              name: $name
+              url: $url
+              description: $description
+              yearFounded: $yearFounded
+              Industry: $Industry
+              employeeCount: $employeeCount
+              twitter: $twitter
+			  updatedAt: $updatedAt
+              devCount: $devCount
+              media1: $media1
+              media2: $media2
+              media3: $media3
+              quote1: $quote1
+              quote2: $quote2
+              employee1: $employee1
+              employee2: $employee2
+              country: $country
+              route: $route
+              street_number: $street_number
+              locality: $locality
+              administrative_area_level_1: $administrative_area_level_1
+              postal_code: $postal_code
+              location: $location
+            }
+          ) {
+            returning {
+              id
+              name
+            }
+          }
+          delete_SkillCompany(where: {CompanyId: {_eq: $id}}) {
+            affected_rows
+          }
+          insert_SkillCompany(objects: $skills) {
+            returning {
+              Skill
+            }
+          }
+          delete_PerkCompany(where: {CompanyId: {_eq: $id}}) {
+            affected_rows
+          }
+          insert_PerkCompany(objects: $perks) {
+            returning {
+              Perk
+            }
+          }
+          delete_Moderator(where: {companyId: {_eq: $id}}) {
+            affected_rows
+          }
+          insert_Moderator(objects: $moderators) {
+            returning {
+              userEmail
+            }
+          }
+        }
+      `,
       headers: {
         'x-access-token': Cookies.get('token'),
       },
@@ -1252,13 +1309,14 @@ insert_Moderator(objects: $moderators){
                         </Typography>
                         <Avatar
                           src={
-                            '/' +
+                            publicRuntimeConfig.cdn +
                             this.state.company.id +
                             '-' +
                             this.state.company.ownerId +
                             '-' +
                             'employee1avatar.png?u=' +
-                            this.state.employee1Uploaded
+                            this.state.employee1Uploaded +
+                            this.state.company.updatedAt
                           }
                           style={{cursor: 'pointer'}}
                           onClick={() => this.fileInput.click()}
@@ -1439,13 +1497,14 @@ insert_Moderator(objects: $moderators){
                         <Avatar
                           style={{cursor: 'pointer'}}
                           src={
-                            '/' +
+                            publicRuntimeConfig.cdn +
                             this.state.company.id +
                             '-' +
                             this.state.company.ownerId +
                             '-' +
                             'employee2avatar.png?u=' +
-                            this.state.employee2Uploaded
+                            this.state.employee2Uploaded +
+                            this.state.company.updatedAt
                           }
                           className={classes.avatar}
                           onClick={() => this.fileInput2.click()}
@@ -1624,13 +1683,14 @@ insert_Moderator(objects: $moderators){
                         <CardMedia
                           className={classes.media}
                           image={
-                            '/' +
+                            publicRuntimeConfig.cdn +
                             this.state.company.id +
                             '-' +
                             this.state.company.ownerId +
                             '-' +
                             '1media.png?u=' +
-                            this.state.media1Uploaded
+                            this.state.media1Uploaded +
+                            this.state.company.updatedAt
                           }
                           title="Contemplative Reptile"
                           onClick={() => this.media1FileInput.click()}
@@ -1709,13 +1769,14 @@ insert_Moderator(objects: $moderators){
                         <CardMedia
                           className={classes.media}
                           image={
-                            '/' +
+                            publicRuntimeConfig.cdn +
                             this.state.company.id +
                             '-' +
                             this.state.company.ownerId +
                             '-' +
                             '2media.png?u=' +
-                            this.state.media2Uploaded
+                            this.state.media2Uploaded +
+                            this.state.company.updatedAt
                           }
                           title="Contemplative Reptile"
                           onClick={() => this.media2FileInput.click()}
@@ -1793,13 +1854,14 @@ insert_Moderator(objects: $moderators){
                         <CardMedia
                           className={classes.media}
                           image={
-                            '/' +
+                            publicRuntimeConfig.cdn +
                             this.state.company.id +
                             '-' +
                             this.state.company.ownerId +
                             '-' +
                             '3media.png?u=' +
-                            this.state.media3Uploaded
+                            this.state.media3Uploaded +
+                            this.state.company.updatedAt
                           }
                           title="Contemplative Reptile"
                           onClick={() => this.media3FileInput.click()}

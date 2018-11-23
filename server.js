@@ -14,10 +14,14 @@ const fileUpload = require('express-fileupload');
 const sharp = require('sharp');
 const acceptWebp = require('accept-webp');
 const createLocaleMiddleware = require('express-locale');
+const {Storage} = require('@google-cloud/storage');
+const projectId = process.env.GOOGLE_STORAGE_PROJECT_ID;
+const fs = require('fs');
 
 app.prepare().then(() => {
   const server = express();
-  const staticPath = __dirname + '/uploads';
+  //const staticPath = __dirname + '/tmp';
+  const staticPath = '/tmp';
 
   server.use(acceptWebp(staticPath, ['jpg', 'jpeg', 'png']));
   server.use(express.static(staticPath));
@@ -32,11 +36,49 @@ app.prepare().then(() => {
     }),
   );
 
+  uploadToGCE = async (bucketName, filename) => {
+    if (process.env.CDN) {
+      console.log('lol');
+      // [START storage_upload_file]
+      // Imports the Google Cloud client library
+      const {Storage} = require('@google-cloud/storage');
+
+      // Creates a client
+      const storage = new Storage();
+
+      /**
+       * TODO(developer): Uncomment the following lines before running the sample.
+       */
+      // const bucketName = 'Name of a bucket, e.g. my-bucket';
+      // const filename = 'Local file to upload, e.g. ./local/path/to/file.txt';
+      console.log(bucketName, filename);
+      // Uploads a local file to the bucket
+      await storage.bucket(bucketName).upload(filename, {
+        destination: '/assets/' + filename.split('/').pop(),
+        // Support for HTTP requests made with `Accept-Encoding: gzip`
+        gzip: true,
+        public: true,
+        metadata: {
+          // Enable long-lived HTTP caching headers
+          // Use only if the contents of the file will never change
+          // (If the contents will change, use cacheControl: 'no-cache')
+          //cacheControl: 'public, max-age=31536000',
+          cacheControl: 'no-cache',
+        },
+      });
+
+      console.log(`${filename} uploaded to ${bucketName}.`);
+      fs.unlink(filename, () => {
+        console.log(`${filename} deleted from ${bucketName}.`);
+      });
+      // [END storage_upload_file]
+    }
+  };
   checkToken = (req, res, next) => {
-    console.log('cookies', req.cookies);
+    //console.log('cookies', req.cookies);
     const token = req.cookies.token;
     if (!token) {
-      console.log('no token');
+      //console.log('no token');
       req.userId = null;
       req.token = null;
       req.github = null;
@@ -55,7 +97,7 @@ app.prepare().then(() => {
         next();
         return;
       } else {
-        console.log('req.userid CheckToken', decoded.userId, req.userId);
+        //console.log('req.userid CheckToken', decoded.userId, req.userId);
         req.userId = decoded.userId;
         req.token = token;
         req.github = decoded.github;
@@ -758,19 +800,14 @@ description
 
     sampleFile = req.files.file;
 
-    uploadPath =
-      __dirname +
-      '/uploads/' +
-      req.get('jobId') +
-      '-' +
-      req.get('applicantId') +
-      '-resume.pdf';
+    const path =
+      '/tmp/' + req.get('jobId') + '-' + req.get('applicantId') + '-resume.pdf';
 
-    sampleFile.mv(uploadPath, function(err) {
+    sampleFile.mv(path, function(err) {
       if (err) {
         return res.status(500).json(err);
       }
-
+      uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path);
       res.send('ok');
     });
   });
@@ -778,157 +815,130 @@ description
   server.post('/upload', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-logo.webp',
-      (err, info) => {
+    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-logo';
+    sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
+      if (err) {
+        res.status(500).json(err);
+      }
+      sharp(sampleFile.data).toFile(path + '.png', (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
-        sharp(sampleFile.data).toFile(
-          'uploads/' + req.get('companyId') + '-' + req.userId + '-logo.png',
-          (err, info) => {
-            if (err) {
-              res.status(500).json(err);
-            }
-            console.log(err, info);
-            res.status(200).json('ok');
-          },
-        );
-      },
-    );
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.png');
+
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.webp');
+        console.log(err, info);
+        res.status(200).json('ok');
+      });
+    });
   });
 
   server.post('/uploadEmployee1Avatar', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    sharp(sampleFile.data).toFile(
-      'uploads/' +
-        req.get('companyId') +
-        '-' +
-        req.userId +
-        '-employee1avatar.webp',
-      (err, info) => {
+    const path =
+      '/tmp/' + req.get('companyId') + '-' + req.userId + '-employee1avatar';
+    sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
+      if (err) {
+        res.status(500).json(err);
+      }
+      sharp(sampleFile.data).toFile(path + '.png', (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
-        sharp(sampleFile.data).toFile(
-          'uploads/' +
-            req.get('companyId') +
-            '-' +
-            req.userId +
-            '-employee1avatar.png',
-          (err, info) => {
-            if (err) {
-              res.status(500).json(err);
-            }
-            console.log(err, info);
-            res.status(200).json('ok');
-          },
-        );
-      },
-    );
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.png');
+
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.webp');
+        console.log(err, info);
+        res.status(200).json('ok');
+      });
+    });
   });
 
   server.post('/uploadEmployee2Avatar', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    sharp(sampleFile.data).toFile(
-      'uploads/' +
-        req.get('companyId') +
-        '-' +
-        req.userId +
-        '-employee2avatar.webp',
-      (err, info) => {
+    const path =
+      '/tmp/' + req.get('companyId') + '-' + req.userId + '-employee2avatar';
+    sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
+      if (err) {
+        res.status(500).json(err);
+      }
+      sharp(sampleFile.data).toFile(path + '.png', (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
-        sharp(sampleFile.data).toFile(
-          'uploads/' +
-            req.get('companyId') +
-            '-' +
-            req.userId +
-            '-employee2avatar.png',
-          (err, info) => {
-            if (err) {
-              res.status(500).json(err);
-            }
-            console.log(err, info);
-            res.status(200).json('ok');
-          },
-        );
-      },
-    );
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.png');
+
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.webp');
+        console.log(err, info);
+        res.status(200).json('ok');
+      });
+    });
   });
 
   server.post('/uploadMedia1Image', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-1media.webp',
-      (err, info) => {
+    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-1media';
+    sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
+      if (err) {
+        res.status(500).json(err);
+      }
+      sharp(sampleFile.data).toFile(path + '.png', (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
-        sharp(sampleFile.data).toFile(
-          'uploads/' + req.get('companyId') + '-' + req.userId + '-1media.png',
-          (err, info) => {
-            if (err) {
-              res.status(500).json(err);
-            }
-            console.log(err, info);
-            res.status(200).json('ok');
-          },
-        );
-      },
-    );
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.png');
+
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.webp');
+        console.log(err, info);
+        res.status(200).json('ok');
+      });
+    });
   });
 
   server.post('/uploadMedia2Image', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-2media.webp',
-      (err, info) => {
+    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-2media';
+    sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
+      if (err) {
+        res.status(500).json(err);
+      }
+      sharp(sampleFile.data).toFile(path + '.png', (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
-        sharp(sampleFile.data).toFile(
-          'uploads/' + req.get('companyId') + '-' + req.userId + '-2media.png',
-          (err, info) => {
-            if (err) {
-              res.status(500).json(err);
-            }
-            console.log(err, info);
-            res.status(200).json('ok');
-          },
-        );
-      },
-    );
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.png');
+
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.webp');
+        console.log(err, info);
+        res.status(200).json('ok');
+      });
+    });
   });
 
   server.post('/uploadMedia3Image', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    sharp(sampleFile.data).toFile(
-      'uploads/' + req.get('companyId') + '-' + req.userId + '-3media.webp',
-      (err, info) => {
+    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-3media';
+    sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
+      if (err) {
+        res.status(500).json(err);
+      }
+      sharp(sampleFile.data).toFile(path + '.png', (err, info) => {
         if (err) {
           res.status(500).json(err);
         }
-        sharp(sampleFile.data).toFile(
-          'uploads/' + req.get('companyId') + '-' + req.userId + '-3media.png',
-          (err, info) => {
-            if (err) {
-              res.status(500).json(err);
-            }
-            console.log(err, info);
-            res.status(200).json('ok');
-          },
-        );
-      },
-    );
-  });
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.png');
 
+        uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path + '.webp');
+        console.log(err, info);
+        res.status(200).json('ok');
+      });
+    });
+  });
   server.get('/*logo.png', (req, res) => {
     res.sendFile(staticPath + '/defaultlogo.png');
   });

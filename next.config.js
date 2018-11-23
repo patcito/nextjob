@@ -4,6 +4,7 @@ module.exports = withGraphql(
   withCSS({
     publicRuntimeConfig: {
       hasura: process.env.HASURA,
+      cdn: process.env.CDN || '/',
     },
     webpack: config => {
       // Fixes npm packages that depend on `fs` module

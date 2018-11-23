@@ -26,6 +26,8 @@ import PlaceIcon from '@material-ui/icons/Place';
 import PeopleIcon from '@material-ui/icons/People';
 import EuroSymbolIcon from '@material-ui/icons/EuroSymbol';
 import WorkIcon from '@material-ui/icons/Work';
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig();
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -105,7 +107,15 @@ class Job extends React.Component {
         <Card className={classes.card} style={{cursor: 'pointer'}}>
           <CardMedia
             className={classes.cover}
-            image={'/' + job.companyId + '-' + job.ownerId + '-' + 'logo.png'}
+            image={
+              publicRuntimeConfig.cdn +
+              job.companyId +
+              '-' +
+              job.ownerId +
+              '-' +
+              'logo.png?u=' +
+              job.Company.updatedAt
+            }
             title={job.title}
           />
           <div className={classes.details}>

@@ -229,6 +229,7 @@ class ShowCompany extends React.Component {
                   description
                   ownerId
                   yearFounded
+                  updatedAt
                   employeeCount
                   devCount
                   quote1
@@ -777,12 +778,13 @@ insert_Moderator(objects: $moderators){
                       <Avatar
                         aria-label={company.name}
                         src={
-                          '/' +
+                          publicRuntimeConfig.cdn +
                           company.id +
                           '-' +
                           company.ownerId +
                           '-' +
-                          'logo.png'
+                          'logo.png?u=' +
+                          company.updatedAt
                         }
                         className={classes.avatar}
                       />
@@ -848,13 +850,13 @@ insert_Moderator(objects: $moderators){
                           <CardMedia
                             className={classes.media}
                             image={
-                              '/' +
+                              publicRuntimeConfig.cdn +
                               company.id +
                               '-' +
                               company.ownerId +
                               '-' +
                               '1media.png?u=' +
-                              this.state.media1Uploaded
+                              company.updatedAt
                             }
                             title="Contemplative Reptile"
                           />
@@ -930,13 +932,13 @@ insert_Moderator(objects: $moderators){
                         <CardMedia
                           className={classes.media}
                           image={
-                            '/' +
+                            publicRuntimeConfig.cdn +
                             company.id +
                             '-' +
                             company.ownerId +
                             '-' +
                             '2media.png?u=' +
-                            this.state.media1Uploaded
+                            company.updatedAt
                           }
                           title="Contemplative Reptile"
                         />
@@ -977,13 +979,13 @@ insert_Moderator(objects: $moderators){
                                   aria-label="Recipe"
                                   className={classes.avatar}
                                   src={
-                                    '/' +
+                                    publicRuntimeConfig.cdn +
                                     company.id +
                                     '-' +
                                     company.ownerId +
                                     '-' +
                                     'employee1avatar.png?u=' +
-                                    this.state.employee1Uploaded
+                                    company.updatedAt
                                   }
                                 />
                               }
@@ -1029,13 +1031,13 @@ insert_Moderator(objects: $moderators){
                         <CardMedia
                           className={classes.media}
                           image={
-                            '/' +
+                            publicRuntimeConfig.cdn +
                             company.id +
                             '-' +
                             company.ownerId +
                             '-' +
                             '3media.png?u=' +
-                            this.state.media1Uploaded
+                            company.updatedAt
                           }
                           title="Contemplative Reptile"
                         />
@@ -1055,13 +1057,13 @@ insert_Moderator(objects: $moderators){
                                   aria-label="Recipe"
                                   className={classes.avatar}
                                   src={
-                                    '/' +
+                                    publicRuntimeConfig.cdn +
                                     company.id +
                                     '-' +
                                     company.ownerId +
                                     '-' +
                                     'employee2avatar.png?u=' +
-                                    this.state.employee1Uploaded
+                                    company.updatedAt
                                   }
                                 />
                               }

@@ -180,7 +180,12 @@ class IndexApplications extends React.Component {
     },
   };
   handleClickEditApplication = (e, jobApplication) => {
-    this.setState({apply: true, currentJobApplication: jobApplication});
+    console.log('edit', jobApplication);
+    this.setState({
+      apply: true,
+      currentJobApplication: jobApplication,
+      hasResumePdf: true,
+    });
   };
 
   handleClickDeleteApplication = (e, jobApplication) => {
@@ -373,7 +378,7 @@ class IndexApplications extends React.Component {
       jobId: this.state.currentJobApplication.jobId,
       applicantId: this.state.currentJobApplication.applicantId,
       coverLetter: this.state.currentJobApplication.coverLetter,
-      hasResumePdf: this.state.currentJobApplication.hasResumePdf,
+      hasResumePdf: this.state.hasResumePdf,
     };
 
     const client = new grequest.GraphQLClient(upsertApplicationopts.uri, {
@@ -545,6 +550,10 @@ githubAvatarUrl
   handleCheckboxHasResumePdf = event => {
     this.setState({
       hasResumePdf: !this.state.currentJobApplication.hasResumePdf,
+      currentJobApplication: {
+        ...this.state.currentJobApplication,
+        ...{hasResumePdf: !this.state.currentJobApplication.hasResumePdf},
+      },
     });
   };
 
@@ -557,7 +566,7 @@ githubAvatarUrl
         method: 'POST',
         headers: {
           applicantId: this.props.userInfo.userId,
-          jobId: this.props.job.id,
+          jobId: this.state.currentJobApplication.jobId,
         },
         body: formData, // This is your file object
       })
@@ -1156,7 +1165,16 @@ githubAvatarUrl
                   name="file"
                   type="file"
                   onChange={e => {
-                    this.setState({file: e.target.files, hasResumePdf: true});
+                    this.setState({
+                      file: e.target.files,
+                      hasResumePdf: true,
+                      currentJobApplication: {
+                        ...this.state.currentJobApplication,
+                        ...{
+                          hasResumePdf: true,
+                        },
+                      },
+                    });
                   }}
                 />
                 <FormHelperText
@@ -1173,9 +1191,8 @@ githubAvatarUrl
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={this.state.currentJobApplication.hasResumePdf}
                       name="hasResumePdf"
-                      value="hasResumePdf"
+                      value={this.state.hasResumePdf}
                       onChange={this.handleCheckboxHasResumePdf}
                       color="primary"
                     />
