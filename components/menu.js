@@ -111,7 +111,7 @@ class MenuList extends React.Component {
                   <ListItemIcon>
                     <InboxIcon />
                   </ListItemIcon>
-                  <ListItemText primary={i18n.t('Applicants')} />
+                  <ListItemText primary={i18n.t('Applications')} />
                 </ListItem>
               </Link>
               {this.props.userInfo.linkedin ? (
@@ -120,7 +120,7 @@ class MenuList extends React.Component {
                     <ListItemIcon>
                       <InboxIcon />
                     </ListItemIcon>
-                    <ListItemText primary={i18n.t('Company details')} />
+                    <ListItemText primary={i18n.t('My Company Details')} />
                   </ListItem>
                 </Link>
               ) : null}

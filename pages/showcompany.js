@@ -858,7 +858,7 @@ insert_Moderator(objects: $moderators){
                               '1media.png?u=' +
                               company.updatedAt
                             }
-                            title="Contemplative Reptile"
+                            title={company.name + ' media'}
                           />
                         )}
                       </>
@@ -940,7 +940,7 @@ insert_Moderator(objects: $moderators){
                             '2media.png?u=' +
                             company.updatedAt
                           }
-                          title="Contemplative Reptile"
+                          title={company.name + ' media'}
                         />
                       )}
                     </CardActionArea>
@@ -1039,7 +1039,7 @@ insert_Moderator(objects: $moderators){
                             '3media.png?u=' +
                             company.updatedAt
                           }
-                          title="Contemplative Reptile"
+                          title={company.name + ' media'}
                         />
                       )}
                     </CardActionArea>

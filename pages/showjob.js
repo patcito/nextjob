@@ -133,6 +133,10 @@ const styles = theme => ({
   chip: {
     marginRight: 10,
   },
+  companyName: {
+    textDecoration: 'none',
+    color: 'black',
+  },
 });
 
 class ShowJob extends React.Component {
@@ -299,6 +303,7 @@ class ShowJob extends React.Component {
                   id
                   description
                   ownerId
+                  updatedAt
                   yearFounded
                   employeeCount
                   devCount
@@ -452,19 +457,24 @@ class ShowJob extends React.Component {
                       <Avatar
                         aria-label={job.Company.name}
                         src={
-                          '/' +
+                          publicRuntimeConfig.cdn +
                           job.Company.id +
                           '-' +
                           job.Company.ownerId +
                           '-' +
-                          'logo.png'
+                          'logo.png?u=' +
+                          job.Company.updatedAt
                         }
                         className={classes.avatar}
                       />
                     }
                     title={
                       <Typography gutterBottom variant="h3" component="h1">
-                        {job.Company.name}
+                        <Link href={'/companies/' + job.Company.id}>
+                          <a className={classes.companyName}>
+                            {job.Company.name}
+                          </a>
+                        </Link>
                       </Typography>
                     }
                     subheader={
@@ -526,15 +536,15 @@ class ShowJob extends React.Component {
                           <CardMedia
                             className={classes.media}
                             image={
-                              '/' +
+                              publicRuntimeConfig.cdn +
                               job.Company.id +
                               '-' +
                               job.Company.ownerId +
                               '-' +
                               '1media.png?u=' +
-                              this.state.media1Uploaded
+                              job.Company.updatedAt
                             }
-                            title="Contemplative Reptile"
+                            title={job.Company.name + ' media'}
                             subheader={
                               <>
                                 <span>Since {job.Company.yearFounded}</span>
