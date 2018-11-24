@@ -10,6 +10,6 @@ RUN yarn
 
 # Bundle app source
 COPY . .
-
+RUN yarn run build
 EXPOSE 4000
-CMD [ "yarn", "run", "dev"  ]
+CMD [ "yarn", "run", "start"  ]
