@@ -13,8 +13,7 @@ export async function getTranslation(lang, files, baseUrl) {
   let translation = {};
 
   for (let file of files) {
-    const response = await fetch(`${baseUrl}${lang}/${file}.json`);
-    translation[file] = await response.json();
+    translation[file] = require(`../static/locales/${lang}/${file}.json`);
   }
 
   return {[lang]: translation};

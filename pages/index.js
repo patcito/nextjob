@@ -89,7 +89,7 @@ class Index extends React.Component {
     const translations = await getTranslation(
       lang,
       ['common', 'namespace1', 'employementtypes', 'jobstitles'],
-      'http://localhost:4000/static/locales/',
+      publicRuntimeConfig.i18nHost + '/static/locales/',
     );
     let skill = null;
     let description = null;
