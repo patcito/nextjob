@@ -16,6 +16,8 @@ import pink from '@material-ui/core/colors/pink';
 import Link from 'next/link';
 import Drawer from '@material-ui/core/Drawer';
 import Router from 'next/router';
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig();
 
 import SearchFilters from '../components/search';
 
@@ -194,12 +196,20 @@ class LoginAppBarTop extends React.Component {
             </Button>
           ) : (
             <>
-              <a href="https://github.com/login/oauth/authorize?client_id=e11e3938d18bb98dda68&scope=user">
+              <a
+                href={`https://github.com/login/oauth/authorize?client_id=${
+                  publicRuntimeConfig.githubId
+                }&scope=user`}>
                 <Button color="inherit">
                   {i18n.t('common:Login as Applicant')}
                 </Button>
               </a>
-              <a href="https://www.linkedin.com/oauth/v2/authorization?client_id=86in1o0kvqc348&response_type=code&redirect_uri=http://localhost:4000&scope=r_basicprofile%20r_emailaddress">
+              <a
+                href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
+                  publicRuntimeConfig.linkedinId
+                }&response_type=code&redirect_uri=${
+                  publicRuntimeConfig.hostname
+                }&scope=r_basicprofile%20r_emailaddress`}>
                 <Button color="inherit">
                   {i18n.t('common:Login as HR to post a job')}
                 </Button>
