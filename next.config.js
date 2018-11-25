@@ -4,6 +4,7 @@ module.exports = withGraphql(
   withCSS({
     publicRuntimeConfig: {
       hasura: process.env.HASURA,
+      hasuraClient: process.env.HASURA_CLIENT,
       cdn: process.env.CDN || '/',
       i18nHost: process.env.I18N_HOST || 'http://localhost:4000',
     },

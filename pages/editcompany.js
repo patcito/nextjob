@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
 import getConfig from 'next/config';
+import {getHasuraHost} from '../lib/getHasuraHost';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -221,7 +222,7 @@ class EditCompany extends React.Component {
     }
 
     const queryOpts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `query JobCompanies($ownerId: Int, $companyId: Int){
               Company(where: {_and: [{id: {_eq: $companyId}},
@@ -718,7 +719,7 @@ class EditCompany extends React.Component {
   };
   touchCompany = () => {
     const createCompanyopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `
         mutation update_Company($updatedAt: timestamptz, $id: Int) {
@@ -757,7 +758,7 @@ class EditCompany extends React.Component {
     };
     const that = this;
     const createCompanyopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `
         mutation update_Company(

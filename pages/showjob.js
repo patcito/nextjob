@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
 import getConfig from 'next/config';
 const {publicRuntimeConfig} = getConfig();
+import {getHasuraHost} from '../lib/getHasuraHost';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -184,7 +185,7 @@ class ShowJob extends React.Component {
   handleSendApplication = () => {
     this.setState({apply: false});
     const upsertApplicationopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `
 				mutation upsert_application($jobId: Int, $applicantId: Int,
@@ -280,7 +281,7 @@ class ShowJob extends React.Component {
         : (userId = null);
     }
     const queryOpts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `query JobCompanies($id: Int){
               Job(where: {id: {_eq: $id}}){

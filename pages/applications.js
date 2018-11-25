@@ -14,6 +14,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Grid from '@material-ui/core/Grid';
 import {Parallax} from 'react-parallax';
 import getConfig from 'next/config';
+import {getHasuraHost} from '../lib/getHasuraHost';
 
 import {I18nextProvider} from 'react-i18next';
 import startI18n from '../tools/startI18n';
@@ -196,7 +197,7 @@ class IndexApplications extends React.Component {
     );
     if (rm) {
       const deleteApplicationopts = {
-        uri: publicRuntimeConfig.hasura,
+        uri: getHasuraHost(process, undefined, publicRuntimeConfig),
         json: true,
         query: deleteJobApplication.loc.source.body,
         headers: {
@@ -230,7 +231,7 @@ class IndexApplications extends React.Component {
     );
     if (rm) {
       const acceptApplicationopts = {
-        uri: publicRuntimeConfig.hasura,
+        uri: getHasuraHost(process, undefined, publicRuntimeConfig),
         json: true,
         query: updateJobApplicationStatus.loc.source.body,
         headers: {
@@ -265,7 +266,7 @@ class IndexApplications extends React.Component {
     );
     if (rm) {
       const acceptApplicationopts = {
-        uri: publicRuntimeConfig.hasura,
+        uri: getHasuraHost(process, undefined, publicRuntimeConfig),
         json: true,
         query: updateJobApplicationStatus.loc.source.body,
         headers: {
@@ -308,7 +309,7 @@ class IndexApplications extends React.Component {
   handleSendMessage = () => {
     this.setState({apply: false});
     const inserMessageopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `
 				mutation insert_Message($body: String!,
@@ -347,7 +348,7 @@ class IndexApplications extends React.Component {
   handleSendApplication = () => {
     this.setState({apply: false});
     const upsertApplicationopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `
 				mutation upsert_application($jobId: Int, $applicantId: Int,
@@ -451,7 +452,7 @@ class IndexApplications extends React.Component {
       userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
     const queryOpts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `query Applications($userId: Int){
 				  JobApplication(where: {_or: [{Job: {Company: {Moderators:

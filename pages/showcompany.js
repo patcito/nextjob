@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
 import getConfig from 'next/config';
 const {publicRuntimeConfig} = getConfig();
+import {getHasuraHost} from '../lib/getHasuraHost';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -220,7 +221,7 @@ class ShowCompany extends React.Component {
     }
 
     const queryOpts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `query JobCompanies($ownerId: Int, $companyId: Int){
               Company(where: {_and: [{id: {_eq: $companyId}},

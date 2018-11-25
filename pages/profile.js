@@ -238,7 +238,7 @@ class Profile extends React.Component {
       userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
     const queryOpts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `query User($id: Int!){
   						User(where: {id: {_eq: $id}}) {

@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
+import {getHasuraHost} from '../lib/getHasuraHost';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -61,6 +62,7 @@ import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
 import getConfig from 'next/config';
 const {publicRuntimeConfig} = getConfig();
+import {getHasuraHost} from '../lib/getHasuraHost';
 
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -310,7 +312,7 @@ $applicationEmail: String,
 		`;
 
     const saveJobopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: this.props.job ? updateQuery : insertQuery,
       headers: {
@@ -356,7 +358,7 @@ $applicationEmail: String,
       };
 
       const saveJobExtrasopts = {
-        uri: publicRuntimeConfig.hasura,
+        uri: getHasuraHost(process, undefined, publicRuntimeConfig),
         json: true,
         query: `
 		mutation insert_extras($id: Int, $skills: [SkillJob_insert_input!]!,
@@ -596,7 +598,7 @@ $applicationEmail: String,
     }
 
     const createCompanyopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `query Job($id: Int){
 			Job(where: {id: {_eq: $id}}){
@@ -824,7 +826,7 @@ $applicationEmail: String,
     };
     const that = this;
     const createCompanyopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `mutation insert_Company($ownerId: Int!,
     			$name: String!,

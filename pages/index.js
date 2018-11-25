@@ -13,6 +13,7 @@ import {getTranslation} from '../tools/translationHelpers';
 import IndexJobs from '../components/indexjobs';
 import IndexCompanies from '../components/indexcompanies';
 import getConfig from 'next/config';
+import {getHasuraHost} from '../lib/getHasuraHost';
 const {publicRuntimeConfig} = getConfig();
 const grequest = require('graphql-request');
 
@@ -118,7 +119,7 @@ class Index extends React.Component {
     }
 
     const getJobsopts = {
-      uri: publicRuntimeConfig.hasura,
+      uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `
         query JobCompanies(
