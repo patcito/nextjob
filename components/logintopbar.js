@@ -208,7 +208,7 @@ class LoginAppBarTop extends React.Component {
                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
                   publicRuntimeConfig.linkedinId
                 }&response_type=code&redirect_uri=${
-                  publicRuntimeConfig.hostname
+                  publicRuntimeConfig.publicHostname
                 }&scope=r_basicprofile%20r_emailaddress`}>
                 <Button color="inherit">
                   {i18n.t('common:Login as HR to post a job')}

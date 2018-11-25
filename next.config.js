@@ -7,7 +7,7 @@ module.exports = withGraphql(
       hasuraClient: process.env.HASURA_CLIENT,
       cdn: process.env.CDN || '/',
       i18nHost: process.env.I18N_HOST || 'http://localhost:4000',
-      hostname: process.env.HOSTNAME || 'http://localhost:4000',
+      publicHostname: process.env.PUBLIC_HOSTNAME || 'http://localhost:4000',
       githubId: process.env.GITHUB_ID,
       linkedinId: process.env.LINKEDIN_ID,
     },
