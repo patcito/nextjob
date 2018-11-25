@@ -62,7 +62,6 @@ import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
 import getConfig from 'next/config';
 const {publicRuntimeConfig} = getConfig();
-import {getHasuraHost} from '../lib/getHasuraHost';
 
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
