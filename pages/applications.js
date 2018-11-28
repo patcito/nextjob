@@ -454,50 +454,53 @@ class IndexApplications extends React.Component {
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
-      query: `query Applications($userId: Int){
-				  JobApplication(where: {_or: [{Job: {Company: {Moderators:
-					{User: {id: {_eq: $userId}}}}}},
-				  {applicantId: {_eq: $userId}},{Job:
-					{Company: {ownerId: {_eq: $userId}}}}
-				  ]}) {
-					coverLetter
-					jobId
-					applicantId
-                    status
-					hasResumePdf
-                    Messages {
-                    body
-                    createdAt
-                    User{
-                    name
-                    githubAvatarUrl
-                    linkedinAvatarUrl
-                    }
-                    }
-					createdAt
-					updatedAt
-                              id
-                              Job{
-                                          JobTitle
-                                          Company{
-                                                        name
-
-                                          }
-
-                              }
-					Applicant{
-					  id
-					  linkedinProfile
-					  githubEmail
-					  githubUsername
-            firstName
-                        lastName
-name
-githubAvatarUrl
-					}
-				  }
-				}
-        `,
+      query: `
+        query Applications($userId: Int) {
+          JobApplication(
+            where: {
+              _or: [
+                {Job: {Company: {Moderators: {User: {id: {_eq: $userId}}}}}}
+                {applicantId: {_eq: $userId}}
+                {Job: {Company: {ownerId: {_eq: $userId}}}}
+              ]
+            }
+          ) {
+            coverLetter
+            jobId
+            applicantId
+            status
+            hasResumePdf
+            Messages {
+              body
+              createdAt
+              User {
+                name
+                githubAvatarUrl
+                linkedinAvatarUrl
+              }
+            }
+            createdAt
+            updatedAt
+            id
+            Job {
+              JobTitle
+              Company {
+                name
+              }
+            }
+            Applicant {
+              id
+              linkedinProfile
+              githubEmail
+              githubUsername
+              firstName
+              lastName
+              name
+              githubAvatarUrl
+            }
+          }
+        }
+      `,
       headers: {
         'x-access-token': userInfo.token,
         'x-access-role': 'userType',
@@ -513,7 +516,7 @@ githubAvatarUrl
     if (applications.JobApplication.length > 0) {
       applications = applications.JobApplication;
     } else {
-      applications = null;
+      applications = [];
     }
     return {translations, userInfo, applications};
   }
