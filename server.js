@@ -458,7 +458,7 @@ description
             uri:
               'https://www.linkedin.com/oauth/v2/accessToken?code=' +
               options.code +
-              '&grant_type=authorization_code&redirect_uri=http://localhost:4000&client_id=' +
+              `&grant_type=authorization_code&redirect_uri=${process.env.PUBLIC_HOSTNAME}&client_id=` +
               process.env.LINKEDIN_ID +
               '&client_secret=' +
               process.env.LINKEDIN_SECRET,
