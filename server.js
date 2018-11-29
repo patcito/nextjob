@@ -957,6 +957,6 @@ description
 
   server.listen(port, err => {
     if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
+    console.log(`> Now ready on http://localhost:${port}`);
   });
 });
