@@ -957,6 +957,7 @@ description
 
   server.listen(port, err => {
     if (err) throw err;
+    console.log(process.env);
     console.log(`> Now ready on http://localhost:${port}`);
   });
 });
