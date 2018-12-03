@@ -3,6 +3,7 @@
 import React from 'react';
 import AppBarTop from '../components/appbar';
 import PropTypes from 'prop-types';
+import {getHasuraHost} from '../lib/getHasuraHost';
 const grequest = require('graphql-request');
 import getConfig from 'next/config';
 const {publicRuntimeConfig} = getConfig();

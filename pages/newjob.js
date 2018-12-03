@@ -659,10 +659,10 @@ $applicationEmail: String,
       } else {
         job = null;
       }
-      return {translations, job, userInfo};
+      return {translations, job, userInfo, lang};
     } else {
       const job = null;
-      return {translations, job, userInfo};
+      return {translations, job, userInfo,lang};
     }
   }
   constructor(props) {
