@@ -94,6 +94,7 @@ class Index extends React.Component {
     );
     let skill = null;
     let description = null;
+    let description_fr = null;
     let employementType = null;
     let remote = null;
     let country = null;
@@ -104,6 +105,9 @@ class Index extends React.Component {
     }
     if (query.description) {
       description = '%' + query.description + '%';
+    }
+    if (query.description_fr) {
+      description_fr = '%' + query.description_fr + '%';
     }
     if (query.jobEmployementType && query.jobEmployementType.length > 0) {
       employementType = query.jobEmployementType.split(',');
@@ -129,6 +133,7 @@ class Index extends React.Component {
           $companyId: Int
           $skill: String
           $description: String
+          $description_fr: String
           $remote: Boolean
           $employementType: [String]
           $nocompany: String
@@ -138,6 +143,7 @@ class Index extends React.Component {
             id
             updatedAt
             description
+            description_fr
             ownerId
             yearFounded
             employeeCount
@@ -180,6 +186,7 @@ class Index extends React.Component {
                     {Skills: {Skill: {_ilike: $description}}}
                     {Company: {name: {_ilike: $description}}}
                     {Company: {description: {_ilike: $description}}}
+                    {Company: {description_fr: {_ilike: $description_fr}}}
                     {JobFunctions: {JobFunction: {_ilike: $description}}}
                     {JobTitle: {_ilike: $description}}
                   ]
@@ -195,6 +202,7 @@ class Index extends React.Component {
             Company {
               name
               description
+              description_fr
               yearFounded
               updatedAt
             }

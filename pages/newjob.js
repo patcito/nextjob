@@ -650,6 +650,7 @@ $applicationEmail: String,
     const client = new grequest.GraphQLClient(createCompanyopts.uri, {
       headers: createCompanyopts.headers,
     });
+    let forceFr = query.fr;
     if (query.id) {
       let job = await client.request(createCompanyopts.query, {
         id: query.id || 0,
@@ -659,10 +660,10 @@ $applicationEmail: String,
       } else {
         job = null;
       }
-      return {translations, job, userInfo, lang};
+      return {translations, job, userInfo, lang, forceFr};
     } else {
       const job = null;
-      return {translations, job, userInfo,lang};
+      return {translations, job, userInfo, lang, forceFr};
     }
   }
   constructor(props) {
@@ -1259,7 +1260,7 @@ $applicationEmail: String,
                   className={classes.formControl}
                   error={this.state.descriptionvalid === false}>
                   <InputLabel htmlFor="name-simple">
-                    {this.i18n.t('Description')}
+                    {this.i18n.t('Your Mission')}
                   </InputLabel>
                   <Input
                     id="description"
@@ -1288,6 +1289,35 @@ $applicationEmail: String,
                           'Writing a description about what your company is about is required',
                         )}
                   </FormHelperText>
+                  {this.props.lang === 'fr' || this.props.forceFr === '1' ? (
+                    <>
+                      <Input
+                        id="description_fr"
+                        value={this.state.description_fr}
+                        onChange={this.handleChange}
+                        name="description_fr"
+                        multiline={true}
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        rows={5}
+                        fullWidth={true}
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.description_frvalid !== false
+                            ? 'description_fr-helper-text'
+                            : 'description_fr-error-text'
+                        }>
+                        {this.state.description_frvalid !== false
+                          ? this.i18n.t(
+                              'Write a description about what your company is about in French',
+                            )
+                          : this.i18n.t(
+                              'Writing a description about what your company is about is required',
+                            )}
+                      </FormHelperText>
+                    </>
+                  ) : null}
                 </FormControl>
                 <FormControl
                   className={classes.formControl}

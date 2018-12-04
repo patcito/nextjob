@@ -37,7 +37,7 @@
   "Your company's website is required": "L'adresse web de votre société est obligatoire",
   "The year your company was founded is required": "L'année de création de votre société est obligatoire",
   "Selecting your company's industry": "Selectionner un secteur d'activité est obligatoire",
-  "Write a description about what your company is about": "Décrivez ce que fait votre société, son coeur de métier, sa mission",
+  "Write a description about what your company is about": "Décrivez ce que fait votre société, son coeur de métier, sa mission en anglais",
   "Writing a description about what your company is about is required": "Décrire votre société est obligatoire",
 
   "Next": "Suivant",
@@ -77,5 +77,7 @@
   "Employee count": "Nombre d'employés",
   "This field is required": "Ce champs est obligatoire",
 
-  "Your company's logo": "Le logo de votre société"
+  "Your company's logo": "Le logo de votre société",
+  "Your Mission": "Votre mission",
+  "Write a description about what your company is about in French": "Décrivez ce que fait votre société, son coeur de métier, sa mission en français"
 }

@@ -140,6 +140,7 @@ class EditCompany extends React.Component {
       devCount: 5,
       id: 0,
       description: '',
+      description_fr: '',
       employee1: {
         name: '',
         title: '',
@@ -177,7 +178,7 @@ class EditCompany extends React.Component {
     if (lang !== 'en' && lang !== 'fr') {
       lang = 'en';
     }
-
+    let forceFr = query.fr;
     const translations = await getTranslation(
       lang,
       [
@@ -202,7 +203,7 @@ class EditCompany extends React.Component {
 
     const companyId = query.companyId || null;
     if (req) {
-      query.me && req.userId ? (userId = req.userId) : (userId = null);
+      req.userId ? (userId = req.userId) : (userId = null);
       token = req.token || null;
       github = req.github;
       linkedin = req.linkedin;
@@ -219,6 +220,7 @@ class EditCompany extends React.Component {
       localStorage.getItem('currentUser')
         ? (userId = JSON.parse(localStorage.getItem('currentUser')).id)
         : (userId = null);
+      userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
 
     const queryOpts = {
@@ -229,6 +231,7 @@ class EditCompany extends React.Component {
                   {ownerId: {_eq: $ownerId}}]}){
                   id
                   description
+                  description_fr
                   ownerId
 				  updatedAt
                   yearFounded
@@ -282,7 +285,7 @@ class EditCompany extends React.Component {
     if (!company.devCount) {
       company.devCount = 5;
     }
-    return {translations, company, companyId, userInfo};
+    return {translations, company, companyId, userInfo, lang, forceFr};
   }
   constructor(props) {
     super(props);
@@ -767,6 +770,7 @@ class EditCompany extends React.Component {
           $name: String!
           $url: String!
           $description: String!
+          $description_fr: String!
           $yearFounded: Int!
           $updatedAt: timestamptz
           $employeeCount: Int
@@ -798,6 +802,7 @@ class EditCompany extends React.Component {
               name: $name
               url: $url
               description: $description
+              description_fr: $description_fr
               yearFounded: $yearFounded
               Industry: $Industry
               employeeCount: $employeeCount
@@ -1214,6 +1219,35 @@ class EditCompany extends React.Component {
                             'Writing a description about what your company is about is required',
                           )}
                     </FormHelperText>
+                    {this.props.lang === 'fr' || this.props.forceFr === 1 ? (
+                      <>
+                        <Input
+                          id="description_fr"
+                          value={this.state.company.description_fr}
+                          onChange={this.handleChange}
+                          name="description_fr"
+                          multiline={true}
+                          onBlur={e => this.handleBlur(e, true)}
+                          onFocus={e => this.handleFocus(e, true)}
+                          rows={5}
+                          fullWidth={true}
+                        />
+                        <FormHelperText
+                          id={
+                            this.state.description_frvalid !== false
+                              ? 'description_fr-helper-text'
+                              : 'description_fr-error-text'
+                          }>
+                          {this.state.description_frvalid !== false
+                            ? this.i18n.t(
+                                'Write a description about what your company is about in French',
+                              )
+                            : this.i18n.t(
+                                'Writing a description about what your company is about is required',
+                              )}
+                        </FormHelperText>
+                      </>
+                    ) : null}
                   </FormControl>
                   <FormControl
                     className={classes.formControl}

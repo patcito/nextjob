@@ -97,7 +97,6 @@ app.prepare().then(() => {
         next();
         return;
       } else {
-        //console.log('req.userid CheckToken', decoded.userId, req.userId);
         req.userId = decoded.userId;
         req.token = token;
         req.github = decoded.github;
@@ -458,7 +457,9 @@ description
             uri:
               'https://www.linkedin.com/oauth/v2/accessToken?code=' +
               options.code +
-              `&grant_type=authorization_code&redirect_uri=${process.env.PUBLIC_HOSTNAME}&client_id=` +
+              `&grant_type=authorization_code&redirect_uri=${
+                process.env.PUBLIC_HOSTNAME
+              }&client_id=` +
               process.env.LINKEDIN_ID +
               '&client_secret=' +
               process.env.LINKEDIN_SECRET,
@@ -783,6 +784,14 @@ description
   server.get('/companies/:companyId/edit', (req, res) => {
     return app.render(req, res, '/editcompany', {
       companyId: req.params.companyId,
+      action: 'editCompany',
+    });
+  });
+
+  server.get('/companies/:companyId/edit/fr', (req, res) => {
+    return app.render(req, res, '/editcompany', {
+      companyId: req.params.companyId,
+      fr: 1,
       action: 'editCompany',
     });
   });
