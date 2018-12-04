@@ -70,7 +70,7 @@ class LoginAppBarTop extends React.Component {
     this.setState({[name]: event.target.checked});
   };
 
-  handleLogoutClick = () => {
+  logOut = () => {
     this.setState({token: false, currentUser: null, loggedOut: true});
     localStorage.clear();
     document.cookie.split(';').forEach(function(c) {
@@ -78,6 +78,9 @@ class LoginAppBarTop extends React.Component {
         .replace(/^ +/, '')
         .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
     });
+  };
+  handleLogoutClick = () => {
+    this.logOut();
     Router.push('/');
   };
 
@@ -127,6 +130,9 @@ class LoginAppBarTop extends React.Component {
           'currentUser',
           JSON.stringify(this.props.userInfo.currentUser),
         );
+      }
+      if (!this.props.userInfo) {
+        this.logOut();
       }
     }
   }
