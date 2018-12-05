@@ -782,10 +782,26 @@ description
     });
   });
 
+  server.get('/companies/:companyId/fr', (req, res) => {
+    return app.render(req, res, '/showcompany', {
+      companyId: req.params.companyId,
+      action: 'showCompany',
+      lang: 'fr',
+    });
+  });
+
   server.get('/jobs/:jobId', (req, res) => {
     return app.render(req, res, '/showjob', {
       jobId: req.params.jobId,
       action: 'showJob',
+    });
+  });
+
+  server.get('/jobs/:jobId/fr', (req, res) => {
+    return app.render(req, res, '/showjob', {
+      jobId: req.params.jobId,
+      action: 'showJob',
+      lang: 'fr',
     });
   });
 

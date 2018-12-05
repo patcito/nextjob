@@ -218,7 +218,6 @@ class ShowJob extends React.Component {
       coverLetter: this.state.coverLetter,
       hasResumePdf: this.state.hasResumePdf,
     };
-    console.log('lolappli', upsertApplicationopts, vars);
 
     const client = new grequest.GraphQLClient(upsertApplicationopts.uri, {
       headers: upsertApplicationopts.headers,
@@ -242,7 +241,9 @@ class ShowJob extends React.Component {
     if (lang !== 'en' && lang !== 'fr') {
       lang = 'en';
     }
-
+    if (query.lang === 'fr') {
+      lang = 'fr';
+    }
     const translations = await getTranslation(
       lang,
       [
@@ -287,6 +288,7 @@ class ShowJob extends React.Component {
               Job(where: {id: {_eq: $id}}){
                                 id
                       description
+                      description_fr
                       Industry
                       country
                       route
@@ -303,6 +305,7 @@ class ShowJob extends React.Component {
                   Company {
                   id
                   description
+                  description_fr
                   ownerId
                   updatedAt
                   yearFounded
@@ -377,7 +380,7 @@ class ShowJob extends React.Component {
     } else {
       job = null;
     }
-    return {translations, jobId, userInfo, job};
+    return {translations, jobId, userInfo, job, lang};
   }
   constructor(props) {
     super(props);
@@ -442,6 +445,7 @@ class ShowJob extends React.Component {
     const {classes, job} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
+    console.log(i18n.language);
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
@@ -680,7 +684,11 @@ class ShowJob extends React.Component {
                   />
                   <CardActionArea className={classes.cardActionArea}>
                     <CardContent>
-                      <Typography component="p">{job.description}</Typography>
+                      <Typography component="p">
+                        {this.props.lang === 'fr'
+                          ? job.description_fr
+                          : job.description}
+                      </Typography>
                     </CardContent>
                     {job.Skills.map(Skill => (
                       <Chip

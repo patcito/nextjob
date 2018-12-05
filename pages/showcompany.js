@@ -144,6 +144,7 @@ class ShowCompany extends React.Component {
       devCount: 5,
       id: 0,
       description: '',
+      description_fr: '',
       employee1: {
         name: '',
         title: '',
@@ -180,6 +181,9 @@ class ShowCompany extends React.Component {
     }
     if (lang !== 'en' && lang !== 'fr') {
       lang = 'en';
+    }
+    if (query.lang === 'fr') {
+      lang = 'fr';
     }
 
     const translations = await getTranslation(
@@ -228,6 +232,7 @@ class ShowCompany extends React.Component {
                   {ownerId: {_eq: $ownerId}}]}){
                   id
                   description
+                  description_fr
                   ownerId
                   yearFounded
                   updatedAt
@@ -343,7 +348,7 @@ class ShowCompany extends React.Component {
     delete company['Skills'];
     delete company['Perks'];
     delete company['Moderators'];
-    return {translations, company, companyId, userInfo};
+    return {translations, company, companyId, userInfo, lang};
   }
   constructor(props) {
     super(props);
@@ -866,7 +871,9 @@ insert_Moderator(objects: $moderators){
                     ) : null}
                     <CardContent>
                       <Typography component="p">
-                        {company.description}
+                        {this.props.lang === 'fr'
+                          ? company.description_fr
+                          : company.description}
                       </Typography>
                     </CardContent>
                     <CardActions>

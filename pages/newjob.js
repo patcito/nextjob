@@ -96,6 +96,7 @@ class NewJob extends React.Component {
     job: {},
     yearsExperienceRange: [0, 4],
     dailySalaryRange: [100, 1500],
+    hasApplicationEmail: true,
     open: false,
     yearlySalaryRange: [40000, 50000],
     monthlySalaryRange: [500, 1000],

@@ -60,6 +60,9 @@ class Index extends React.Component {
     let currentUser = {};
 
     const companyId = query.companyId || null;
+    if (query.lang === 'fr') {
+      lang = 'fr';
+    }
     if (req) {
       console.log('query', query, req.userId);
       query.me && req.userId ? (userId = req.userId) : (userId = null);

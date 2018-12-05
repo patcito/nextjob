@@ -101,7 +101,6 @@ class Job extends React.Component {
   render(props) {
     const {classes, job, i18n} = this.props;
     const {open} = this.state;
-
     return (
       <Link href={'/jobs/' + job.id}>
         <Card className={classes.card} style={{cursor: 'pointer'}}>
@@ -127,7 +126,11 @@ class Job extends React.Component {
                   {i18n.t('jobstitles:' + job.JobTitle)}{' '}
                 </>
               </Typography>
-              <Typography>{job.Company.description}</Typography>
+              <Typography>
+                {i18n.language === 'fr'
+                  ? job.Company.description_fr
+                  : job.Company.description}
+              </Typography>
               <Grid item>
                 <div className={classes.root}>
                   <Chip
