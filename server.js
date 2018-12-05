@@ -748,6 +748,14 @@ description
     return app.render(req, res, '/newjob', {id: req.params.id});
   });
 
+  server.get('/jobs/update/:id/fr', (req, res) => {
+    return app.render(req, res, '/newjob', {id: req.params.id, fr: 1});
+  });
+
+  server.get('/newjob/fr', (req, res) => {
+    return app.render(req, res, '/newjob', {fr: 1});
+  });
+
   server.get('/jobs/companies/:companyId', (req, res) => {
     return app.render(req, res, '/', {companyId: req.params.companyId});
   });

@@ -157,6 +157,7 @@ class NewJob extends React.Component {
       country: this.state.fullAddress.country,
       postal_code: this.state.fullAddress.postal_code,
       description: this.state.jobDescription,
+      description_fr: this.state.jobDescriptionFr,
       EmployementType: this.state.selectedEmployementType.value,
       SeniorityLevel: this.state.selectedSeniorityLevel.value,
       JobTitle: this.state.jobTitle.value,
@@ -194,6 +195,7 @@ $hasMonthlySalary: Boolean,
  $country: String,
  $postal_code: String,
  $description: String,
+ $description_fr: String,
  $EmployementType: String,
  $SeniorityLevel: String,
 		$JobTitle: String ){
@@ -222,6 +224,7 @@ hasMonthlySalary: $hasMonthlySalary,
 				country: $country,
 				postal_code: $postal_code,
 				description: $description,
+				description_fr: $description_fr,
 				EmployementType: $EmployementType,
 				SeniorityLevel: $SeniorityLevel,
 				JobTitle: $JobTitle,
@@ -232,6 +235,7 @@ hasMonthlySalary: $hasMonthlySalary,
 				returning{
 					      id
           description
+          description_fr
 
 
 }
@@ -265,6 +269,7 @@ $applicationEmail: String,
  $country: String,
  $postal_code: String,
  $description: String,
+ $description_fr: String,
  $EmployementType: String,
  $SeniorityLevel: String,
 		$JobTitle: String){
@@ -293,6 +298,7 @@ $applicationEmail: String,
 				country: $country,
 				postal_code: $postal_code,
 				description: $description,
+				description_fr: $description_fr,
 				EmployementType: $EmployementType,
 				SeniorityLevel: $SeniorityLevel,
 				JobTitle: $JobTitle,
@@ -636,6 +642,7 @@ $applicationEmail: String,
         country
         postal_code
       description
+      description_fr
 
       EmployementType
       SeniorityLevel
@@ -751,6 +758,7 @@ $applicationEmail: String,
             ', ' +
             job.country,
           jobDescription: job.description,
+          jobDescriptionFr: job.description_fr,
           jobFunction: job.JobFunctions.map(v => ({
             value: v,
             label: this.i18n.t('jobfunctions:' + v.JobFunction),
@@ -1289,7 +1297,7 @@ $applicationEmail: String,
                           'Writing a description about what your company is about is required',
                         )}
                   </FormHelperText>
-                  {this.props.lang === 'fr' || this.props.forceFr === '1' ? (
+                  {this.props.lang === 'fr' || this.props.forceFr === 1 ? (
                     <>
                       <Input
                         id="description_fr"
@@ -1474,12 +1482,43 @@ $applicationEmail: String,
                 }>
                 {this.state.jobDescriptionvalid !== false
                   ? this.i18n.t(
-                      'Write a description about what your company is about',
+                      'Write a description about what this job is about',
                     )
                   : this.i18n.t(
-                      'Writing a description about what your company is about is required',
+                      'Writing a description about what this job is about is required',
                     )}
               </FormHelperText>
+              {this.props.lang === 'fr' || this.props.forceFr === 1 ? (
+                <>
+                  <Input
+                    id="jobDescriptionFr"
+                    value={this.state.jobDescriptionFr}
+                    onChange={this.handleChange}
+                    name="jobDescriptionFr"
+                    required={true}
+                    multiline={true}
+                    onBlur={e => this.handleBlur(e, true)}
+                    onFocus={e => this.handleFocus(e, true)}
+                    rows={5}
+                    fullWidth={true}
+                  />
+
+                  <FormHelperText
+                    id={
+                      this.state.descriptionvalid !== false
+                        ? 'jobDescriptionFr-helper-text'
+                        : 'jobDescriptionFR-error-text'
+                    }>
+                    {this.state.jobDescriptionFrvalid !== false
+                      ? this.i18n.t(
+                          'Write a description about what this job is about in French',
+                        )
+                      : this.i18n.t(
+                          'Writing a description about what this job is about is required',
+                        )}
+                  </FormHelperText>
+                </>
+              ) : null}
             </FormControl>
           </>
         );
