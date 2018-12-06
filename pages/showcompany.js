@@ -7,6 +7,7 @@ const grequest = require('graphql-request');
 import getConfig from 'next/config';
 const {publicRuntimeConfig} = getConfig();
 import {getHasuraHost} from '../lib/getHasuraHost';
+import Markdown from 'markdown-to-jsx';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -871,9 +872,11 @@ insert_Moderator(objects: $moderators){
                     ) : null}
                     <CardContent>
                       <Typography component="p">
-                        {this.props.lang === 'fr'
-                          ? company.description_fr
-                          : company.description}
+                        <Markdown>
+                          {this.props.lang === 'fr'
+                            ? company.description_fr
+                            : company.description}
+                        </Markdown>
                       </Typography>
                     </CardContent>
                     <CardActions>

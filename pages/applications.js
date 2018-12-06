@@ -83,6 +83,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Snackbar from '@material-ui/core/Snackbar';
 import deleteJobApplication from '../queries/DeleteJobApplication.gql';
 import updateJobApplicationStatus from '../queries/UpdateJobApplicationStatus.gql';
+
+import Markdown from 'markdown-to-jsx';
+
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const TooltipRange = createSliderWithTooltip(Range);
@@ -1098,7 +1101,9 @@ class IndexApplications extends React.Component {
                       }
                       subheader={new Date(message.createdAt).toLocaleString()}
                     />
-                    <CardContent>{message.body}</CardContent>
+                    <CardContent>
+                      <Markdown>{message.body}</Markdown>
+                    </CardContent>
                   </Card>
                 ))}
               </div>

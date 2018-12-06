@@ -79,8 +79,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Snackbar from '@material-ui/core/Snackbar';
+import Markdown from 'markdown-to-jsx';
 
-import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 
 const TooltipRange = createSliderWithTooltip(Range);
@@ -685,9 +685,11 @@ class ShowJob extends React.Component {
                   <CardActionArea className={classes.cardActionArea}>
                     <CardContent>
                       <Typography component="p">
-                        {this.props.lang === 'fr'
-                          ? job.description_fr
-                          : job.description}
+                        <Markdown>
+                          {this.props.lang === 'fr'
+                            ? job.description_fr
+                            : job.description}
+                        </Markdown>{' '}
                       </Typography>
                     </CardContent>
                     {job.Skills.map(Skill => (
