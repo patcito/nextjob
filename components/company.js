@@ -35,6 +35,9 @@ const styles = theme => ({
     width: '100%',
     marginTop: 10,
     marginRight: 10,
+    '@media (max-width: 728px)': {
+      margin: 5,
+    },
   },
 
   cardActionArea: {

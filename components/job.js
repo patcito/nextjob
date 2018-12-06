@@ -27,6 +27,8 @@ import PeopleIcon from '@material-ui/icons/People';
 import EuroSymbolIcon from '@material-ui/icons/EuroSymbol';
 import WorkIcon from '@material-ui/icons/Work';
 import getConfig from 'next/config';
+import removeMd from 'remove-markdown';
+
 const {publicRuntimeConfig} = getConfig();
 const styles = theme => ({
   root: {
@@ -35,11 +37,13 @@ const styles = theme => ({
   flex: {
     flexGrow: 1,
   },
-
   card: {
     display: 'flex',
     marginTop: 10,
     marginBottom: 10,
+    '@media (max-width: 728px)': {
+      margin: 5,
+    },
   },
   details: {
     display: 'flex',
@@ -49,12 +53,25 @@ const styles = theme => ({
     flex: '1 0 auto',
   },
   cover: {
-    width: 151,
-    height: 151,
+    '@media (min-width: 728px)': {
+      width: 151,
+      height: 151,
+    },
+    '@media (max-width: 728px)': {
+      width: 70,
+      height: 70,
+      marginTop: 5,
+      marginLeft: 5,
+      img: {
+        width: 50,
+        height: 50,
+      },
+    },
   },
   chip: {
     marginTop: 10,
     marginRight: 10,
+    '@media (max-width: 728px)': {},
   },
   chiptags: {
     color: '#fff',
@@ -128,8 +145,8 @@ class Job extends React.Component {
               </Typography>
               <Typography>
                 {i18n.language === 'fr'
-                  ? job.Company.description_fr
-                  : job.Company.description}
+                  ? removeMd(job.Company.description_fr)
+                  : removeMd(job.Company.description)}
               </Typography>
               <Grid item>
                 <div className={classes.root}>

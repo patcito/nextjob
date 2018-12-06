@@ -38,6 +38,16 @@ const styles = theme => ({
   offersButton: {
     backgroundColor: pink[500],
   },
+  showOnMobile: {
+    '@media (min-width: 728px)': {
+      display: 'none',
+    },
+  },
+  hideOnMobile: {
+    '@media (max-width: 728px)': {
+      display: 'none',
+    },
+  },
 });
 
 // get language from query parameter or url path
@@ -182,12 +192,14 @@ class LoginAppBarTop extends React.Component {
               <Button
                 variant="contained"
                 color="secondary"
+                cyylassName={classes.hideOnMobile}
                 style={{color: '#FFF', marginLeft: '15px'}}>
                 {i18n.t('Post a job')}
               </Button>
             </Link>
           ) : null}
           <Button
+            className={classes.hideOnMobile}
             variant="contained"
             style={{
               marginLeft: '15px',
@@ -211,6 +223,7 @@ class LoginAppBarTop extends React.Component {
                 </Button>
               </a>
               <a
+                className={classes.hideOnMobile}
                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
                   publicRuntimeConfig.linkedinId
                 }&response_type=code&redirect_uri=${
@@ -219,6 +232,15 @@ class LoginAppBarTop extends React.Component {
                 <Button color="inherit">
                   {i18n.t('common:Login as HR to post a job')}
                 </Button>
+              </a>
+              <a
+                className={classes.showOnMobile}
+                href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
+                  publicRuntimeConfig.linkedinId
+                }&response_type=code&redirect_uri=${
+                  publicRuntimeConfig.publicHostname
+                }&scope=r_basicprofile%20r_emailaddress`}>
+                <Button color="inherit">{i18n.t('common:Login as HR')}</Button>
               </a>
             </>
           )}

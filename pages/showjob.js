@@ -98,6 +98,16 @@ const styles = theme => ({
   formControl: {
     margin: theme.spacing.unit,
   },
+  showOnMobile: {
+    '@media (min-width: 728px)': {
+      display: 'none',
+    },
+  },
+  hideOnMobile: {
+    '@media (max-width: 728px)': {
+      display: 'none',
+    },
+  },
   card: {
     width: '100%',
     marginTop: 10,
@@ -113,10 +123,14 @@ const styles = theme => ({
   },
   avatar: {
     pointer: 'cursor',
+    width: '100px',
+    height: '100px',
+  },
+  mobileCompanyInfo: {
+    textAlign: 'center',
   },
   iconButton: {
     fontSize: '14px',
-    width: '25%',
     '&:hover': {
       backgroundColor: 'transparent',
       cursor: 'auto',
@@ -483,7 +497,7 @@ class ShowJob extends React.Component {
                       </Typography>
                     }
                     subheader={
-                      <>
+                      <div className={classes.hideOnMobile}>
                         <span>
                           {i18n.t('Since')} {job.Company.yearFounded}
                         </span>
@@ -526,10 +540,58 @@ class ShowJob extends React.Component {
                               .replace('http://', '')}
                           </IconButton>
                         </a>
-                      </>
+                      </div>
                     }
                   />
                   <CardActionArea className={classes.cardActionArea}>
+                    <div className={classes.showOnMobile}>
+                      <div className={classes.mobileCompanyInfo}>
+                        <span>
+                          {i18n.t('Since')} {job.Company.yearFounded}
+                        </span>
+                        <IconButton
+                          disableRipple={true}
+                          disableFocusRipple={true}
+                          className={classes.iconButton}
+                          aria-label="Delete">
+                          <PlaceIcon className={classes.headerIcons} />{' '}
+                          <a
+                            href={
+                              'https://www.google.com/maps/search/' +
+                              this.state.currentAddressDescription
+                            }
+                            style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                            target="_blank">
+                            {job.Company.locality}
+                          </a>
+                        </IconButton>
+                      </div>
+                      <div className={classes.mobileCompanyInfo}>
+                        <IconButton
+                          disableRipple={true}
+                          disableFocusRipple={true}
+                          className={classes.iconButton}
+                          aria-label="Delete">
+                          <PeopleIcon className={classes.headerIcons} />{' '}
+                          {job.Company.employeeCount} {i18n.t('employees')}
+                        </IconButton>
+                        <a href={job.Company.url} target="_blank">
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Delete"
+                            style={{cursor: 'pointer'}}>
+                            <LinkIcon className={classes.headerIcons} />{' '}
+                            {job.Company.url
+                              .replace('http://wwww.', '')
+                              .replace('https://wwww.', '')
+                              .replace('https://', '')
+                              .replace('http://', '')}
+                          </IconButton>
+                        </a>
+                      </div>
+                    </div>
                     {job.Company.media1 && job.Company.media1.published ? (
                       <>
                         {job.Company.media1.hasVideo ? (
@@ -684,13 +746,13 @@ class ShowJob extends React.Component {
                   />
                   <CardActionArea className={classes.cardActionArea}>
                     <CardContent>
-                      <Typography component="p">
+                      <div>
                         <Markdown>
                           {this.props.lang === 'fr'
                             ? job.description_fr
                             : job.description}
                         </Markdown>{' '}
-                      </Typography>
+                      </div>
                     </CardContent>
                     {job.Skills.map(Skill => (
                       <Chip

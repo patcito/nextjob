@@ -57,6 +57,7 @@
     "react-select": "^2.0.0",
     "react-swipeable-views": "^0.13.0",
     "react-timeout": "^1.1.2",
+    "remove-markdown": "^0.3.0",
     "request": "^2.88.0",
     "sharp": "^0.20.8",
     "showdown": "^1.9.0",

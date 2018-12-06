@@ -117,6 +117,10 @@ const styles = theme => ({
   },
   avatar: {
     pointer: 'cursor',
+    '@media (min-width: 728px)': {
+      width: '100px',
+      height: '100px',
+    },
   },
   iconButton: {
     fontSize: '14px',
