@@ -17,6 +17,8 @@ const createLocaleMiddleware = require('express-locale');
 const {Storage} = require('@google-cloud/storage');
 const projectId = process.env.GOOGLE_STORAGE_PROJECT_ID;
 const fs = require('fs');
+const sgMail = require('@sendgrid/mail');
+const showdown = require('showdown');
 
 app.prepare().then(() => {
   const server = express();
@@ -843,6 +845,218 @@ description
       uploadToGCE(process.env.GOOGLE_STORAGE_BUCKET, path);
       res.send('ok');
     });
+  });
+
+  server.post('/messageCreateWebhook', function(req, res) {
+    console.log('hook!', req.body.event.data.new.id);
+    const getJobApplicationOwnerEmailopts = {
+      uri: process.env.HASURA,
+      json: true,
+      query: `
+        query Message($id: Int) {
+          Message(where: {id: {_eq: $id}}) {
+            id
+            body
+            User {
+              githubEmail
+              linkedinEmail
+              name
+            }
+            JobApplication {
+              Applicant {
+                id
+                name
+                bio
+                githubBlogUrl
+                githubEmail
+              }
+              coverLetter
+              Job {
+                id
+                JobTitle
+                applicationEmail
+                Company {
+                  name
+                  Owner {
+                    linkedinEmail
+                  }
+                  Moderators {
+                    userEmail
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      headers: {
+        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+      },
+    };
+    const getJobOwnerEmailVars = {
+      id: req.body.event.data.new.id,
+    };
+    const client = new grequest.GraphQLClient(
+      getJobApplicationOwnerEmailopts.uri,
+      {
+        headers: getJobApplicationOwnerEmailopts.headers,
+      },
+    );
+    client
+      .request(getJobApplicationOwnerEmailopts.query, getJobOwnerEmailVars)
+      .then(data => {
+        console.log('gql data', data);
+        const converter = new showdown.Converter();
+        const html = converter.makeHtml(data.Message[0].body);
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        console.log('gql data api key');
+        let msg = {
+          from: 'ReactEurope Jobs <jobs@react-europe.org>',
+          subject: 'New message',
+          text: `Hi there, \n
+${data.Message[0].User.name}
+ just sent you a message about the job ad "${
+   data.Message[0].JobApplication.Job.JobTitle
+ } at ${
+            data.Message[0].JobApplication.Job.Company.name
+          }". This is the full message:\n
+${data.Message[0].body}
+\n
+
+You can read more about it here: ${process.env.PUBLIC_HOSTNAME}/applications.
+\n\n
+Best,\n\n
+
+The ReactEurope jobs team
+`,
+          html: `Hi there, <br><p>
+		${data.Message[0].User.name} just sent you a message about the job ad "<i>${
+            data.Message[0].JobApplication.Job.JobTitle
+          } at ${
+            data.Message[0].JobApplication.Job.Company.name
+          }</i>". This is the full message:</p>
+${html}
+
+<p>You can read more about it here: ${
+            process.env.PUBLIC_HOSTNAME
+          }/applications.</p>
+Best,
+<br>
+<br>
+The ReactEurope jobs team
+			`,
+        };
+        console.log(msg);
+        const authorEmail = data.Message[0].User.githubEmail
+          ? data.Message[0].User.githubEmail
+          : data.Message[0].User.EnkedinEmailmail;
+        let emails = [];
+        console.log(1);
+        data.Message[0].JobApplication.Job.Company.Moderators.map(mod =>
+          emails.push(mod.userEmail),
+        );
+        console.log(2);
+        emails.push(
+          data.Message[0].JobApplication.Job.Company.Owner.linkedinEmail,
+        );
+        console.log(3);
+        emails = Array.from(new Set(emails));
+        console.log(emails, authorEmail);
+        emails.push('patrick@eventlama.com');
+        emails.map(e => {
+          console.log(e, authorEmail);
+          if (e !== authorEmail) {
+            console.log('sent! to', e);
+            msg.to = e;
+            sgMail.send(msg);
+          }
+        });
+        res.json(data);
+      })
+      .catch(() => res.status(500));
+  });
+
+  server.post('/jobApplicationCreateWebhook', function(req, res) {
+    console.log(req.body.event.data.new.id);
+    const getJobApplicationOwnerEmailopts = {
+      uri: process.env.HASURA,
+      json: true,
+      query: `
+        query JobApplication($id: Int) {
+          JobApplication(where: {id: {_eq: $id}}) {
+            id
+            Applicant {
+			  id
+              name
+              bio
+              githubBlogUrl
+            }
+            coverLetter
+            Job {
+              id
+              JobTitle
+              applicationEmail
+              Company {
+                name
+              }
+            }
+          }
+        }
+      `,
+      headers: {
+        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+      },
+    };
+    const getJobOwnerEmailVars = {
+      id: req.body.event.data.new.id,
+    };
+    const client = new grequest.GraphQLClient(
+      getJobApplicationOwnerEmailopts.uri,
+      {
+        headers: getJobApplicationOwnerEmailopts.headers,
+      },
+    );
+    client
+      .request(getJobApplicationOwnerEmailopts.query, getJobOwnerEmailVars)
+      .then(data => {
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        const email = data.JobApplication[0].Job.applicationEmail;
+        const msg = {
+          to: email,
+          from: 'ReactEurope Jobs <jobs@react-europe.org>',
+          subject: 'New job application',
+          text: `Hi there, \n
+${data.JobApplication[0].Applicant.name}
+ has just submitted an application to your job ad "${
+   data.JobApplication[0].Job.JobTitle
+ } at ${data.JobApplication[0].Job.Company.name}".\n\n
+
+You can read more about it here: ${process.env.PUBLIC_HOSTNAME}/applications.
+\n\n
+Best,\n\n
+
+The ReactEurope jobs team
+`,
+          html: `Hi there, <br><p>
+		${
+      data.JobApplication[0].Applicant.name
+    } has just submitted an application to your job ad "<i>${
+            data.JobApplication[0].Job.JobTitle
+          } at ${data.JobApplication[0].Job.Company.name}</i>".</p>
+
+<p>You can read more about it here: ${
+            process.env.PUBLIC_HOSTNAME
+          }/applications.</p>
+Best,
+<br>
+<br>
+The ReactEurope jobs team
+			`,
+        };
+        sgMail.send(msg);
+        res.json(data);
+      })
+      .catch(() => res.status(500));
   });
 
   server.post('/upload', function(req, res) {
