@@ -599,415 +599,435 @@ class IndexApplications extends React.Component {
       <I18nextProvider i18n={this.i18n}>
         <div>
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
-          <Grid container spacing={24}>
-            <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+          <div style={{paddingLeft: 12, paddingRight: 12}}>
+            <Grid container spacing={24}>
+              <Grid item xs={12} md={3}>
+                <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <div style={{background: 'white'}}>
+                  <AppBar position="static" color="default">
+                    <Tabs
+                      value={this.state.value}
+                      onChange={(event, value) => {
+                        this.setState({value});
+                      }}
+                      indicatorColor="primary"
+                      textColor="primary"
+                      fullWidth>
+                      <Tab label={i18n.t('applications:Reviewing')} />
+                      <Tab label={i18n.t('applications:Accepted')} />
+                      <Tab label={i18n.t('applications:Declined')} />
+                    </Tabs>
+                  </AppBar>
+                  <SwipeableViews
+                    axis="x"
+                    index={this.state.value}
+                    onChangeIndex={this.handleChangeIndex}>
+                    <>
+                      {applications.map(application => (
+                        <div key={application.jobId + application.applicantId}>
+                          {application.status === null ? (
+                            <Card
+                              className={classes.card}
+                              key={application.jobId + application.applicantId}>
+                              <CardHeader
+                                avatar={
+                                  <Avatar
+                                    aria-label={application.Job.Company.name}
+                                    src={application.Applicant.githubAvatarUrl}
+                                    className={classes.avatar}
+                                  />
+                                }
+                                title={
+                                  <Typography variant="h5" gutterBottom>
+                                    <Link
+                                      href={
+                                        '/profile/' + application.Applicant.id
+                                      }>
+                                      <a>{application.Applicant.name}</a>
+                                    </Link>{' '}
+                                    {i18n.t('applications:applied for')}{' '}
+                                    {i18n.t(
+                                      'jobstitles:' + application.Job.JobTitle,
+                                    )}{' '}
+                                    @ {application.Job.Company.name}
+                                  </Typography>
+                                }
+                                subheader={application.coverLetter}
+                              />
+                              <CardActions>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={e =>
+                                    this.handleClickMessage(e, application)
+                                  }
+                                  style={{color: '#FFF', marginLeft: '15px'}}>
+                                  {i18n.t('applications:Message')}
+                                </Button>
+                                {this.props.userInfo.github ? (
+                                  <>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      onClick={e =>
+                                        this.handleClickEditApplication(
+                                          e,
+                                          application,
+                                        )
+                                      }
+                                      style={{
+                                        color: '#FFF',
+                                        marginLeft: '15px',
+                                      }}>
+                                      {i18n.t('common:edit')}
+                                    </Button>
+                                    <Button
+                                      onClick={e =>
+                                        this.handleClickDeleteApplication(
+                                          e,
+                                          application,
+                                        )
+                                      }
+                                      variant="contained"
+                                      color="secondary"
+                                      style={{
+                                        color: '#FFF',
+                                        marginLeft: '15px',
+                                      }}>
+                                      {i18n.t('common:delete')}
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    {!application.status ? (
+                                      <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={e =>
+                                          this.handleClickAcceptApplication(
+                                            e,
+                                            application,
+                                          )
+                                        }
+                                        style={{
+                                          color: '#FFF',
+                                          marginLeft: '15px',
+                                        }}>
+                                        ✓ {i18n.t('applications:Got it')}
+                                      </Button>
+                                    ) : null}
+                                    {application.status ||
+                                    application.status === null ? (
+                                      <Button
+                                        variant="contained"
+                                        onClick={e =>
+                                          this.handleClickRejectApplication(
+                                            e,
+                                            application,
+                                          )
+                                        }
+                                        style={{
+                                          backgroundColor: '#f50057',
+                                          color: '#FFF',
+                                          marginLeft: '15px',
+                                        }}>
+                                        ✘ {i18n.t('applications:Not a fit')}
+                                      </Button>
+                                    ) : null}
+                                  </>
+                                )}
+                                {application.hasResumePdf ? (
+                                  <a
+                                    href={
+                                      '/' +
+                                      application.jobId +
+                                      '-' +
+                                      application.applicantId +
+                                      '-resume.pdf'
+                                    }
+                                    target="_blank">
+                                    Download resume
+                                  </a>
+                                ) : null}
+                              </CardActions>
+                            </Card>
+                          ) : null}
+                        </div>
+                      ))}
+                    </>
+                    <>
+                      {applications.map(application => (
+                        <div key={application.jobId + application.applicantId}>
+                          {application.status ? (
+                            <Card
+                              className={classes.card}
+                              key={application.jobId + application.applicantId}>
+                              <CardHeader
+                                avatar={
+                                  <Avatar
+                                    aria-label={application.Job.Company.name}
+                                    src={application.Applicant.githubAvatarUrl}
+                                    className={classes.avatar}
+                                  />
+                                }
+                                title={
+                                  <Typography variant="h5" gutterBottom>
+                                    <Link
+                                      href={
+                                        '/profile/' + application.Applicant.id
+                                      }>
+                                      <a>{application.Applicant.name}</a>
+                                    </Link>{' '}
+                                    {i18n.t('applications:applied for')}{' '}
+                                    {i18n.t(
+                                      'jobstitles:' + application.Job.JobTitle,
+                                    )}{' '}
+                                    @ {application.Job.Company.name}
+                                  </Typography>
+                                }
+                                subheader={application.coverLetter}
+                              />
+                              <CardActions>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={e =>
+                                    this.handleClickMessage(e, application)
+                                  }
+                                  style={{color: '#FFF', marginLeft: '15px'}}>
+                                  {i18n.t('applications:Message')}
+                                </Button>
+                                {this.props.userInfo.github ? (
+                                  <>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      onClick={e =>
+                                        this.handleClickEditApplication(
+                                          e,
+                                          application,
+                                        )
+                                      }
+                                      style={{
+                                        color: '#FFF',
+                                        marginLeft: '15px',
+                                      }}>
+                                      {i18n.t('common:edit')}
+                                    </Button>
+                                    <Button
+                                      onClick={e =>
+                                        this.handleClickDeleteApplication(
+                                          e,
+                                          application,
+                                        )
+                                      }
+                                      variant="contained"
+                                      color="secondary"
+                                      style={{
+                                        color: '#FFF',
+                                        marginLeft: '15px',
+                                      }}>
+                                      {i18n.t('common:delete')}
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    {!application.status ? (
+                                      <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={e =>
+                                          this.handleClickAcceptApplication(
+                                            e,
+                                            application,
+                                          )
+                                        }
+                                        style={{
+                                          color: '#FFF',
+                                          marginLeft: '15px',
+                                        }}>
+                                        ✓ {i18n.t('applications:Got it')}
+                                      </Button>
+                                    ) : null}
+                                    {application.status ||
+                                    application.status === null ? (
+                                      <Button
+                                        variant="contained"
+                                        onClick={e =>
+                                          this.handleClickRejectApplication(
+                                            e,
+                                            application,
+                                          )
+                                        }
+                                        style={{
+                                          backgroundColor: '#f50057',
+                                          color: '#FFF',
+                                          marginLeft: '15px',
+                                        }}>
+                                        ✘ {i18n.t('applications:Not a fit')}
+                                      </Button>
+                                    ) : null}
+                                  </>
+                                )}
+                                {application.hasResumePdf ? (
+                                  <a
+                                    href={
+                                      '/' +
+                                      application.jobId +
+                                      '-' +
+                                      application.applicantId +
+                                      '-resume.pdf'
+                                    }
+                                    target="_blank">
+                                    Download resume
+                                  </a>
+                                ) : null}
+                              </CardActions>
+                            </Card>
+                          ) : null}
+                        </div>
+                      ))}
+                    </>
+                    <>
+                      {applications.map(application => (
+                        <div key={application.jobId + application.applicantId}>
+                          {application.status === false ? (
+                            <Card
+                              className={classes.card}
+                              key={application.jobId + application.applicantId}>
+                              <CardHeader
+                                avatar={
+                                  <Avatar
+                                    aria-label={application.Job.Company.name}
+                                    src={application.Applicant.githubAvatarUrl}
+                                    className={classes.avatar}
+                                  />
+                                }
+                                title={
+                                  <Typography
+                                    gutterBottom
+                                    variant="h5"
+                                    gutterBottom>
+                                    <Link
+                                      href={
+                                        '/profile/' + application.Applicant.id
+                                      }>
+                                      <a>{application.Applicant.name}</a>
+                                    </Link>{' '}
+                                    applied for {application.Job.JobTitle} @{' '}
+                                    {application.Job.Company.name}
+                                  </Typography>
+                                }
+                                subheader={application.coverLetter}
+                              />
+                              <CardActions>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={e =>
+                                    this.handleClickMessage(e, application)
+                                  }
+                                  style={{color: '#FFF', marginLeft: '15px'}}>
+                                  {i18n.t('applications:Message')}
+                                </Button>
+                                {this.props.userInfo.github ? (
+                                  <>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      onClick={e =>
+                                        this.handleClickEditApplication(
+                                          e,
+                                          application,
+                                        )
+                                      }
+                                      style={{
+                                        color: '#FFF',
+                                        marginLeft: '15px',
+                                      }}>
+                                      {i18n.t('common:edit')}
+                                    </Button>
+                                    <Button
+                                      onClick={e =>
+                                        this.handleClickDeleteApplication(
+                                          e,
+                                          application,
+                                        )
+                                      }
+                                      variant="contained"
+                                      color="secondary"
+                                      style={{
+                                        color: '#FFF',
+                                        marginLeft: '15px',
+                                      }}>
+                                      {i18n.t('common:delete')}
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    {!application.status ? (
+                                      <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={e =>
+                                          this.handleClickAcceptApplication(
+                                            e,
+                                            application,
+                                          )
+                                        }
+                                        style={{
+                                          color: '#FFF',
+                                          marginLeft: '15px',
+                                        }}>
+                                        ✓ {i18n.t('applications:Got it')}
+                                      </Button>
+                                    ) : null}
+                                    {application.status ||
+                                    application.status === null ? (
+                                      <Button
+                                        variant="contained"
+                                        onClick={e =>
+                                          this.handleClickRejectApplication(
+                                            e,
+                                            application,
+                                          )
+                                        }
+                                        style={{
+                                          backgroundColor: '#f50057',
+                                          color: '#FFF',
+                                          marginLeft: '15px',
+                                        }}>
+                                        ✘ {i18n.t('applications:Not a fit')}
+                                      </Button>
+                                    ) : null}
+                                  </>
+                                )}
+                                {application.hasResumePdf ? (
+                                  <a
+                                    href={
+                                      '/' +
+                                      application.jobId +
+                                      '-' +
+                                      application.applicantId +
+                                      '-resume.pdf'
+                                    }
+                                    target="_blank">
+                                    Download resume
+                                  </a>
+                                ) : null}
+                              </CardActions>
+                            </Card>
+                          ) : null}
+                        </div>
+                      ))}
+                    </>
+                  </SwipeableViews>
+                </div>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <div style={{background: 'white'}}>
-                <AppBar position="static" color="default">
-                  <Tabs
-                    value={this.state.value}
-                    onChange={(event, value) => {
-                      this.setState({value});
-                    }}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    fullWidth>
-                    <Tab label={i18n.t('applications:Reviewing')} />
-                    <Tab label={i18n.t('applications:Accepted')} />
-                    <Tab label={i18n.t('applications:Declined')} />
-                  </Tabs>
-                </AppBar>
-                <SwipeableViews
-                  axis="x"
-                  index={this.state.value}
-                  onChangeIndex={this.handleChangeIndex}>
-                  <>
-                    {applications.map(application => (
-                      <div key={application.jobId + application.applicantId}>
-                        {application.status === null ? (
-                          <Card
-                            className={classes.card}
-                            key={application.jobId + application.applicantId}>
-                            <CardHeader
-                              avatar={
-                                <Avatar
-                                  aria-label={application.Job.Company.name}
-                                  src={application.Applicant.githubAvatarUrl}
-                                  className={classes.avatar}
-                                />
-                              }
-                              title={
-                                <Typography variant="h5" gutterBottom>
-                                  <Link
-                                    href={
-                                      '/profile/' + application.Applicant.id
-                                    }>
-                                    <a>{application.Applicant.name}</a>
-                                  </Link>{' '}
-                                  {i18n.t('applications:applied for')}{' '}
-                                  {i18n.t(
-                                    'jobstitles:' + application.Job.JobTitle,
-                                  )}{' '}
-                                  @ {application.Job.Company.name}
-                                </Typography>
-                              }
-                              subheader={application.coverLetter}
-                            />
-                            <CardActions>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={e =>
-                                  this.handleClickMessage(e, application)
-                                }
-                                style={{color: '#FFF', marginLeft: '15px'}}>
-                                {i18n.t('applications:Message')}
-                              </Button>
-                              {this.props.userInfo.github ? (
-                                <>
-                                  <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={e =>
-                                      this.handleClickEditApplication(
-                                        e,
-                                        application,
-                                      )
-                                    }
-                                    style={{color: '#FFF', marginLeft: '15px'}}>
-                                    {i18n.t('common:edit')}
-                                  </Button>
-                                  <Button
-                                    onClick={e =>
-                                      this.handleClickDeleteApplication(
-                                        e,
-                                        application,
-                                      )
-                                    }
-                                    variant="contained"
-                                    color="secondary"
-                                    style={{color: '#FFF', marginLeft: '15px'}}>
-                                    {i18n.t('common:delete')}
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  {!application.status ? (
-                                    <Button
-                                      variant="contained"
-                                      color="secondary"
-                                      onClick={e =>
-                                        this.handleClickAcceptApplication(
-                                          e,
-                                          application,
-                                        )
-                                      }
-                                      style={{
-                                        color: '#FFF',
-                                        marginLeft: '15px',
-                                      }}>
-                                      ✓ {i18n.t('applications:Got it')}
-                                    </Button>
-                                  ) : null}
-                                  {application.status ||
-                                  application.status === null ? (
-                                    <Button
-                                      variant="contained"
-                                      onClick={e =>
-                                        this.handleClickRejectApplication(
-                                          e,
-                                          application,
-                                        )
-                                      }
-                                      style={{
-                                        backgroundColor: '#f50057',
-                                        color: '#FFF',
-                                        marginLeft: '15px',
-                                      }}>
-                                      ✘ {i18n.t('applications:Not a fit')}
-                                    </Button>
-                                  ) : null}
-                                </>
-                              )}
-                              {application.hasResumePdf ? (
-                                <a
-                                  href={
-                                    '/' +
-                                    application.jobId +
-                                    '-' +
-                                    application.applicantId +
-                                    '-resume.pdf'
-                                  }
-                                  target="_blank">
-                                  Download resume
-                                </a>
-                              ) : null}
-                            </CardActions>
-                          </Card>
-                        ) : null}
-                      </div>
-                    ))}
-                  </>
-                  <>
-                    {applications.map(application => (
-                      <div key={application.jobId + application.applicantId}>
-                        {application.status ? (
-                          <Card
-                            className={classes.card}
-                            key={application.jobId + application.applicantId}>
-                            <CardHeader
-                              avatar={
-                                <Avatar
-                                  aria-label={application.Job.Company.name}
-                                  src={application.Applicant.githubAvatarUrl}
-                                  className={classes.avatar}
-                                />
-                              }
-                              title={
-                                <Typography variant="h5" gutterBottom>
-                                  <Link
-                                    href={
-                                      '/profile/' + application.Applicant.id
-                                    }>
-                                    <a>{application.Applicant.name}</a>
-                                  </Link>{' '}
-                                  {i18n.t('applications:applied for')}{' '}
-                                  {i18n.t(
-                                    'jobstitles:' + application.Job.JobTitle,
-                                  )}{' '}
-                                  @ {application.Job.Company.name}
-                                </Typography>
-                              }
-                              subheader={application.coverLetter}
-                            />
-                            <CardActions>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={e =>
-                                  this.handleClickMessage(e, application)
-                                }
-                                style={{color: '#FFF', marginLeft: '15px'}}>
-                                {i18n.t('applications:Message')}
-                              </Button>
-                              {this.props.userInfo.github ? (
-                                <>
-                                  <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={e =>
-                                      this.handleClickEditApplication(
-                                        e,
-                                        application,
-                                      )
-                                    }
-                                    style={{color: '#FFF', marginLeft: '15px'}}>
-                                    {i18n.t('common:edit')}
-                                  </Button>
-                                  <Button
-                                    onClick={e =>
-                                      this.handleClickDeleteApplication(
-                                        e,
-                                        application,
-                                      )
-                                    }
-                                    variant="contained"
-                                    color="secondary"
-                                    style={{color: '#FFF', marginLeft: '15px'}}>
-                                    {i18n.t('common:delete')}
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  {!application.status ? (
-                                    <Button
-                                      variant="contained"
-                                      color="secondary"
-                                      onClick={e =>
-                                        this.handleClickAcceptApplication(
-                                          e,
-                                          application,
-                                        )
-                                      }
-                                      style={{
-                                        color: '#FFF',
-                                        marginLeft: '15px',
-                                      }}>
-                                      ✓ {i18n.t('applications:Got it')}
-                                    </Button>
-                                  ) : null}
-                                  {application.status ||
-                                  application.status === null ? (
-                                    <Button
-                                      variant="contained"
-                                      onClick={e =>
-                                        this.handleClickRejectApplication(
-                                          e,
-                                          application,
-                                        )
-                                      }
-                                      style={{
-                                        backgroundColor: '#f50057',
-                                        color: '#FFF',
-                                        marginLeft: '15px',
-                                      }}>
-                                      ✘ {i18n.t('applications:Not a fit')}
-                                    </Button>
-                                  ) : null}
-                                </>
-                              )}
-                              {application.hasResumePdf ? (
-                                <a
-                                  href={
-                                    '/' +
-                                    application.jobId +
-                                    '-' +
-                                    application.applicantId +
-                                    '-resume.pdf'
-                                  }
-                                  target="_blank">
-                                  Download resume
-                                </a>
-                              ) : null}
-                            </CardActions>
-                          </Card>
-                        ) : null}
-                      </div>
-                    ))}
-                  </>
-                  <>
-                    {applications.map(application => (
-                      <div key={application.jobId + application.applicantId}>
-                        {application.status === false ? (
-                          <Card
-                            className={classes.card}
-                            key={application.jobId + application.applicantId}>
-                            <CardHeader
-                              avatar={
-                                <Avatar
-                                  aria-label={application.Job.Company.name}
-                                  src={application.Applicant.githubAvatarUrl}
-                                  className={classes.avatar}
-                                />
-                              }
-                              title={
-                                <Typography
-                                  gutterBottom
-                                  variant="h5"
-                                  gutterBottom>
-                                  <Link
-                                    href={
-                                      '/profile/' + application.Applicant.id
-                                    }>
-                                    <a>{application.Applicant.name}</a>
-                                  </Link>{' '}
-                                  applied for {application.Job.JobTitle} @{' '}
-                                  {application.Job.Company.name}
-                                </Typography>
-                              }
-                              subheader={application.coverLetter}
-                            />
-                            <CardActions>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={e =>
-                                  this.handleClickMessage(e, application)
-                                }
-                                style={{color: '#FFF', marginLeft: '15px'}}>
-                                {i18n.t('applications:Message')}
-                              </Button>
-                              {this.props.userInfo.github ? (
-                                <>
-                                  <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={e =>
-                                      this.handleClickEditApplication(
-                                        e,
-                                        application,
-                                      )
-                                    }
-                                    style={{color: '#FFF', marginLeft: '15px'}}>
-                                    {i18n.t('common:edit')}
-                                  </Button>
-                                  <Button
-                                    onClick={e =>
-                                      this.handleClickDeleteApplication(
-                                        e,
-                                        application,
-                                      )
-                                    }
-                                    variant="contained"
-                                    color="secondary"
-                                    style={{color: '#FFF', marginLeft: '15px'}}>
-                                    {i18n.t('common:delete')}
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  {!application.status ? (
-                                    <Button
-                                      variant="contained"
-                                      color="secondary"
-                                      onClick={e =>
-                                        this.handleClickAcceptApplication(
-                                          e,
-                                          application,
-                                        )
-                                      }
-                                      style={{
-                                        color: '#FFF',
-                                        marginLeft: '15px',
-                                      }}>
-                                      ✓ {i18n.t('applications:Got it')}
-                                    </Button>
-                                  ) : null}
-                                  {application.status ||
-                                  application.status === null ? (
-                                    <Button
-                                      variant="contained"
-                                      onClick={e =>
-                                        this.handleClickRejectApplication(
-                                          e,
-                                          application,
-                                        )
-                                      }
-                                      style={{
-                                        backgroundColor: '#f50057',
-                                        color: '#FFF',
-                                        marginLeft: '15px',
-                                      }}>
-                                      ✘ {i18n.t('applications:Not a fit')}
-                                    </Button>
-                                  ) : null}
-                                </>
-                              )}
-                              {application.hasResumePdf ? (
-                                <a
-                                  href={
-                                    '/' +
-                                    application.jobId +
-                                    '-' +
-                                    application.applicantId +
-                                    '-resume.pdf'
-                                  }
-                                  target="_blank">
-                                  Download resume
-                                </a>
-                              ) : null}
-                            </CardActions>
-                          </Card>
-                        ) : null}
-                      </div>
-                    ))}
-                  </>
-                </SwipeableViews>
-              </div>
-            </Grid>
-          </Grid>
+          </div>
           <Dialog
             open={this.state.message}
             onClose={this.handleClose}
