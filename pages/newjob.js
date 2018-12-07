@@ -89,6 +89,17 @@ const styles = theme => ({
   formControl: {
     margin: theme.spacing.unit,
   },
+  inputForm: {
+    '@media (min-width: 992px)': {
+      width: '45%',
+    },
+  },
+  selectFormControl: {
+    margin: theme.spacing.unit,
+    '@media (min-width: 992px)': {
+      width: '45%',
+    },
+  },
 });
 
 class NewJob extends React.Component {
@@ -1101,7 +1112,7 @@ $applicationEmail: String,
                       error={this.state.namevalid === false}>
                       <Input
                         id="name-simple"
-                        style={{width: '45%'}}
+                        className={classes.inputForm}
                         name="applicationEmail"
                         value={this.state.applicationEmail}
                         onChange={this.handleChange}
@@ -1134,7 +1145,7 @@ $applicationEmail: String,
                       error={this.state.namevalid === false}>
                       <Input
                         id="name-simple"
-                        style={{width: '50%'}}
+                        className={classes.inputForm}
                         name="applicationUrl"
                         value={this.state.applicationUrl}
                         disabled={this.state.hasApplicationEmail}
@@ -1389,7 +1400,7 @@ $applicationEmail: String,
                 {this.i18n.t("newjob:Select your job's function")}
               </FormHelperText>
             </FormControl>
-            <FormControl className={classes.formControl} style={{width: '45%'}}>
+            <FormControl className={classes.selectFormControl}>
               <InputLabel htmlFor="selectedEmployementTypes-helper">
                 {this.i18n.t('newjob:Employement types')}
               </InputLabel>
@@ -1413,7 +1424,7 @@ $applicationEmail: String,
                 {this.i18n.t('newjob:Select your employement type')}
               </FormHelperText>
             </FormControl>
-            <FormControl className={classes.formControl} style={{width: '45%'}}>
+            <FormControl className={classes.selectFormControl}>
               <InputLabel htmlFor="selectedSeniorityLevels-helper">
                 {this.i18n.t('newjob:Seniority level')}
               </InputLabel>
@@ -1606,18 +1617,11 @@ $applicationEmail: String,
                 step={10000}
                 marks={{
                   30000: '€30k',
-                  40000: '€40k',
-                  50000: '€50k',
                   60000: '€60k',
-                  70000: '€70k',
-                  80000: '€80k',
                   90000: '€90k',
-                  100000: '€100k',
-                  120000: '€120k',
-                  140000: '€140k',
-                  160000: '€160k',
-                  180000: '€180k',
-                  200000: '€200k',
+                  140000: '€120k',
+                  140000: '€150k',
+                  200000: '€180k',
                   230000: '€230k',
                 }}
                 style={{

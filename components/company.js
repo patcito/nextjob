@@ -32,11 +32,13 @@ import getConfig from 'next/config';
 const {publicRuntimeConfig} = getConfig();
 const styles = theme => ({
   card: {
-    width: '100%',
     marginTop: 10,
-    marginRight: 10,
+    '@media (min-width: 728px)': {
+      width: '100%',
+      marginRight: 10,
+    },
     '@media (max-width: 728px)': {
-      margin: 5,
+      width: '95%',
     },
   },
 
