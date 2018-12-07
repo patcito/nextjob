@@ -141,6 +141,7 @@ class EditCompany extends React.Component {
       id: 0,
       description: '',
       description_fr: '',
+      Skills: [],
       employee1: {
         name: '',
         title: '',
@@ -324,6 +325,16 @@ class EditCompany extends React.Component {
             },
           }),
         );*/
+    if (!company.Perks) {
+      company.Perks = [];
+    }
+    if (!company.Moderators) {
+      company.Moderators = [];
+    }
+
+    if (!company.Skills) {
+      company.Skills = [];
+    }
     if (!company.employee1) {
       company.employee1 = {
         name: '',
@@ -944,1050 +955,1060 @@ class EditCompany extends React.Component {
             />
           ) : null}
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
-          <Grid container spacing={24}>
-            <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <div style={{background: 'white'}}>
-                <form>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.namevalid === false}>
-                    <InputLabel htmlFor="name-simple">
-                      {i18n.t('Name')}
-                    </InputLabel>
-                    <Input
-                      id="name-simple"
-                      name="name"
-                      value={this.state.company.name}
-                      onChange={this.handleChange}
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      required={true}
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.namevalid !== false
-                          ? 'name-helper-text'
-                          : 'name-error-text'
-                      }>
-                      {this.state.namevalid !== false
-                        ? i18n.t("Your company's name")
-                        : i18n.t("Your company's name is required")}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.urlvalid === false}
-                    aria-describedby="url-text">
-                    <InputLabel htmlFor="url">{i18n.t('URL')}</InputLabel>
-                    <Input
-                      id="url"
-                      value={this.state.company.url}
-                      name="url"
-                      required={true}
-                      type="url"
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      onChange={this.handleChange}
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.urlvalid !== false
-                          ? 'url-helper-text'
-                          : 'url-error-text'
-                      }>
-                      {this.state.urlvalid !== false
-                        ? i18n.t("Your company's website")
-                        : i18n.t("Your company's website is required")}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.company.yearFoundedvalid === false}>
-                    <InputLabel htmlFor="yearFounded">
-                      {i18n.t('Year founded')}
-                    </InputLabel>
-                    <Input
-                      id="yearFounded"
-                      name="yearFounded"
-                      value={this.state.company.yearFounded}
-                      onChange={this.handleChange}
-                      required={true}
-                      min={1900}
-                      placeholder="2018"
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      type="number"
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.yearFoundedvalid !== false
-                          ? 'yearFounded-helper-text'
-                          : 'yearFounded-error-text'
-                      }>
-                      {this.state.yearFoundedvalid !== false
-                        ? i18n.t('The year your company was founded')
-                        : i18n.t(
-                            'The year your company was founded is required',
-                          )}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.industryvalid === false}>
-                    <DownshiftSelect
-                      i18n={i18n}
-                      suggestions={industries}
-                      defaultInputValue={this.state.industry}
-                      label={this.state.industry.label || i18n.t('Industry')}
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      handleParentChange={this.handleChangeIndustry}
-                      handleParentBlur={this.handleBlurIndustry}
-                      name="industry"
-                      id="jobIndustry"
-                      required={true}
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.industryvalid !== false
-                          ? 'industry-helper-text'
-                          : 'industry-error-text'
-                      }>
-                      {this.state.industryvalid !== false
-                        ? i18n.t("Select your company's industry")
-                        : i18n.t(
-                            "Selecting your company's industry is required",
-                          )}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.employeeCountvalid === false}>
-                    <InputLabel htmlFor="employeeCount">
-                      {i18n.t('Employee count')}
-                    </InputLabel>
-                    <Input
-                      id="employeeCount"
-                      name="employeeCount"
-                      value={this.state.company.employeeCount}
-                      onChange={this.handleChange}
-                      required={true}
-                      min={0}
-                      placeholder="1"
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      type="number"
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.employeeCountvalid !== false
-                          ? 'employeeCount-helper-text'
-                          : 'employeeCount-error-text'
-                      }>
-                      {this.state.employeeCountvalid !== false
-                        ? i18n.t('editcompany:How many employees do you have')
-                        : i18n.t('This field is required')}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.company.twittervalid === false}>
-                    <TextField
-                      label="Twitter"
-                      name="twitter"
-                      onChange={this.handleChange}
-                      value={this.state.company.twitter}
-                      id="twitter"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">@</InputAdornment>
-                        ),
-                      }}
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.twittervalid !== false
-                          ? 'twitter-helper-text'
-                          : 'twitter-error-text'
-                      }>
-                      {this.state.twittervalid !== false
-                        ? i18n.t("editcompany:Your company's Twitter account")
-                        : i18n.t('This field is required')}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.company.devCountvalid === false}>
-                    <InputLabel htmlFor="devCount">
-                      {i18n.t('Dev count')}
-                    </InputLabel>
-                    <Input
-                      id="devCount"
-                      name="devCount"
-                      value={this.state.company.devCount}
-                      onChange={this.handleChange}
-                      required={true}
-                      min={0}
-                      placeholder="1"
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      type="number"
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.devCountvalid !== false
-                          ? 'devCount-helper-text'
-                          : 'devCount-error-text'
-                      }>
-                      {this.state.devCountvalid !== false
-                        ? i18n.t('editcompany:How many developers do you have')
-                        : i18n.t('This field is required')}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.namevalid === false}>
-                    <InputLabel htmlFor="name-simple">
-                      {i18n.t('Logo')}
-                    </InputLabel>
-                    <Input
-                      id="logo-simple"
-                      onChange={this.upload}
-                      name="file"
-                      type="file"
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.namevalid !== false
-                          ? 'name-helper-text'
-                          : 'name-error-text'
-                      }>
-                      {this.state.namevalid !== false
-                        ? i18n.t("Your company's logo")
-                        : i18n.t("Your company's logo is required")}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl fullWidth={true}>
-                    {this.state.googleMaps || typeof google !== 'undefined' ? (
-                      <PlacesSelect
-                        i18n={this.i18n}
-                        placeholder={
-                          this.state.currentAddressDescription ||
-                          this.i18n.t(
-                            'updatecompany:Where is your company located?',
-                          )
-                        }
-                        that={this}
+          <div style={{paddingLeft: 12, paddingRight: 16}}>
+            <Grid container spacing={24}>
+              <Grid item xs={12} md={3}>
+                <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <div style={{background: 'white'}}>
+                  <form>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.namevalid === false}>
+                      <InputLabel htmlFor="name-simple">
+                        {i18n.t('Name')}
+                      </InputLabel>
+                      <Input
+                        id="name-simple"
+                        name="name"
+                        value={this.state.company.name}
+                        onChange={this.handleChange}
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        required={true}
                       />
-                    ) : null}
-                  </FormControl>
-
-                  <FormControl
-                    fullWidth={true}
-                    className={classes.formControl}
-                    error={this.state.company.descriptionvalid === false}>
-                    <InputLabel htmlFor="name-simple">
-                      {i18n.t('Description')}
-                    </InputLabel>
-                    <Input
-                      id="description"
-                      value={this.state.company.description}
-                      onChange={this.handleChange}
-                      name="description"
-                      required={true}
-                      multiline={true}
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      rows={5}
-                      fullWidth={true}
-                    />
-
-                    <FormHelperText
-                      id={
-                        this.state.descriptionvalid !== false
-                          ? 'description-helper-text'
-                          : 'description-error-text'
-                      }>
-                      {this.state.descriptionvalid !== false
-                        ? i18n.t(
-                            'Write a description about what your company is about',
-                          )
-                        : i18n.t(
-                            'Writing a description about what your company is about is required',
-                          )}
-                    </FormHelperText>
-                    {this.props.lang === 'fr' || this.props.forceFr === 1 ? (
-                      <>
-                        <Input
-                          id="description_fr"
-                          value={this.state.company.description_fr}
-                          onChange={this.handleChange}
-                          name="description_fr"
-                          multiline={true}
-                          onBlur={e => this.handleBlur(e, true)}
-                          onFocus={e => this.handleFocus(e, true)}
-                          rows={5}
-                          fullWidth={true}
+                      <FormHelperText
+                        id={
+                          this.state.namevalid !== false
+                            ? 'name-helper-text'
+                            : 'name-error-text'
+                        }>
+                        {this.state.namevalid !== false
+                          ? i18n.t("Your company's name")
+                          : i18n.t("Your company's name is required")}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.urlvalid === false}
+                      aria-describedby="url-text">
+                      <InputLabel htmlFor="url">{i18n.t('URL')}</InputLabel>
+                      <Input
+                        id="url"
+                        value={this.state.company.url}
+                        name="url"
+                        required={true}
+                        type="url"
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        onChange={this.handleChange}
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.urlvalid !== false
+                            ? 'url-helper-text'
+                            : 'url-error-text'
+                        }>
+                        {this.state.urlvalid !== false
+                          ? i18n.t("Your company's website")
+                          : i18n.t("Your company's website is required")}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.company.yearFoundedvalid === false}>
+                      <InputLabel htmlFor="yearFounded">
+                        {i18n.t('Year founded')}
+                      </InputLabel>
+                      <Input
+                        id="yearFounded"
+                        name="yearFounded"
+                        value={this.state.company.yearFounded}
+                        onChange={this.handleChange}
+                        required={true}
+                        min={1900}
+                        placeholder="2018"
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        type="number"
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.yearFoundedvalid !== false
+                            ? 'yearFounded-helper-text'
+                            : 'yearFounded-error-text'
+                        }>
+                        {this.state.yearFoundedvalid !== false
+                          ? i18n.t('The year your company was founded')
+                          : i18n.t(
+                              'The year your company was founded is required',
+                            )}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.industryvalid === false}>
+                      <DownshiftSelect
+                        i18n={i18n}
+                        suggestions={industries}
+                        defaultInputValue={this.state.industry}
+                        label={this.state.industry.label || i18n.t('Industry')}
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        handleParentChange={this.handleChangeIndustry}
+                        handleParentBlur={this.handleBlurIndustry}
+                        name="industry"
+                        id="jobIndustry"
+                        required={true}
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.industryvalid !== false
+                            ? 'industry-helper-text'
+                            : 'industry-error-text'
+                        }>
+                        {this.state.industryvalid !== false
+                          ? i18n.t("Select your company's industry")
+                          : i18n.t(
+                              "Selecting your company's industry is required",
+                            )}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.employeeCountvalid === false}>
+                      <InputLabel htmlFor="employeeCount">
+                        {i18n.t('Employee count')}
+                      </InputLabel>
+                      <Input
+                        id="employeeCount"
+                        name="employeeCount"
+                        value={this.state.company.employeeCount}
+                        onChange={this.handleChange}
+                        required={true}
+                        min={0}
+                        placeholder="1"
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        type="number"
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.employeeCountvalid !== false
+                            ? 'employeeCount-helper-text'
+                            : 'employeeCount-error-text'
+                        }>
+                        {this.state.employeeCountvalid !== false
+                          ? i18n.t('editcompany:How many employees do you have')
+                          : i18n.t('This field is required')}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.company.twittervalid === false}>
+                      <TextField
+                        label="Twitter"
+                        name="twitter"
+                        onChange={this.handleChange}
+                        value={this.state.company.twitter}
+                        id="twitter"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">@</InputAdornment>
+                          ),
+                        }}
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.twittervalid !== false
+                            ? 'twitter-helper-text'
+                            : 'twitter-error-text'
+                        }>
+                        {this.state.twittervalid !== false
+                          ? i18n.t("editcompany:Your company's Twitter account")
+                          : i18n.t('This field is required')}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.company.devCountvalid === false}>
+                      <InputLabel htmlFor="devCount">
+                        {i18n.t('Dev count')}
+                      </InputLabel>
+                      <Input
+                        id="devCount"
+                        name="devCount"
+                        value={this.state.company.devCount}
+                        onChange={this.handleChange}
+                        required={true}
+                        min={0}
+                        placeholder="1"
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        type="number"
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.devCountvalid !== false
+                            ? 'devCount-helper-text'
+                            : 'devCount-error-text'
+                        }>
+                        {this.state.devCountvalid !== false
+                          ? i18n.t(
+                              'editcompany:How many developers do you have',
+                            )
+                          : i18n.t('This field is required')}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.namevalid === false}>
+                      <InputLabel htmlFor="name-simple">
+                        {i18n.t('Logo')}
+                      </InputLabel>
+                      <Input
+                        id="logo-simple"
+                        onChange={this.upload}
+                        name="file"
+                        type="file"
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.namevalid !== false
+                            ? 'name-helper-text'
+                            : 'name-error-text'
+                        }>
+                        {this.state.namevalid !== false
+                          ? i18n.t("Your company's logo")
+                          : i18n.t("Your company's logo is required")}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl fullWidth={true}>
+                      {this.state.googleMaps ||
+                      typeof google !== 'undefined' ? (
+                        <PlacesSelect
+                          i18n={this.i18n}
+                          placeholder={
+                            this.state.currentAddressDescription ||
+                            this.i18n.t(
+                              'updatecompany:Where is your company located?',
+                            )
+                          }
+                          that={this}
                         />
-                        <FormHelperText
-                          id={
-                            this.state.description_frvalid !== false
-                              ? 'description_fr-helper-text'
-                              : 'description_fr-error-text'
-                          }>
-                          {this.state.description_frvalid !== false
-                            ? this.i18n.t(
-                                'Write a description about what your company is about in French',
-                              )
-                            : this.i18n.t(
-                                'Writing a description about what your company is about is required',
-                              )}
-                        </FormHelperText>
+                      ) : null}
+                    </FormControl>
+
+                    <FormControl
+                      fullWidth={true}
+                      className={classes.formControl}
+                      error={this.state.company.descriptionvalid === false}>
+                      <InputLabel htmlFor="name-simple">
+                        {i18n.t('Description')}
+                      </InputLabel>
+                      <Input
+                        id="description"
+                        value={this.state.company.description}
+                        onChange={this.handleChange}
+                        name="description"
+                        required={true}
+                        multiline={true}
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        rows={5}
+                        fullWidth={true}
+                      />
+
+                      <FormHelperText
+                        id={
+                          this.state.descriptionvalid !== false
+                            ? 'description-helper-text'
+                            : 'description-error-text'
+                        }>
+                        {this.state.descriptionvalid !== false
+                          ? i18n.t(
+                              'Write a description about what your company is about',
+                            )
+                          : i18n.t(
+                              'Writing a description about what your company is about is required',
+                            )}
+                      </FormHelperText>
+                      {this.props.lang === 'fr' || this.props.forceFr === 1 ? (
+                        <>
+                          <Input
+                            id="description_fr"
+                            value={this.state.company.description_fr}
+                            onChange={this.handleChange}
+                            name="description_fr"
+                            multiline={true}
+                            onBlur={e => this.handleBlur(e, true)}
+                            onFocus={e => this.handleFocus(e, true)}
+                            rows={5}
+                            fullWidth={true}
+                          />
+                          <FormHelperText
+                            id={
+                              this.state.description_frvalid !== false
+                                ? 'description_fr-helper-text'
+                                : 'description_fr-error-text'
+                            }>
+                            {this.state.description_frvalid !== false
+                              ? this.i18n.t(
+                                  'Write a description about what your company is about in French',
+                                )
+                              : this.i18n.t(
+                                  'Writing a description about what your company is about is required',
+                                )}
+                          </FormHelperText>
+                        </>
+                      ) : null}
+                    </FormControl>
+                    <FormControl
+                      className={classes.formControl}
+                      error={this.state.namevalid === false}>
+                      <InputLabel htmlFor="moderators">
+                        {i18n.t('editcompany:Moderators')}
+                      </InputLabel>
+                      <Input
+                        id="moderators"
+                        name="moderators"
+                        value={this.state.moderators}
+                        onChange={this.handleModeratorsChange}
+                        onBlur={e => this.handleBlur(e, true)}
+                        onFocus={e => this.handleFocus(e, true)}
+                        placeholder="a@company.com, b@company.com"
+                        required={true}
+                      />
+                      <FormHelperText
+                        id={
+                          this.state.namevalid !== false
+                            ? 'name-helper-text'
+                            : 'name-error-text'
+                        }>
+                        {i18n.t(
+                          'editcompany:List emails of people who can add and modify jobs, these people must already have an account before they can be added',
+                        )}
+                      </FormHelperText>
+                    </FormControl>
+
+                    {this.state.company.name ? (
+                      <>
+                        <FormControl
+                          fullWidth={true}
+                          className={classes.formControl}>
+                          <MultipleDownshiftSelect
+                            i18n={i18n}
+                            suggestions={skills}
+                            selectedItems={this.state.skills}
+                            label={i18n.t(
+                              'editcompany:List the techs being used at your company',
+                            )}
+                            placeholder={i18n.t(
+                              'editcompany:Select multiple techs (up to 25)',
+                            )}
+                            handleParentChange={this.handleChangeSkills}
+                            name="skills"
+                            id="skills"
+                            maxSelection={25}
+                            required={true}
+                          />
+                          <FormHelperText>
+                            {i18n.t(
+                              'newjob:Select skills required for the job',
+                            )}
+                          </FormHelperText>
+                        </FormControl>
+                        <FormControl
+                          fullWidth={true}
+                          className={classes.formControl}>
+                          <MultipleDownshiftSelect
+                            i18n={i18n}
+                            suggestions={perks}
+                            selectedItems={this.state.perks}
+                            label={i18n.t(
+                              'editcompany:List perks available at your company',
+                            )}
+                            placeholder={i18n.t(
+                              'editcompany:Select multiple perks',
+                            )}
+                            handleParentChange={this.handleChangePerks}
+                            name="perks"
+                            id="perks"
+                            maxSelection={40}
+                            required={true}
+                          />
+                          <FormHelperText>
+                            {i18n.t(
+                              'editcompany:Select perks your company offers',
+                            )}
+                          </FormHelperText>
+                        </FormControl>
                       </>
                     ) : null}
-                  </FormControl>
-                  <FormControl
-                    className={classes.formControl}
-                    error={this.state.namevalid === false}>
-                    <InputLabel htmlFor="moderators">
-                      {i18n.t('editcompany:Moderators')}
-                    </InputLabel>
-                    <Input
-                      id="moderators"
-                      name="moderators"
-                      value={this.state.moderators}
-                      onChange={this.handleModeratorsChange}
-                      onBlur={e => this.handleBlur(e, true)}
-                      onFocus={e => this.handleFocus(e, true)}
-                      placeholder="a@company.com, b@company.com"
-                      required={true}
-                    />
-                    <FormHelperText
-                      id={
-                        this.state.namevalid !== false
-                          ? 'name-helper-text'
-                          : 'name-error-text'
-                      }>
-                      {i18n.t(
-                        'editcompany:List emails of people who can add and modify jobs, these people must already have an account before they can be added',
-                      )}
-                    </FormHelperText>
-                  </FormControl>
+                    {this.state.company.employee1 ? (
+                      <Card className={classes.card}>
+                        <CardContent>
+                          <Typography
+                            className={classes.title}
+                            color="textSecondary">
+                            {i18n.t('editcompany:Featured employee #1')}
+                          </Typography>
+                          <Typography component="h2">
+                            {i18n.t(
+                              'editcompany:Add details about an employee you think could encourage people to work at your company',
+                            )}
+                          </Typography>
+                          <Avatar
+                            src={
+                              publicRuntimeConfig.cdn +
+                              this.state.company.id +
+                              '-' +
+                              this.state.company.ownerId +
+                              '-' +
+                              'employee1avatar.png?u=' +
+                              this.state.employee1Uploaded +
+                              this.state.company.updatedAt
+                            }
+                            style={{cursor: 'pointer'}}
+                            onClick={() => this.fileInput.click()}
+                          />
+                          <input
+                            style={{display: 'none'}}
+                            ref={fileInput => (this.fileInput = fileInput)}
+                            type="file"
+                            onChange={this.uploadEmployee1Avatar}
+                          />
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="name-simple">
+                              {i18n.t("editcompany:Employee's Name")}
+                            </InputLabel>
+                            <Input
+                              id="name-simple"
+                              name="name"
+                              value={this.state.company.employee1.name}
+                              onChange={this.handleChangeEmployee1}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.namevalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {this.state.namevalid !== false
+                                ? i18n.t("editcompany:Your employee's name")
+                                : i18n.t(
+                                    "editcompany:Your employee's name is required",
+                                  )}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="title-simple">
+                              {i18n.t("editcompany:Employee's title")}
+                            </InputLabel>
+                            <Input
+                              id="title-simple"
+                              name="title"
+                              value={this.state.company.employee1.title}
+                              onChange={this.handleChangeEmployee1}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.titlevalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {i18n.t("editcompany:Your employee's title")}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="name-simple">
+                              {i18n.t("editcompany:Employee's Twitter")}
+                            </InputLabel>
+                            <Input
+                              id="twitter-simple"
+                              name="twitter"
+                              value={this.state.company.employee1.twitter}
+                              onChange={this.handleChangeEmployee1}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.twittervalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {i18n.t("editcompany:Your employee's twitter")}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="name-simple">
+                              {i18n.t("editcompany:Employee's Github")}
+                            </InputLabel>
+                            <Input
+                              id="github-simple"
+                              name="github"
+                              value={this.state.company.employee1.github}
+                              onChange={this.handleChangeEmployee1}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.githubvalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {i18n.t("editcompany:Your employee's github")}
+                            </FormHelperText>
+                          </FormControl>
 
-                  {this.state.company.name ? (
-                    <>
-                      <FormControl
-                        fullWidth={true}
-                        className={classes.formControl}>
-                        <MultipleDownshiftSelect
-                          i18n={i18n}
-                          suggestions={skills}
-                          selectedItems={this.state.skills}
-                          label={i18n.t(
-                            'editcompany:List the techs being used at your company',
-                          )}
-                          placeholder={i18n.t(
-                            'editcompany:Select multiple techs (up to 25)',
-                          )}
-                          handleParentChange={this.handleChangeSkills}
-                          name="skills"
-                          id="skills"
-                          maxSelection={25}
-                          required={true}
-                        />
-                        <FormHelperText>
-                          {i18n.t('newjob:Select skills required for the job')}
-                        </FormHelperText>
-                      </FormControl>
-                      <FormControl
-                        fullWidth={true}
-                        className={classes.formControl}>
-                        <MultipleDownshiftSelect
-                          i18n={i18n}
-                          suggestions={perks}
-                          selectedItems={this.state.perks}
-                          label={i18n.t(
-                            'editcompany:List perks available at your company',
-                          )}
-                          placeholder={i18n.t(
-                            'editcompany:Select multiple perks',
-                          )}
-                          handleParentChange={this.handleChangePerks}
-                          name="perks"
-                          id="perks"
-                          maxSelection={40}
-                          required={true}
-                        />
-                        <FormHelperText>
-                          {i18n.t(
-                            'editcompany:Select perks your company offers',
-                          )}
-                        </FormHelperText>
-                      </FormControl>
-                    </>
-                  ) : null}
-                  {this.state.company.employee1 ? (
+                          <FormControl
+                            fullWidth={true}
+                            className={classes.formControl}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={
+                                    this.state.company.employee1.published
+                                  }
+                                  name="published"
+                                  value="published"
+                                  onChange={this.handleCheckboxChangeEmployee1}
+                                  color="primary"
+                                />
+                              }
+                              label={this.i18n.t('newjob:Publish')}
+                            />
+                          </FormControl>
+
+                          <FormControl
+                            fullWidth={true}
+                            className={classes.formControl}
+                            error={this.state.company.biovalid === false}>
+                            <InputLabel htmlFor="bio-simple">
+                              {i18n.t('Bio')}
+                            </InputLabel>
+                            <Input
+                              id="bio"
+                              value={this.state.company.employee1.bio}
+                              onChange={this.handleChangeEmployee1}
+                              name="bio"
+                              required={true}
+                              multiline={true}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              rows={5}
+                              fullWidth={true}
+                            />
+
+                            <FormHelperText
+                              id={
+                                this.state.biovalid !== false
+                                  ? 'bio-helper-text'
+                                  : 'bio-error-text'
+                              }>
+                              {this.state.biovalid !== false
+                                ? i18n.t(
+                                    'editcompany:Write a bio about your employee and what they do',
+                                  )
+                                : i18n.t('editcompany:A bio is required')}
+                            </FormHelperText>
+                          </FormControl>
+                        </CardContent>
+                      </Card>
+                    ) : null}
+                    {this.state.company.employee2 ? (
+                      <Card className={classes.card}>
+                        <CardContent>
+                          <Typography
+                            className={classes.title}
+                            color="textSecondary">
+                            {i18n.t('editcompany:Featured employee #2')}
+                          </Typography>
+                          <Typography component="h2">
+                            {i18n.t(
+                              'editcompany:Add details about an employee you think could encourage people to work at your company',
+                            )}
+                          </Typography>
+                          <Avatar
+                            style={{cursor: 'pointer'}}
+                            src={
+                              publicRuntimeConfig.cdn +
+                              this.state.company.id +
+                              '-' +
+                              this.state.company.ownerId +
+                              '-' +
+                              'employee2avatar.png?u=' +
+                              this.state.employee2Uploaded +
+                              this.state.company.updatedAt
+                            }
+                            className={classes.avatar}
+                            onClick={() => this.fileInput2.click()}
+                          />
+                          <input
+                            style={{display: 'none'}}
+                            ref={fileInput2 => (this.fileInput2 = fileInput2)}
+                            type="file"
+                            onChange={this.uploadEmployee2Avatar}
+                          />
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="name-simple">
+                              {i18n.t("editcompany:Employee's Name")}
+                            </InputLabel>
+                            <Input
+                              id="name-simple"
+                              name="name"
+                              value={this.state.company.employee2.name}
+                              onChange={this.handleChangeEmployee2}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.namevalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {this.state.namevalid !== false
+                                ? i18n.t("editcompany:Your employee's name")
+                                : i18n.t(
+                                    "editcompany:Your employee's name is required",
+                                  )}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="title-simple">
+                              {i18n.t("editcompany:Employee's title")}
+                            </InputLabel>
+                            <Input
+                              id="title-simple"
+                              name="title"
+                              value={this.state.company.employee2.title}
+                              onChange={this.handleChangeEmployee2}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.titlevalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {i18n.t("editcompany:Your employee's title")}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="name-simple">
+                              {i18n.t("editcompany:Employee's Twitter")}
+                            </InputLabel>
+                            <Input
+                              id="twitter-simple"
+                              name="twitter"
+                              value={this.state.company.employee2.twitter}
+                              onChange={this.handleChangeEmployee2}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.twittervalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {i18n.t("editcompany:Your employee's twitter")}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            className={classes.formControl}
+                            error={this.state.namevalid === false}>
+                            <InputLabel htmlFor="name-simple">
+                              {i18n.t("editcompany:Employee's Github")}
+                            </InputLabel>
+                            <Input
+                              id="github-simple"
+                              name="github"
+                              value={this.state.company.employee2.github}
+                              onChange={this.handleChangeEmployee2}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              required={true}
+                            />
+                            <FormHelperText
+                              id={
+                                this.state.githubvalid !== false
+                                  ? 'name-helper-text'
+                                  : 'name-error-text'
+                              }>
+                              {i18n.t("editcompany:Your employee's github")}
+                            </FormHelperText>
+                          </FormControl>
+
+                          <FormControl
+                            fullWidth={true}
+                            className={classes.formControl}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={
+                                    this.state.company.employee2.published
+                                  }
+                                  name="published"
+                                  value="published"
+                                  onChange={this.handleCheckboxChangeEmployee2}
+                                  color="primary"
+                                />
+                              }
+                              label={this.i18n.t('newjob:Publish')}
+                            />
+                          </FormControl>
+
+                          <FormControl
+                            fullWidth={true}
+                            className={classes.formControl}
+                            error={this.state.company.biovalid === false}>
+                            <InputLabel htmlFor="bio-simple">
+                              {i18n.t('Bio')}
+                            </InputLabel>
+                            <Input
+                              id="bio"
+                              value={this.state.company.employee2.bio}
+                              onChange={this.handleChangeEmployee2}
+                              name="bio"
+                              required={true}
+                              multiline={true}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              rows={5}
+                              fullWidth={true}
+                            />
+
+                            <FormHelperText
+                              id={
+                                this.state.biovalid !== false
+                                  ? 'bio-helper-text'
+                                  : 'bio-error-text'
+                              }>
+                              {this.state.biovalid !== false
+                                ? i18n.t(
+                                    'editcompany:Write a bio about your employee and what they do',
+                                  )
+                                : i18n.t('editcompany:A bio is required')}
+                            </FormHelperText>
+                          </FormControl>
+                        </CardContent>
+                      </Card>
+                    ) : null}
                     <Card className={classes.card}>
-                      <CardContent>
-                        <Typography
-                          className={classes.title}
-                          color="textSecondary">
-                          {i18n.t('editcompany:Featured employee #1')}
-                        </Typography>
-                        <Typography component="h2">
-                          {i18n.t(
-                            'editcompany:Add details about an employee you think could encourage people to work at your company',
-                          )}
-                        </Typography>
-                        <Avatar
-                          src={
-                            publicRuntimeConfig.cdn +
-                            this.state.company.id +
-                            '-' +
-                            this.state.company.ownerId +
-                            '-' +
-                            'employee1avatar.png?u=' +
-                            this.state.employee1Uploaded +
-                            this.state.company.updatedAt
-                          }
-                          style={{cursor: 'pointer'}}
-                          onClick={() => this.fileInput.click()}
-                        />
+                      <CardHeader
+                        title={i18n.t(
+                          'editcompany:Add an image or video to your profile',
+                        )}
+                      />
+
+                      <CardActionArea className={classes.cardActionArea}>
+                        {this.state.company.media1.hasVideo ? (
+                          <ReactPlayer url={this.state.company.media1.url} />
+                        ) : (
+                          <CardMedia
+                            className={classes.media}
+                            image={
+                              publicRuntimeConfig.cdn +
+                              this.state.company.id +
+                              '-' +
+                              this.state.company.ownerId +
+                              '-' +
+                              '1media.png?u=' +
+                              this.state.media1Uploaded +
+                              this.state.company.updatedAt
+                            }
+                            title="Contemplative Reptile"
+                            onClick={() => this.media1FileInput.click()}
+                          />
+                        )}
+                      </CardActionArea>
+                      <CardActions>
                         <input
                           style={{display: 'none'}}
-                          ref={fileInput => (this.fileInput = fileInput)}
+                          ref={media1FileInput =>
+                            (this.media1FileInput = media1FileInput)
+                          }
                           type="file"
-                          onChange={this.uploadEmployee1Avatar}
+                          onChange={this.uploadMedia1Image}
                         />
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="name-simple">
-                            {i18n.t("editcompany:Employee's Name")}
-                          </InputLabel>
-                          <Input
-                            id="name-simple"
-                            name="name"
-                            value={this.state.company.employee1.name}
-                            onChange={this.handleChangeEmployee1}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.namevalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {this.state.namevalid !== false
-                              ? i18n.t("editcompany:Your employee's name")
-                              : i18n.t(
-                                  "editcompany:Your employee's name is required",
-                                )}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="title-simple">
-                            {i18n.t("editcompany:Employee's title")}
-                          </InputLabel>
-                          <Input
-                            id="title-simple"
-                            name="title"
-                            value={this.state.company.employee1.title}
-                            onChange={this.handleChangeEmployee1}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.titlevalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {i18n.t("editcompany:Your employee's title")}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="name-simple">
-                            {i18n.t("editcompany:Employee's Twitter")}
-                          </InputLabel>
-                          <Input
-                            id="twitter-simple"
-                            name="twitter"
-                            value={this.state.company.employee1.twitter}
-                            onChange={this.handleChangeEmployee1}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.twittervalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {i18n.t("editcompany:Your employee's twitter")}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="name-simple">
-                            {i18n.t("editcompany:Employee's Github")}
-                          </InputLabel>
-                          <Input
-                            id="github-simple"
-                            name="github"
-                            value={this.state.company.employee1.github}
-                            onChange={this.handleChangeEmployee1}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.githubvalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {i18n.t("editcompany:Your employee's github")}
-                          </FormHelperText>
-                        </FormControl>
+                        <TextField
+                          id="standard-bare"
+                          value={this.state.company.media1.url}
+                          placeholder={i18n.t(
+                            'editcompany:Paste your video URL here',
+                          )}
+                          margin="normal"
+                          onChange={e => {
+                            const company = this.state.company;
+                            company.media1.url = e.target.value;
+                            this.setState({company: company});
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          color="primary"
+                          onClick={() => {
+                            if (this.state.company.media1.url) {
+                              const company = this.state.company;
+                              company.media1.hasVideo = true;
+                              this.setState({company: company});
+                            }
+                          }}>
+                          {i18n.t('editcompany:video')}
+                        </Button>
+                        <Button
+                          size="small"
+                          color="primary"
+                          onClick={() => this.media1FileInput.click()}>
+                          {i18n.t('editcompany:image')}
+                        </Button>
 
-                        <FormControl
-                          fullWidth={true}
-                          className={classes.formControl}>
+                        <FormControl className={classes.formControl}>
                           <FormControlLabel
                             control={
                               <Checkbox
-                                checked={this.state.company.employee1.published}
+                                checked={this.state.company.media1.published}
                                 name="published"
                                 value="published"
-                                onChange={this.handleCheckboxChangeEmployee1}
+                                onChange={this.handleCheckboxChangeMedia1}
                                 color="primary"
                               />
                             }
                             label={this.i18n.t('newjob:Publish')}
                           />
                         </FormControl>
-
-                        <FormControl
-                          fullWidth={true}
-                          className={classes.formControl}
-                          error={this.state.company.biovalid === false}>
-                          <InputLabel htmlFor="bio-simple">
-                            {i18n.t('Bio')}
-                          </InputLabel>
-                          <Input
-                            id="bio"
-                            value={this.state.company.employee1.bio}
-                            onChange={this.handleChangeEmployee1}
-                            name="bio"
-                            required={true}
-                            multiline={true}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            rows={5}
-                            fullWidth={true}
-                          />
-
-                          <FormHelperText
-                            id={
-                              this.state.biovalid !== false
-                                ? 'bio-helper-text'
-                                : 'bio-error-text'
-                            }>
-                            {this.state.biovalid !== false
-                              ? i18n.t(
-                                  'editcompany:Write a bio about your employee and what they do',
-                                )
-                              : i18n.t('editcompany:A bio is required')}
-                          </FormHelperText>
-                        </FormControl>
-                      </CardContent>
+                      </CardActions>
                     </Card>
-                  ) : null}
-                  {this.state.company.employee2 ? (
+
                     <Card className={classes.card}>
-                      <CardContent>
-                        <Typography
-                          className={classes.title}
-                          color="textSecondary">
-                          {i18n.t('editcompany:Featured employee #2')}
-                        </Typography>
-                        <Typography component="h2">
-                          {i18n.t(
-                            'editcompany:Add details about an employee you think could encourage people to work at your company',
-                          )}
-                        </Typography>
-                        <Avatar
-                          style={{cursor: 'pointer'}}
-                          src={
-                            publicRuntimeConfig.cdn +
-                            this.state.company.id +
-                            '-' +
-                            this.state.company.ownerId +
-                            '-' +
-                            'employee2avatar.png?u=' +
-                            this.state.employee2Uploaded +
-                            this.state.company.updatedAt
-                          }
-                          className={classes.avatar}
-                          onClick={() => this.fileInput2.click()}
-                        />
+                      <CardHeader
+                        title={i18n.t(
+                          'editcompany:Add a second image or video to your profile',
+                        )}
+                      />
+
+                      <CardActionArea className={classes.cardActionArea}>
+                        {this.state.company.media2.hasVideo ? (
+                          <ReactPlayer url={this.state.company.media2.url} />
+                        ) : (
+                          <CardMedia
+                            className={classes.media}
+                            image={
+                              publicRuntimeConfig.cdn +
+                              this.state.company.id +
+                              '-' +
+                              this.state.company.ownerId +
+                              '-' +
+                              '2media.png?u=' +
+                              this.state.media2Uploaded +
+                              this.state.company.updatedAt
+                            }
+                            title="Contemplative Reptile"
+                            onClick={() => this.media2FileInput.click()}
+                          />
+                        )}
+                      </CardActionArea>
+                      <CardActions>
                         <input
                           style={{display: 'none'}}
-                          ref={fileInput2 => (this.fileInput2 = fileInput2)}
+                          ref={media2FileInput =>
+                            (this.media2FileInput = media2FileInput)
+                          }
                           type="file"
-                          onChange={this.uploadEmployee2Avatar}
+                          onChange={this.uploadMedia2Image}
                         />
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="name-simple">
-                            {i18n.t("editcompany:Employee's Name")}
-                          </InputLabel>
-                          <Input
-                            id="name-simple"
-                            name="name"
-                            value={this.state.company.employee2.name}
-                            onChange={this.handleChangeEmployee2}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.namevalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {this.state.namevalid !== false
-                              ? i18n.t("editcompany:Your employee's name")
-                              : i18n.t(
-                                  "editcompany:Your employee's name is required",
-                                )}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="title-simple">
-                            {i18n.t("editcompany:Employee's title")}
-                          </InputLabel>
-                          <Input
-                            id="title-simple"
-                            name="title"
-                            value={this.state.company.employee2.title}
-                            onChange={this.handleChangeEmployee2}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.titlevalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {i18n.t("editcompany:Your employee's title")}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="name-simple">
-                            {i18n.t("editcompany:Employee's Twitter")}
-                          </InputLabel>
-                          <Input
-                            id="twitter-simple"
-                            name="twitter"
-                            value={this.state.company.employee2.twitter}
-                            onChange={this.handleChangeEmployee2}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.twittervalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {i18n.t("editcompany:Your employee's twitter")}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl
-                          className={classes.formControl}
-                          error={this.state.namevalid === false}>
-                          <InputLabel htmlFor="name-simple">
-                            {i18n.t("editcompany:Employee's Github")}
-                          </InputLabel>
-                          <Input
-                            id="github-simple"
-                            name="github"
-                            value={this.state.company.employee2.github}
-                            onChange={this.handleChangeEmployee2}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            required={true}
-                          />
-                          <FormHelperText
-                            id={
-                              this.state.githubvalid !== false
-                                ? 'name-helper-text'
-                                : 'name-error-text'
-                            }>
-                            {i18n.t("editcompany:Your employee's github")}
-                          </FormHelperText>
-                        </FormControl>
+                        <TextField
+                          id="standard-bare"
+                          value={this.state.company.media2.url}
+                          placeholder={i18n.t(
+                            'editcompany:Paste your video URL here',
+                          )}
+                          margin="normal"
+                          onChange={e => {
+                            const company = this.state.company;
+                            company.media2.url = e.target.value;
+                            this.setState({company: company});
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          color="primary"
+                          onClick={() => {
+                            if (this.state.company.media2.url) {
+                              const company = this.state.company;
+                              company.media2.hasVideo = true;
+                              this.setState({company: company});
+                            }
+                          }}>
+                          {i18n.t('editcompany:video')}
+                        </Button>
+                        <Button
+                          size="small"
+                          color="primary"
+                          onClick={() => this.media2FileInput.click()}>
+                          {i18n.t('editcompany:image')}
+                        </Button>
 
-                        <FormControl
-                          fullWidth={true}
-                          className={classes.formControl}>
+                        <FormControl className={classes.formControl}>
                           <FormControlLabel
                             control={
                               <Checkbox
-                                checked={this.state.company.employee2.published}
+                                checked={this.state.company.media2.published}
                                 name="published"
                                 value="published"
-                                onChange={this.handleCheckboxChangeEmployee2}
+                                onChange={this.handleCheckboxChangeMedia2}
                                 color="primary"
                               />
                             }
                             label={this.i18n.t('newjob:Publish')}
                           />
                         </FormControl>
-
-                        <FormControl
-                          fullWidth={true}
-                          className={classes.formControl}
-                          error={this.state.company.biovalid === false}>
-                          <InputLabel htmlFor="bio-simple">
-                            {i18n.t('Bio')}
-                          </InputLabel>
-                          <Input
-                            id="bio"
-                            value={this.state.company.employee2.bio}
-                            onChange={this.handleChangeEmployee2}
-                            name="bio"
-                            required={true}
-                            multiline={true}
-                            onBlur={e => this.handleBlur(e, true)}
-                            onFocus={e => this.handleFocus(e, true)}
-                            rows={5}
-                            fullWidth={true}
-                          />
-
-                          <FormHelperText
-                            id={
-                              this.state.biovalid !== false
-                                ? 'bio-helper-text'
-                                : 'bio-error-text'
-                            }>
-                            {this.state.biovalid !== false
-                              ? i18n.t(
-                                  'editcompany:Write a bio about your employee and what they do',
-                                )
-                              : i18n.t('editcompany:A bio is required')}
-                          </FormHelperText>
-                        </FormControl>
-                      </CardContent>
+                      </CardActions>
                     </Card>
-                  ) : null}
-                  <Card className={classes.card}>
-                    <CardHeader
-                      title={i18n.t(
-                        'editcompany:Add an image or video to your profile',
-                      )}
-                    />
 
-                    <CardActionArea className={classes.cardActionArea}>
-                      {this.state.company.media1.hasVideo ? (
-                        <ReactPlayer url={this.state.company.media1.url} />
-                      ) : (
-                        <CardMedia
-                          className={classes.media}
-                          image={
-                            publicRuntimeConfig.cdn +
-                            this.state.company.id +
-                            '-' +
-                            this.state.company.ownerId +
-                            '-' +
-                            '1media.png?u=' +
-                            this.state.media1Uploaded +
-                            this.state.company.updatedAt
-                          }
-                          title="Contemplative Reptile"
-                          onClick={() => this.media1FileInput.click()}
-                        />
-                      )}
-                    </CardActionArea>
-                    <CardActions>
-                      <input
-                        style={{display: 'none'}}
-                        ref={media1FileInput =>
-                          (this.media1FileInput = media1FileInput)
-                        }
-                        type="file"
-                        onChange={this.uploadMedia1Image}
-                      />
-                      <TextField
-                        id="standard-bare"
-                        value={this.state.company.media1.url}
-                        placeholder={i18n.t(
-                          'editcompany:Paste your video URL here',
+                    <Card className={classes.card}>
+                      <CardHeader
+                        title={i18n.t(
+                          'editcompany:Add a third image or video to your profile',
                         )}
-                        margin="normal"
-                        onChange={e => {
-                          const company = this.state.company;
-                          company.media1.url = e.target.value;
-                          this.setState({company: company});
-                        }}
                       />
-                      <Button
-                        size="small"
-                        color="primary"
-                        onClick={() => {
-                          if (this.state.company.media1.url) {
-                            const company = this.state.company;
-                            company.media1.hasVideo = true;
-                            this.setState({company: company});
-                          }
-                        }}>
-                        {i18n.t('editcompany:add video')}
-                      </Button>
-                      <Button
-                        size="small"
-                        color="primary"
-                        onClick={() => this.media1FileInput.click()}>
-                        {i18n.t('editcompany:add image instead')}
-                      </Button>
-
-                      <FormControl className={classes.formControl}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={this.state.company.media1.published}
-                              name="published"
-                              value="published"
-                              onChange={this.handleCheckboxChangeMedia1}
-                              color="primary"
-                            />
-                          }
-                          label={this.i18n.t('newjob:Publish')}
-                        />
-                      </FormControl>
-                    </CardActions>
-                  </Card>
-
-                  <Card className={classes.card}>
-                    <CardHeader
-                      title={i18n.t(
-                        'editcompany:Add a second image or video to your profile',
-                      )}
-                    />
-
-                    <CardActionArea className={classes.cardActionArea}>
-                      {this.state.company.media2.hasVideo ? (
-                        <ReactPlayer url={this.state.company.media2.url} />
-                      ) : (
-                        <CardMedia
-                          className={classes.media}
-                          image={
-                            publicRuntimeConfig.cdn +
-                            this.state.company.id +
-                            '-' +
-                            this.state.company.ownerId +
-                            '-' +
-                            '2media.png?u=' +
-                            this.state.media2Uploaded +
-                            this.state.company.updatedAt
-                          }
-                          title="Contemplative Reptile"
-                          onClick={() => this.media2FileInput.click()}
-                        />
-                      )}
-                    </CardActionArea>
-                    <CardActions>
-                      <input
-                        style={{display: 'none'}}
-                        ref={media2FileInput =>
-                          (this.media2FileInput = media2FileInput)
-                        }
-                        type="file"
-                        onChange={this.uploadMedia2Image}
-                      />
-                      <TextField
-                        id="standard-bare"
-                        value={this.state.company.media2.url}
-                        placeholder={i18n.t(
-                          'editcompany:Paste your video URL here',
+                      <CardActionArea className={classes.cardActionArea}>
+                        {this.state.company.media3.hasVideo ? (
+                          <ReactPlayer url={this.state.company.media3.url} />
+                        ) : (
+                          <CardMedia
+                            className={classes.media}
+                            image={
+                              publicRuntimeConfig.cdn +
+                              this.state.company.id +
+                              '-' +
+                              this.state.company.ownerId +
+                              '-' +
+                              '3media.png?u=' +
+                              this.state.media3Uploaded +
+                              this.state.company.updatedAt
+                            }
+                            title="Contemplative Reptile"
+                            onClick={() => this.media3FileInput.click()}
+                          />
                         )}
-                        margin="normal"
-                        onChange={e => {
-                          const company = this.state.company;
-                          company.media2.url = e.target.value;
-                          this.setState({company: company});
-                        }}
-                      />
-                      <Button
-                        size="small"
-                        color="primary"
-                        onClick={() => {
-                          if (this.state.company.media2.url) {
+                      </CardActionArea>
+                      <CardActions>
+                        <input
+                          style={{display: 'none'}}
+                          ref={media3FileInput =>
+                            (this.media3FileInput = media3FileInput)
+                          }
+                          type="file"
+                          onChange={this.uploadMedia3Image}
+                        />
+                        <TextField
+                          id="standard-bare"
+                          value={this.state.company.media3.url}
+                          placeholder={i18n.t(
+                            'editcompany:Paste your video URL here',
+                          )}
+                          margin="normal"
+                          onChange={e => {
                             const company = this.state.company;
-                            company.media2.hasVideo = true;
+                            company.media3.url = e.target.value;
                             this.setState({company: company});
-                          }
-                        }}>
-                        {i18n.t('editcompany:add video')}
-                      </Button>
-                      <Button
-                        size="small"
-                        color="primary"
-                        onClick={() => this.media2FileInput.click()}>
-                        {i18n.t('editcompany:add image instead')}
-                      </Button>
-
-                      <FormControl className={classes.formControl}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={this.state.company.media2.published}
-                              name="published"
-                              value="published"
-                              onChange={this.handleCheckboxChangeMedia2}
-                              color="primary"
-                            />
-                          }
-                          label={this.i18n.t('newjob:Publish')}
+                          }}
                         />
-                      </FormControl>
-                    </CardActions>
-                  </Card>
+                        <Button
+                          size="small"
+                          color="primary"
+                          onClick={() => {
+                            if (this.state.company.media3.url) {
+                              const company = this.state.company;
+                              company.media3.hasVideo = true;
+                              this.setState({company: company});
+                            }
+                          }}>
+                          {i18n.t('editcompany:video')}
+                        </Button>
+                        <Button
+                          size="small"
+                          color="primary"
+                          onClick={() => this.media3FileInput.click()}>
+                          {i18n.t('editcompany:image')}
+                        </Button>
 
-                  <Card className={classes.card}>
-                    <CardHeader
-                      title={i18n.t(
-                        'editcompany:Add a third image or video to your profile',
-                      )}
-                    />
-                    <CardActionArea className={classes.cardActionArea}>
-                      {this.state.company.media3.hasVideo ? (
-                        <ReactPlayer url={this.state.company.media3.url} />
-                      ) : (
-                        <CardMedia
-                          className={classes.media}
-                          image={
-                            publicRuntimeConfig.cdn +
-                            this.state.company.id +
-                            '-' +
-                            this.state.company.ownerId +
-                            '-' +
-                            '3media.png?u=' +
-                            this.state.media3Uploaded +
-                            this.state.company.updatedAt
-                          }
-                          title="Contemplative Reptile"
-                          onClick={() => this.media3FileInput.click()}
-                        />
-                      )}
-                    </CardActionArea>
-                    <CardActions>
-                      <input
-                        style={{display: 'none'}}
-                        ref={media3FileInput =>
-                          (this.media3FileInput = media3FileInput)
-                        }
-                        type="file"
-                        onChange={this.uploadMedia3Image}
-                      />
-                      <TextField
-                        id="standard-bare"
-                        value={this.state.company.media3.url}
-                        placeholder={i18n.t(
-                          'editcompany:Paste your video URL here',
-                        )}
-                        margin="normal"
-                        onChange={e => {
-                          const company = this.state.company;
-                          company.media3.url = e.target.value;
-                          this.setState({company: company});
-                        }}
-                      />
-                      <Button
-                        size="small"
-                        color="primary"
-                        onClick={() => {
-                          if (this.state.company.media3.url) {
-                            const company = this.state.company;
-                            company.media3.hasVideo = true;
-                            this.setState({company: company});
-                          }
-                        }}>
-                        {i18n.t('editcompany:add video')}
-                      </Button>
-                      <Button
-                        size="small"
-                        color="primary"
-                        onClick={() => this.media3FileInput.click()}>
-                        {i18n.t('editcompany:add image instead')}
-                      </Button>
-
-                      <FormControl className={classes.formControl}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={this.state.company.media3.published}
-                              name="published"
-                              value="published"
-                              onChange={this.handleCheckboxChangeMedia3}
-                              color="primary"
-                            />
-                          }
-                          label={this.i18n.t('newjob:Publish')}
-                        />
-                      </FormControl>
-                    </CardActions>
-                  </Card>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={this.saveCompany}
-                    className={classes.button}>
-                    {i18n.t('Save')}
-                  </Button>
-                </form>
-                <Snackbar
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                  }}
-                  open={this.state.openNotification}
-                  autoHideDuration={6000}
-                  onClose={() => {
-                    this.setState({openNotification: false});
-                  }}
-                  ContentProps={{
-                    'aria-describedby': 'message-id',
-                  }}
-                  message={
-                    <span id="message-id">
-                      {this.i18n.t('Company updated')}
-                    </span>
-                  }
-                  action={[
-                    /*  TODO implement undo save company
+                        <FormControl className={classes.formControl}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={this.state.company.media3.published}
+                                name="published"
+                                value="published"
+                                onChange={this.handleCheckboxChangeMedia3}
+                                color="primary"
+                              />
+                            }
+                            label={this.i18n.t('newjob:Publish')}
+                          />
+                        </FormControl>
+                      </CardActions>
+                    </Card>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={this.saveCompany}
+                      className={classes.button}>
+                      {i18n.t('Save')}
+                    </Button>
+                  </form>
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                    open={this.state.openNotification}
+                    autoHideDuration={6000}
+                    onClose={() => {
+                      this.setState({openNotification: false});
+                    }}
+                    ContentProps={{
+                      'aria-describedby': 'message-id',
+                    }}
+                    message={
+                      <span id="message-id">
+                        {this.i18n.t('Company updated')}
+                      </span>
+                    }
+                    action={[
+                      /*  TODO implement undo save company
                 <Button
                   key="undo"
                   color="secondary"
@@ -1997,21 +2018,22 @@ class EditCompany extends React.Component {
                   }}>
                   UNDO
                 </Button>,*/
-                    <IconButton
-                      key="close"
-                      aria-label="Close"
-                      color="inherit"
-                      className={styles.close}
-                      onClick={() => {
-                        this.setState({openNotification: false});
-                      }}>
-                      <CloseIcon />
-                    </IconButton>,
-                  ]}
-                />
-              </div>
+                      <IconButton
+                        key="close"
+                        aria-label="Close"
+                        color="inherit"
+                        className={styles.close}
+                        onClick={() => {
+                          this.setState({openNotification: false});
+                        }}>
+                        <CloseIcon />
+                      </IconButton>,
+                    ]}
+                  />
+                </div>
+              </Grid>
             </Grid>
-          </Grid>
+          </div>
         </div>
       </I18nextProvider>
     );
