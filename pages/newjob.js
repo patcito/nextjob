@@ -102,8 +102,8 @@ class NewJob extends React.Component {
     monthlySalaryRange: [500, 1000],
     remote: false,
     selectedCompany: '',
-    selectedEmployementType: '',
-    selectedSeniorityLevel: '',
+    selectedEmployementType: {value: 'FullTime', label: 'Full-time'},
+    selectedSeniorityLevel: {value: 'EntryLevel', label: 'Entry level'},
     activeStep: 0,
     addNewCompany: false,
     minSalary: 10,
@@ -339,21 +339,18 @@ $applicationEmail: String,
       let industries = [];
       let skills = [];
       that.state.jobFunction.map(jf => {
-        console.log(jf);
         jobFunctions.push({
           JobFunction: jf.value.JobFunction || jf.value,
           JobId: jobId,
         });
       });
       that.state.companyIndustries.map(ci => {
-        console.log(ci);
         industries.push({
           IndustryName: ci.value.IndustryName || ci.value,
           JobId: jobId,
         });
       });
       that.state.skills.map(skill => {
-        console.log(skill);
         skills.push({Skill: skill.value.Skill || skill.value, JobId: jobId});
       });
       const extraVars = {
@@ -451,17 +448,14 @@ $applicationEmail: String,
   };
 
   handleSliderChange = value => {
-    console.log(this.state.yearsExperienceRange, value);
     this.setState({yearsExperienceRange: value});
   };
 
   handleYearlySalaryRangeSliderChange = value => {
-    console.log(this.state.yearlySalaryRange, value);
     this.setState({yearlySalaryRange: value});
   };
 
   handleMonthlySalaryRangeSliderChange = value => {
-    console.log(this.state.monthlySalaryRange, value);
     this.setState({monthlySalaryRange: value});
   };
 
@@ -561,6 +555,10 @@ $applicationEmail: String,
     if (lang !== 'en' && lang !== 'fr') {
       lang = 'en';
     }
+    let forceFr = query.fr;
+    if (forceFr === 1) {
+      lang = 'fr';
+    }
 
     const translations = await getTranslation(
       lang,
@@ -658,7 +656,6 @@ $applicationEmail: String,
     const client = new grequest.GraphQLClient(createCompanyopts.uri, {
       headers: createCompanyopts.headers,
     });
-    let forceFr = query.fr;
     if (query.id) {
       let job = await client.request(createCompanyopts.query, {
         id: query.id || 0,
@@ -713,7 +710,16 @@ $applicationEmail: String,
         type: 'Point',
         coordinates: [this.state.coordinates.lat, this.state.coordinates.lng],
       },
-    };*/
+    };*/ if (
+      this.props.job
+    ) {
+      this.setState({
+        selectedEmployementType: {
+          value: 'FullTime',
+          label: this.i18n.t('employementtypes:Full-time'),
+        },
+      });
+    }
 
     if (typeof window !== 'undefined' && window.localStorage) {
       const job = this.props.job;
@@ -1582,7 +1588,6 @@ $applicationEmail: String,
                     this.setState({
                       hasMonthlySalary: !this.state.hasMonthlySalary,
                     });
-                    console.log(this.state.yearlySalaryRange);
                   }}>
                   <Button color="primary" className={classes.button}>
                     {this.state.hasMonthlySalary
@@ -1678,7 +1683,6 @@ $applicationEmail: String,
     const employementtypes = this.EMPLOYEMENTTYPES;
     const senioritylevels = this.SENIORITYLEVELS;
     const skills = this.SKILLS;
-    console.log('CI', this.state.companyIndustries);
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
