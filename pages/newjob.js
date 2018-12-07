@@ -1104,7 +1104,7 @@ $applicationEmail: String,
                         <Radio checked={this.state.hasApplicationEmail} />
                       }
                       label={this.i18n.t(
-                        'newjob:Recommended, let applicants apply through this site with their Github account and notify me by email',
+                        'newjob:From this site directly (recommended)',
                       )}
                     />
                     <FormControl
@@ -1698,74 +1698,77 @@ $applicationEmail: String,
             />
           ) : null}
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
-          <Grid container spacing={24} alignItems="center" justify="center">
-            <Grid item xs={12} md={6}>
-              <div>
-                <Stepper activeStep={activeStep} orientation="vertical">
-                  {steps.map((label, index) => {
-                    return (
-                      <Step key={label}>
-                        <StepLabel>{label}</StepLabel>
-                        <StepContent>
-                          {this.getStepContent(
-                            index,
-                            classes,
-                            industries,
-                            jobstitles,
-                            jobfunctions,
-                            employementtypes,
-                            senioritylevels,
-                            skills,
-                          )}
-                          <div className={classes.actionsContainer}>
-                            <div>
-                              <Button
-                                disabled={
-                                  activeStep === 0 && !this.state.addNewCompany
-                                }
-                                onClick={this.handleBack}
-                                className={classes.button}>
-                                {this.i18n.t('Back')}
-                              </Button>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={this.handleNext}
-                                disabled={this.checkActiveStepValidity(
-                                  activeStep,
-                                )}
-                                className={classes.button}>
-                                {activeStep === steps.length - 1
-                                  ? this.i18n.t('Save')
-                                  : this.i18n.t('Next')}
-                              </Button>
+          <div style={{paddingLeft: 12, paddingRight: 12}}>
+            <Grid container spacing={24} alignItems="center" justify="center">
+              <Grid item xs={12} md={6}>
+                <div>
+                  <Stepper activeStep={activeStep} orientation="vertical">
+                    {steps.map((label, index) => {
+                      return (
+                        <Step key={label}>
+                          <StepLabel>{label}</StepLabel>
+                          <StepContent>
+                            {this.getStepContent(
+                              index,
+                              classes,
+                              industries,
+                              jobstitles,
+                              jobfunctions,
+                              employementtypes,
+                              senioritylevels,
+                              skills,
+                            )}
+                            <div className={classes.actionsContainer}>
+                              <div>
+                                <Button
+                                  disabled={
+                                    activeStep === 0 &&
+                                    !this.state.addNewCompany
+                                  }
+                                  onClick={this.handleBack}
+                                  className={classes.button}>
+                                  {this.i18n.t('Back')}
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={this.handleNext}
+                                  disabled={this.checkActiveStepValidity(
+                                    activeStep,
+                                  )}
+                                  className={classes.button}>
+                                  {activeStep === steps.length - 1
+                                    ? this.i18n.t('Save')
+                                    : this.i18n.t('Next')}
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        </StepContent>
-                      </Step>
-                    );
-                  })}
-                </Stepper>
-                {activeStep === steps.length && (
-                  <Paper
-                    square
-                    elevation={0}
-                    className={classes.resetContainer}>
-                    <Typography>
-                      {this.i18n.t(
-                        'newjob:All steps completed - your job has been saved!',
-                      )}
-                    </Typography>
-                    <Button
-                      onClick={this.handleReset}
-                      className={classes.button}>
-                      {this.i18n.t('newjob:Update your job post')}
-                    </Button>
-                  </Paper>
-                )}
-              </div>
+                          </StepContent>
+                        </Step>
+                      );
+                    })}
+                  </Stepper>
+                  {activeStep === steps.length && (
+                    <Paper
+                      square
+                      elevation={0}
+                      className={classes.resetContainer}>
+                      <Typography>
+                        {this.i18n.t(
+                          'newjob:All steps completed - your job has been saved!',
+                        )}
+                      </Typography>
+                      <Button
+                        onClick={this.handleReset}
+                        className={classes.button}>
+                        {this.i18n.t('newjob:Update your job post')}
+                      </Button>
+                    </Paper>
+                  )}
+                </div>
+              </Grid>
             </Grid>
-          </Grid>
+          </div>
         </div>
       </I18nextProvider>
     );
