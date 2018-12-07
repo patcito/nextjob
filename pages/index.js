@@ -324,21 +324,23 @@ class Index extends React.Component {
     const i18n = this.i18n;
     return (
       <I18nextProvider i18n={this.i18n}>
-        <div>
+        <>
           <AppBarTop
             i18n={this.i18n}
             userInfo={userInfo}
             group_by_location={this.props.jobsAndCompanies.group_by_location}
           />
-          <Grid container spacing={24}>
-            <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} userInfo={userInfo} />
+          <div style={{paddingLeft: 12, paddingRight: 12}}>
+            <Grid container spacing={24}>
+              <Grid item xs={12} md={3}>
+                <MenuList i18n={i18n} userInfo={userInfo} />
+              </Grid>
+              <Grid item xs={12} md={8}>
+                {this.content()}
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={8}>
-              {this.content()}
-            </Grid>
-          </Grid>
-        </div>
+          </div>
+        </>
       </I18nextProvider>
     );
   }
