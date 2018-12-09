@@ -17,6 +17,7 @@
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "dotenv": "^6.1.0",
+    "download-file": "^0.1.5",
     "downshift": "^2.2.0",
     "draft-js-plugins-editor": "^2.1.1",
     "express": "^4.16.3",

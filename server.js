@@ -19,6 +19,7 @@ const projectId = process.env.GOOGLE_STORAGE_PROJECT_ID;
 const fs = require('fs');
 const sgMail = require('@sendgrid/mail');
 const showdown = require('showdown');
+const download = require('download-file');
 
 app.prepare().then(() => {
   const server = express();
@@ -140,96 +141,93 @@ app.prepare().then(() => {
               Authorization: 'bearer ' + githubToken,
             },
             query: `
-			  query getUser{
-  viewer {
-    login
-    name
-	bio
-	  email
-	  databaseId
-	  avatarUrl
-	  url
-	  websiteUrl
-	  followers {
-      totalCount
-}
-pullRequests(last: 100, states: MERGED, orderBy: {direction: DESC, field: CREATED_AT}){
-  nodes{
-    url
-	title
-    repository{
-      url
-      nameWithOwner
-	  owner{
-        avatarUrl
-	  }
-      name
-	  description
-  stargazers{
-    totalCount
-  }
-   primaryLanguage{
-    name
-    id
-}
-      languages(first: 100){
-        nodes{
-          name
-          id
-        }
-      }
-    }
-    mergedBy{
-      avatarUrl
-      login
-      url
-
-    }
-  }
-}
-repositoriesContributedTo(first: 100, orderBy: {direction: DESC, field: STARGAZERS}){
-totalCount
-nodes {
-  id
-  name
-  primaryLanguage{
-    name
-    id
-}
-	  owner{
-        avatarUrl
-
-	}
-  nameWithOwner
-description
-  url
-  stargazers{
-    totalCount
-  }
-  viewerCanAdminister
-		languages(first: 25) {
-          totalCount
-		  edges {
-			node {
-              id
-              name
-              color
-
-}
-
-}
-
-}
-
-}
-
-}
-
-}
-
-}
-
-`,
+              query getUser {
+                viewer {
+                  login
+                  name
+                  bio
+                  email
+                  databaseId
+                  avatarUrl
+                  url
+                  websiteUrl
+                  followers {
+                    totalCount
+                  }
+                  pullRequests(
+                    last: 100
+                    states: MERGED
+                    orderBy: {direction: DESC, field: CREATED_AT}
+                  ) {
+                    nodes {
+                      url
+                      title
+                      repository {
+                        url
+                        nameWithOwner
+                        owner {
+                          avatarUrl
+                        }
+                        name
+                        description
+                        stargazers {
+                          totalCount
+                        }
+                        primaryLanguage {
+                          name
+                          id
+                        }
+                        languages(first: 100) {
+                          nodes {
+                            name
+                            id
+                          }
+                        }
+                      }
+                      mergedBy {
+                        avatarUrl
+                        login
+                        url
+                      }
+                    }
+                  }
+                  repositoriesContributedTo(
+                    first: 100
+                    orderBy: {direction: DESC, field: STARGAZERS}
+                  ) {
+                    totalCount
+                    nodes {
+                      id
+                      name
+                      primaryLanguage {
+                        name
+                        id
+                      }
+                      owner {
+                        avatarUrl
+                      }
+                      nameWithOwner
+                      description
+                      url
+                      stargazers {
+                        totalCount
+                      }
+                      viewerCanAdminister
+                      languages(first: 25) {
+                        totalCount
+                        edges {
+                          node {
+                            id
+                            name
+                            color
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `,
           };
           const client = new grequest.GraphQLClient(opts.uri, {
             headers: opts.headers,
@@ -249,27 +247,42 @@ description
               const checkUserRequestopts = {
                 uri: process.env.HASURA,
                 json: true,
-                query: `mutation User($githubId: String!, $token: String!,
-									  $githubRepositories: jsonb, $pullRequests: jsonb,
-									  $bio: String, $githubBlogUrl: String){
-						  update_User(where: {githubId: {_eq: $githubId}},
-							_set: {bio: $bio, githubBlogUrl: $githubBlogUrl, githubAccessToken: $token, githubRepositories: $githubRepositories, pullRequests: $pullRequests}) {
-							returning {
-							  id
-							  githubEmail
-									  name
-									  Companies {
-								id
-								name
-								description
-										url
-										Industry
-										yearFounded
-						}
-
-						}
-						}
-						}`,
+                query: `
+                  mutation User(
+                    $githubId: String!
+                    $token: String!
+                    $githubRepositories: jsonb
+                    $pullRequests: jsonb
+                    $bio: String
+                    $githubBlogUrl: String
+                  ) {
+                    update_User(
+                      where: {githubId: {_eq: $githubId}}
+                      _set: {
+                        bio: $bio
+                        githubBlogUrl: $githubBlogUrl
+                        githubAccessToken: $token
+                        githubRepositories: $githubRepositories
+                        pullRequests: $pullRequests
+                      }
+                    ) {
+                      returning {
+                        id
+                        githubEmail
+                        githubAvatarUrl
+                        name
+                        Companies {
+                          id
+                          name
+                          description
+                          url
+                          Industry
+                          yearFounded
+                        }
+                      }
+                    }
+                  }
+                `,
                 headers: {
                   'X-Hasura-Access-Key': process.env.HASURA_SECRET,
                 },
@@ -314,11 +327,52 @@ description
                     token: token,
                     user: currentUser,
                   });*/
+
                     req.userId = currentUser.id;
                     req.token = token;
                     req.github = true;
                     req.linkedin = false;
                     req.currentUser = currentUser;
+                    var url = currentUser.githubAvatarUrl;
+
+                    var options = {
+                      directory: '/tmp',
+                      filename: `github-avatar-${req.userId}.jpeg`,
+                    };
+
+                    download(url, options, function(err) {
+                      if (err) console.log(err);
+                      console.log('meow');
+
+                      sharp(options.directory + '/' + options.filename).toFile(
+                        `/tmp/github-avatar-${req.userId}.webp`,
+                        (err, info) => {
+                          if (err) {
+                            console.log(err);
+                          }
+                          sharp(
+                            options.directory + '/' + options.filename,
+                          ).toFile(
+                            `/tmp/github-avatar-${req.userId}.png`,
+                            (err, info) => {
+                              if (err) {
+                                originalRes.status(500).json(err);
+                              }
+                              uploadToGCE(
+                                process.env.GOOGLE_STORAGE_BUCKET,
+                                `/tmp/github-avatar-${req.userId}.webp`,
+                              );
+
+                              uploadToGCE(
+                                process.env.GOOGLE_STORAGE_BUCKET,
+                                `/tmp/github-avatar-${req.userId}.png`,
+                              );
+                              console.log(err, info);
+                            },
+                          );
+                        },
+                      );
+                    });
                     next();
                     return;
                   }
@@ -326,38 +380,44 @@ description
                   var uopts = {
                     uri: process.env.HASURA,
                     json: true,
-                    query: `mutation insert_User($name: String,
-							$githubEmail: String!,
-							$githubId: String,
-							$githubAvatarUrl: String,
-							  $githubUsername: String,
-							 $githubAccessToken: String,
-							 $githubBlogUrl: String,
-							$githubRepositories: jsonb,
-							 $githubFollowers: Int,
-							$pullRequests: jsonb,
-							$bio: String )
-							{insert_User(objects: {
-							name: $name,
-							githubEmail: $githubEmail,
-							githubId: $githubId,
-							githubAvatarUrl: $githubAvatarUrl,
-							githubUsername:  $githubUsername,
-							githubAccessToken: $githubAccessToken,
-							githubBlogUrl: $githubBlogUrl,
-							githubFollowers: $githubFollowers,
-							githubRepositories: $githubRepositories,
-							pullRequests: $pullRequests,
-							bio: $bio
-
-											}){
-										returning{
-								  id
-											  githubEmail
-											  name
-
-							}
-									}}`,
+                    query: `
+                      mutation insert_User(
+                        $name: String
+                        $githubEmail: String!
+                        $githubId: String
+                        $githubAvatarUrl: String
+                        $githubUsername: String
+                        $githubAccessToken: String
+                        $githubBlogUrl: String
+                        $githubRepositories: jsonb
+                        $githubFollowers: Int
+                        $pullRequests: jsonb
+                        $bio: String
+                      ) {
+                        insert_User(
+                          objects: {
+                            name: $name
+                            githubEmail: $githubEmail
+                            githubId: $githubId
+                            githubAvatarUrl: $githubAvatarUrl
+                            githubUsername: $githubUsername
+                            githubAccessToken: $githubAccessToken
+                            githubBlogUrl: $githubBlogUrl
+                            githubFollowers: $githubFollowers
+                            githubRepositories: $githubRepositories
+                            pullRequests: $pullRequests
+                            bio: $bio
+                          }
+                        ) {
+                          returning {
+                            id
+                            githubEmail
+                            name
+                            githubAvatarUrl
+                          }
+                        }
+                      }
+                    `,
                     headers: {
                       'X-Hasura-Access-Key': process.env.HASURA_SECRET,
                     },
@@ -417,6 +477,50 @@ description
                         req.github = true;
                         req.linkedin = false;
                         req.currentUser = gdata.insert_User.returning[0];
+                        var url =
+                          gdata.insert_User.returning[0].githubAvatarUrl;
+
+                        var options = {
+                          directory: '/tmp',
+                          filename: `github-avatar-${req.userId}.jpeg`,
+                        };
+
+                        download(url, options, function(err) {
+                          if (err) throw err;
+                          console.log('meow');
+
+                          sharp(
+                            options.directory + '/' + options.filename,
+                          ).toFile(
+                            `/tmp/github-avatar-${req.userId}.webp`,
+                            (err, info) => {
+                              if (err) {
+                                originalRes.status(500).json(err);
+                              }
+                              sharp(
+                                options.directory + '/' + options.filename,
+                              ).toFile(
+                                `/tmp/github-avatar-${req.userId}.png`,
+                                (err, info) => {
+                                  if (err) {
+                                    originalRes.status(500).json(err);
+                                  }
+                                  uploadToGCE(
+                                    process.env.GOOGLE_STORAGE_BUCKET,
+                                    `/tmp/github-avatar-${req.userId}.webp`,
+                                  );
+
+                                  uploadToGCE(
+                                    process.env.GOOGLE_STORAGE_BUCKET,
+                                    `/tmp/github-avatar-${req.userId}.png`,
+                                  );
+                                  console.log(err, info);
+                                  res.status(200).json('ok');
+                                },
+                              );
+                            },
+                          );
+                        });
                         console.log('userid', req.userId);
                         next();
                         return;
@@ -474,7 +578,7 @@ description
             const otoken = JSON.parse(body).access_token;
             const aopts = {
               uri:
-                'https://api.linkedin.com/v1/people/~:(email-address,firstName,lastName,id,headline,siteStandardProfileRequest,industry,picture-url,formatted-name,positions)?format=json',
+                'https://api.linkedin.com/v1/people/~:(email-address,firstName,lastName,id,headline,siteStandardProfileRequest,industry,picture-urls::(original),formatted-name,positions)?format=json',
               headers: {
                 Authorization: 'Bearer ' + otoken,
               },
@@ -482,8 +586,8 @@ description
             request(aopts, function(err, res, body) {
               // now body and res.body both will contain decoded content.
               //
-              const bodyJson = JSON.parse(body);
-              //              console.log('linkedin', bodyJson.positions.values[0]);
+              const bodyJson = JSON.parse(body); //;
+              console.log('linkedin', bodyJson);
               if (req.github === true) {
                 console.log('userId!', req.userId);
                 const setLinkedinProfilopts = {
@@ -526,20 +630,24 @@ description
                 const checkUserRequestopts = {
                   uri: process.env.HASURA,
                   json: true,
-                  query: `query User($linkedinId: String!){
-  						User(where: {linkedinId: {_eq: $linkedinId}}) {
-						  id
-						  linkedinEmail
-						  name
-						  Companies {
-							id
-							name
-							description
-							url
-							Industry
-							yearFounded
-						  }	}
-						}`,
+                  query: `
+                    query User($linkedinId: String!) {
+                      User(where: {linkedinId: {_eq: $linkedinId}}) {
+                        id
+                        linkedinEmail
+                        name
+                        linkedinAvatarUrl
+                        Companies {
+                          id
+                          name
+                          description
+                          url
+                          Industry
+                          yearFounded
+                        }
+                      }
+                    }
+                  `,
                   headers: {
                     'X-Hasura-Access-Key': process.env.HASURA_SECRET,
                   },
@@ -581,44 +689,92 @@ description
                       req.github = false;
                       req.linkedin = true;
                       req.currentUser = currentUser;
+                      let url = currentUser.linkedinAvatarUrl;
+                      console.log(url);
+                      let options = {
+                        directory: '/tmp',
+                        filename: `linkedin-avatar-${req.userId}.jpeg`,
+                      };
 
+                      download(url, options, function(err) {
+                        if (err) console.log(err);
+                        console.log('meow');
+
+                        sharp(
+                          options.directory + '/' + options.filename,
+                        ).toFile(
+                          `/tmp/linkedin-avatar-${req.userId}.webp`,
+                          (err, info) => {
+                            if (err) {
+                              console.log(err);
+                            }
+                            sharp(
+                              options.directory + '/' + options.filename,
+                            ).toFile(
+                              `/tmp/linkedin-avatar-${req.userId}.png`,
+                              (err, info) => {
+                                if (err) {
+                                  originalRes.status(500).json(err);
+                                }
+                                uploadToGCE(
+                                  process.env.GOOGLE_STORAGE_BUCKET,
+                                  `/tmp/linkedin-avatar-${req.userId}.webp`,
+                                );
+
+                                uploadToGCE(
+                                  process.env.GOOGLE_STORAGE_BUCKET,
+                                  `/tmp/linkedin-avatar-${req.userId}.png`,
+                                );
+                                console.log(err, info);
+                              },
+                            );
+                          },
+                        );
+                      });
                       next();
                       return;
                     }
                     const uopts = {
                       uri: process.env.HASURA,
                       json: true,
-                      query: `mutation insert_User($name: String,
-					$linkedinEmail: String!,
-					$linkedinId: String,
-					$linkedinAvatarUrl: String,
-					 $linkedinAccessToken: String,
-					$firstName: String,
-					$lastName: String,
-					$headlineLinkedin: String,
-					$industryLinkedin: String,
-					$companyLinkedin: String,
-					$linkedinUrl: String,
-					  )
-					{insert_User(objects: {
-					name: $name,
-					linkedinEmail: $linkedinEmail,
-					linkedinId: $linkedinId,
-					linkedinAvatarUrl: $linkedinAvatarUrl,
-					linkedinAccessToken: $linkedinAccessToken,
-					firstName: $firstName,
-					lastName: $lastName,
-					headlineLinkedin: $headlineLinkedin,
-					industryLinkedin: $industryLinkedin,
-					companyLinkedin: $companyLinkedin,
-					linkedinUrl: $linkedinUrl,
-					}){
-					returning{
-						  id
-						  linkedinEmail
-						  name
-					}
-					}}`,
+                      query: `
+                        mutation insert_User(
+                          $name: String
+                          $linkedinEmail: String!
+                          $linkedinId: String
+                          $linkedinAvatarUrl: String
+                          $linkedinAccessToken: String
+                          $firstName: String
+                          $lastName: String
+                          $headlineLinkedin: String
+                          $industryLinkedin: String
+                          $companyLinkedin: String
+                          $linkedinUrl: String
+                        ) {
+                          insert_User(
+                            objects: {
+                              name: $name
+                              linkedinEmail: $linkedinEmail
+                              linkedinId: $linkedinId
+                              linkedinAvatarUrl: $linkedinAvatarUrl
+                              linkedinAccessToken: $linkedinAccessToken
+                              firstName: $firstName
+                              lastName: $lastName
+                              headlineLinkedin: $headlineLinkedin
+                              industryLinkedin: $industryLinkedin
+                              companyLinkedin: $companyLinkedin
+                              linkedinUrl: $linkedinUrl
+                            }
+                          ) {
+                            returning {
+                              id
+                              linkedinEmail
+                              name
+                              linkedinAvatarUrl
+                            }
+                          }
+                        }
+                      `,
                       headers: {
                         'X-Hasura-Access-Key': process.env.HASURA_SECRET,
                       },
@@ -663,6 +819,49 @@ description
                       req.github = false;
                       req.linkedin = true;
                       req.currentUser = currentUser;
+                      let url = currentUser.linkedinAvatarUrl;
+
+                      let options = {
+                        directory: '/tmp',
+                        filename: `linkedin-avatar-${req.userId}.jpeg`,
+                      };
+
+                      download(url, options, function(err) {
+                        if (err) console.log(err);
+                        console.log('meow');
+
+                        sharp(
+                          options.directory + '/' + options.filename,
+                        ).toFile(
+                          `/tmp/linkedin-avatar-${req.userId}.webp`,
+                          (err, info) => {
+                            if (err) {
+                              console.log(err);
+                            }
+                            sharp(
+                              options.directory + '/' + options.filename,
+                            ).toFile(
+                              `/tmp/linkedin-avatar-${req.userId}.png`,
+                              (err, info) => {
+                                if (err) {
+                                  originalRes.status(500).json(err);
+                                }
+                                uploadToGCE(
+                                  process.env.GOOGLE_STORAGE_BUCKET,
+                                  `/tmp/linkedin-avatar-${req.userId}.webp`,
+                                );
+
+                                uploadToGCE(
+                                  process.env.GOOGLE_STORAGE_BUCKET,
+                                  `/tmp/linkedin-avatar-${req.userId}.png`,
+                                );
+                                console.log(err, info);
+                              },
+                            );
+                          },
+                        );
+                      });
+
                       next();
                       return;
                     });
