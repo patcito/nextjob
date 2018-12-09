@@ -50,9 +50,6 @@ const styles = theme => ({
   },
 });
 
-// get language from query parameter or url path
-const lang = 'fr';
-
 class LoginAppBarTop extends React.Component {
   state = {};
 
@@ -173,7 +170,7 @@ class LoginAppBarTop extends React.Component {
               variant="title"
               color="inherit"
               className={classes.flex}
-              style={{cursor: 'pointer'}}>
+              style={{cursor: 'pointer', color: 'white'}}>
               ReactEurope Jobs
             </Typography>
           </Link>
@@ -218,7 +215,7 @@ class LoginAppBarTop extends React.Component {
                 href={`https://github.com/login/oauth/authorize?client_id=${
                   publicRuntimeConfig.githubId
                 }&scope=user`}>
-                <Button color="inherit">
+                <Button color="inherit" style={{color: 'white'}}>
                   {i18n.t('common:Login as Applicant')}
                 </Button>
               </a>
@@ -229,7 +226,7 @@ class LoginAppBarTop extends React.Component {
                 }&response_type=code&redirect_uri=${
                   publicRuntimeConfig.publicHostname
                 }&scope=r_basicprofile%20r_emailaddress`}>
-                <Button color="inherit">
+                <Button color="inherit" style={{color: 'white'}}>
                   {i18n.t('common:Login as HR to post a job')}
                 </Button>
               </a>
@@ -240,7 +237,9 @@ class LoginAppBarTop extends React.Component {
                 }&response_type=code&redirect_uri=${
                   publicRuntimeConfig.publicHostname
                 }&scope=r_basicprofile%20r_emailaddress`}>
-                <Button color="inherit">{i18n.t('common:Login as HR')}</Button>
+                <Button color="inherit" style={{color: 'white'}}>
+                  {i18n.t('common:Login as HR')}
+                </Button>
               </a>
             </>
           )}
