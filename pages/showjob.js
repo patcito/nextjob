@@ -464,341 +464,348 @@ class ShowJob extends React.Component {
       <I18nextProvider i18n={this.i18n}>
         <div>
           <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
-          <Grid container spacing={24}>
-            <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <div style={{background: 'white'}}>
-                <Card className={classes.card}>
-                  <CardHeader
-                    avatar={
-                      <Avatar
-                        aria-label={job.Company.name}
-                        src={
-                          publicRuntimeConfig.cdn +
-                          job.Company.id +
-                          '-' +
-                          job.Company.ownerId +
-                          '-' +
-                          'logo.png?u=' +
-                          job.Company.updatedAt
-                        }
-                        className={classes.avatar}
-                      />
-                    }
-                    title={
-                      <Typography gutterBottom variant="h3" component="h1">
-                        <Link href={'/companies/' + job.Company.id}>
-                          <a className={classes.companyName}>
-                            {job.Company.name}
-                          </a>
-                        </Link>
-                      </Typography>
-                    }
-                    subheader={
-                      <div className={classes.hideOnMobile}>
-                        <span>
-                          {i18n.t('Since')} {job.Company.yearFounded}
-                        </span>
-                        <IconButton
-                          disableRipple={true}
-                          disableFocusRipple={true}
-                          className={classes.iconButton}
-                          aria-label="Map">
-                          <PlaceIcon className={classes.headerIcons} />{' '}
-                          <a
-                            href={
-                              'https://www.google.com/maps/search/' +
-                              this.state.currentAddressDescription
-                            }
-                            style={{color: 'rgba(0, 0, 0, 0.54)'}}
-                            target="_blank">
-                            {job.Company.locality}
-                          </a>
-                        </IconButton>
-                        <IconButton
-                          disableRipple={true}
-                          disableFocusRipple={true}
-                          className={classes.iconButton}
-                          aria-label="Employee count">
-                          <PeopleIcon className={classes.headerIcons} />{' '}
-                          {job.Company.employeeCount} {i18n.t('employees')}
-                        </IconButton>
-                        <a href={job.Company.url} target="_blank">
+          <div style={{paddingLeft: 12, paddingRight: 12}}>
+            <Grid container spacing={24}>
+              <Grid item xs={12} md={3}>
+                <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <div style={{background: 'white'}}>
+                  <Card className={classes.card}>
+                    <CardHeader
+                      avatar={
+                        <Avatar
+                          aria-label={job.Company.name}
+                          src={
+                            publicRuntimeConfig.cdn +
+                            job.Company.id +
+                            '-' +
+                            job.Company.ownerId +
+                            '-' +
+                            'logo.png?u=' +
+                            job.Company.updatedAt
+                          }
+                          className={classes.avatar}
+                        />
+                      }
+                      title={
+                        <Typography gutterBottom variant="h3" component="h1">
+                          <Link href={'/companies/' + job.Company.id}>
+                            <a className={classes.companyName}>
+                              {job.Company.name}
+                            </a>
+                          </Link>
+                        </Typography>
+                      }
+                      subheader={
+                        <div className={classes.hideOnMobile}>
+                          <span>
+                            {i18n.t('Since')} {job.Company.yearFounded}
+                          </span>
                           <IconButton
                             disableRipple={true}
                             disableFocusRipple={true}
                             className={classes.iconButton}
-                            aria-label="Company URL"
-                            style={{cursor: 'pointer'}}>
-                            <LinkIcon className={classes.headerIcons} />{' '}
-                            {job.Company.url
-                              .replace('http://wwww.', '')
-                              .replace('https://wwww.', '')
-                              .replace('https://', '')
-                              .replace('http://', '')}
+                            aria-label="Map">
+                            <PlaceIcon className={classes.headerIcons} />{' '}
+                            <a
+                              href={
+                                'https://www.google.com/maps/search/' +
+                                this.state.currentAddressDescription
+                              }
+                              style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                              target="_blank">
+                              {job.Company.locality}
+                            </a>
                           </IconButton>
-                        </a>
-                      </div>
-                    }
-                  />
-                  <CardActionArea className={classes.cardActionArea}>
-                    <div className={classes.showOnMobile}>
-                      <div className={classes.mobileCompanyInfo}>
-                        <span>
-                          {i18n.t('Since')} {job.Company.yearFounded}
-                        </span>
-                        <IconButton
-                          disableRipple={true}
-                          disableFocusRipple={true}
-                          className={classes.iconButton}
-                          aria-label="Company's year founded">
-                          <PlaceIcon className={classes.headerIcons} />{' '}
-                          <a
-                            href={
-                              'https://www.google.com/maps/search/' +
-                              this.state.currentAddressDescription
-                            }
-                            style={{color: 'rgba(0, 0, 0, 0.54)'}}
-                            target="_blank">
-                            {job.Company.locality}
-                          </a>
-                        </IconButton>
-                      </div>
-                      <div className={classes.mobileCompanyInfo}>
-                        /*{' '}
-                        <IconButton
-                          disableRipple={true}
-                          disableFocusRipple={true}
-                          className={classes.iconButton}
-                          aria-label="Employees count">
-                          <PeopleIcon className={classes.headerIcons} />{' '}
-                          {job.Company.employeeCount} {i18n.t('employees')}
-                        </IconButton>
-                        */
-                        <a href={job.Company.url} target="_blank">
                           <IconButton
                             disableRipple={true}
                             disableFocusRipple={true}
                             className={classes.iconButton}
-                            aria-label="Company's URL"
-                            style={{cursor: 'pointer'}}>
-                            <LinkIcon className={classes.headerIcons} />{' '}
-                            {job.Company.url
-                              .replace('http://wwww.', '')
-                              .replace('https://wwww.', '')
-                              .replace('https://', '')
-                              .replace('http://', '')}
+                            aria-label="Employee count">
+                            <PeopleIcon className={classes.headerIcons} />{' '}
+                            {job.Company.employeeCount} {i18n.t('employees')}
                           </IconButton>
-                        </a>
+                          <a href={job.Company.url} target="_blank">
+                            <IconButton
+                              disableRipple={true}
+                              disableFocusRipple={true}
+                              className={classes.iconButton}
+                              aria-label="Company URL"
+                              style={{cursor: 'pointer'}}>
+                              <LinkIcon className={classes.headerIcons} />{' '}
+                              {job.Company.url
+                                .replace('http://wwww.', '')
+                                .replace('https://wwww.', '')
+                                .replace('https://', '')
+                                .replace('http://', '')}
+                            </IconButton>
+                          </a>
+                        </div>
+                      }
+                    />
+                    <CardActionArea className={classes.cardActionArea}>
+                      <div className={classes.showOnMobile}>
+                        <div className={classes.mobileCompanyInfo}>
+                          <span>
+                            {i18n.t('Since')} {job.Company.yearFounded}
+                          </span>
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Company's year founded">
+                            <PlaceIcon className={classes.headerIcons} />{' '}
+                            <a
+                              href={
+                                'https://www.google.com/maps/search/' +
+                                this.state.currentAddressDescription
+                              }
+                              style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                              target="_blank">
+                              {job.Company.locality}
+                            </a>
+                          </IconButton>
+                        </div>
+                        <div className={classes.mobileCompanyInfo}>
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Employees count">
+                            <PeopleIcon className={classes.headerIcons} />{' '}
+                            {job.Company.employeeCount} {i18n.t('employees')}
+                          </IconButton>
+                          <a href={job.Company.url} target="_blank">
+                            <IconButton
+                              disableRipple={true}
+                              disableFocusRipple={true}
+                              className={classes.iconButton}
+                              aria-label="Company's URL"
+                              style={{cursor: 'pointer'}}>
+                              <LinkIcon className={classes.headerIcons} />{' '}
+                              {job.Company.url
+                                .replace('http://wwww.', '')
+                                .replace('https://wwww.', '')
+                                .replace('https://', '')
+                                .replace('http://', '')}
+                            </IconButton>
+                          </a>
+                        </div>
                       </div>
-                    </div>
-                    {job.Company.media1 && job.Company.media1.published ? (
-                      <>
-                        {job.Company.media1.hasVideo ? (
-                          <ReactPlayer
-                            url={job.Company.media1.url}
-                            width="100%"
-                          />
-                        ) : (
-                          <CardMedia
-                            className={classes.media}
-                            image={
-                              publicRuntimeConfig.cdn +
-                              job.Company.id +
-                              '-' +
-                              job.Company.ownerId +
-                              '-' +
-                              '1media.png?u=' +
-                              job.Company.updatedAt
-                            }
-                            title={job.Company.name + ' media'}
-                            subheader={
-                              <>
-                                <span>Since {job.Company.yearFounded}</span>
-                                <IconButton
-                                  disableRipple={true}
-                                  disableFocusRipple={true}
-                                  className={classes.iconButton}
-                                  aria-label="Company's year founded">
-                                  <PlaceIcon className={classes.headerIcons} />{' '}
-                                  <a
-                                    href={
-                                      'https://www.google.com/maps/search/' +
-                                      this.state.currentAddressDescription
-                                    }
-                                    style={{color: 'rgba(0, 0, 0, 0.54)'}}
-                                    target="_blank">
-                                    {job.Company.locality}
-                                  </a>
-                                </IconButton>
-                                <IconButton
-                                  disableRipple={true}
-                                  disableFocusRipple={true}
-                                  className={classes.iconButton}
-                                  aria-label="Employee's count">
-                                  <PeopleIcon className={classes.headerIcons} />{' '}
-                                  {job.Company.employeeCount} employees
-                                </IconButton>
-                                <a href={job.Company.url} target="_blank">
+                      {job.Company.media1 && job.Company.media1.published ? (
+                        <>
+                          {job.Company.media1.hasVideo ? (
+                            <ReactPlayer
+                              url={job.Company.media1.url}
+                              width="100%"
+                            />
+                          ) : (
+                            <CardMedia
+                              className={classes.media}
+                              image={
+                                publicRuntimeConfig.cdn +
+                                job.Company.id +
+                                '-' +
+                                job.Company.ownerId +
+                                '-' +
+                                '1media.png?u=' +
+                                job.Company.updatedAt
+                              }
+                              title={job.Company.name + ' media'}
+                              subheader={
+                                <>
+                                  <span>Since {job.Company.yearFounded}</span>
                                   <IconButton
                                     disableRipple={true}
                                     disableFocusRipple={true}
                                     className={classes.iconButton}
-                                    aria-label="Company's URL"
-                                    style={{cursor: 'pointer'}}>
-                                    <LinkIcon className={classes.headerIcons} />{' '}
-                                    {job.Company.url
-                                      .replace('http://wwww.', '')
-                                      .replace('https://wwww.', '')
-                                      .replace('https://', '')
-                                      .replace('http://', '')}
+                                    aria-label="Company's year founded">
+                                    <PlaceIcon
+                                      className={classes.headerIcons}
+                                    />{' '}
+                                    <a
+                                      href={
+                                        'https://www.google.com/maps/search/' +
+                                        this.state.currentAddressDescription
+                                      }
+                                      style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                                      target="_blank">
+                                      {job.Company.locality}
+                                    </a>
                                   </IconButton>
-                                </a>
-                              </>
-                            }
-                          />
-                        )}
-                      </>
-                    ) : null}
-                  </CardActionArea>
-                </Card>
-                <Card className={classes.card}>
-                  <CardHeader
-                    title={
-                      <Typography gutterBottom variant="h3" component="h1">
-                        {job.JobTitle}
-                        {job.applyDirectly ? (
-                          <a
-                            style={{
-                              textDecoration: 'none',
-                            }}
-                            href={job.applicationUrl}
-                            target="_blank">
-                            <Button
-                              variant="contained"
-                              color="secondary"
-                              style={{color: '#FFF', marginLeft: '15px'}}>
-                              Apply On Company Site
-                            </Button>
-                          </a>
-                        ) : (
-                          <>
-                            {this.props.userInfo === null ||
-                            this.props.userInfo.github ? (
+                                  <IconButton
+                                    disableRipple={true}
+                                    disableFocusRipple={true}
+                                    className={classes.iconButton}
+                                    aria-label="Employee's count">
+                                    <PeopleIcon
+                                      className={classes.headerIcons}
+                                    />{' '}
+                                    {job.Company.employeeCount} employees
+                                  </IconButton>
+                                  <a href={job.Company.url} target="_blank">
+                                    <IconButton
+                                      disableRipple={true}
+                                      disableFocusRipple={true}
+                                      className={classes.iconButton}
+                                      aria-label="Company's URL"
+                                      style={{cursor: 'pointer'}}>
+                                      <LinkIcon
+                                        className={classes.headerIcons}
+                                      />{' '}
+                                      {job.Company.url
+                                        .replace('http://wwww.', '')
+                                        .replace('https://wwww.', '')
+                                        .replace('https://', '')
+                                        .replace('http://', '')}
+                                    </IconButton>
+                                  </a>
+                                </>
+                              }
+                            />
+                          )}
+                        </>
+                      ) : null}
+                    </CardActionArea>
+                  </Card>
+                  <Card className={classes.card}>
+                    <CardHeader
+                      title={
+                        <Typography gutterBottom variant="h3" component="h1">
+                          {job.JobTitle}
+                          {job.applyDirectly ? (
+                            <a
+                              style={{
+                                textDecoration: 'none',
+                              }}
+                              href={job.applicationUrl}
+                              target="_blank">
                               <Button
-                                onClick={this.handleClickApply}
                                 variant="contained"
                                 color="secondary"
                                 style={{color: '#FFF', marginLeft: '15px'}}>
-                                {i18n.t('APPLY NOW')}
+                                Apply On Company Site
                               </Button>
-                            ) : null}
-                          </>
-                        )}
-                      </Typography>
-                    }
-                    subheader={
-                      <>
+                            </a>
+                          ) : (
+                            <>
+                              {this.props.userInfo === null ||
+                              this.props.userInfo.github ? (
+                                <Button
+                                  onClick={this.handleClickApply}
+                                  variant="contained"
+                                  color="secondary"
+                                  style={{color: '#FFF', marginLeft: '15px'}}>
+                                  {i18n.t('APPLY NOW')}
+                                </Button>
+                              ) : null}
+                            </>
+                          )}
+                        </Typography>
+                      }
+                      subheader={
+                        <>
+                          <Chip
+                            avatar={
+                              <Avatar>
+                                <PlaceIcon />
+                              </Avatar>
+                            }
+                            label={job.locality ? job.locality : job.country}
+                            className={classes.chip}
+                          />
+                          <Chip
+                            avatar={
+                              <Avatar>
+                                <EuroSymbolIcon />
+                              </Avatar>
+                            }
+                            label={
+                              job.hasMonthlySalary
+                                ? job.minimumMonthlySalary +
+                                  '-' +
+                                  job.maximumMonthlySalary
+                                : job.minimumYearlySalary / 1000 +
+                                  'k' +
+                                  '-' +
+                                  job.maximumYearlySalary / 1000 +
+                                  'k'
+                            }
+                            className={classes.chip}
+                          />
+                          <Chip
+                            avatar={
+                              <Avatar>
+                                <WorkIcon />
+                              </Avatar>
+                            }
+                            label={
+                              new Date().getFullYear() -
+                                job.Company.yearFounded >
+                              3
+                                ? i18n.t('Company (>3 years)')
+                                : i18n.t('Startup (<3 years)')
+                            }
+                            className={classes.chip}
+                          />
+                        </>
+                      }
+                    />
+                    <>
+                      <CardContent>
+                        <div style={{textAlign: 'left'}}>
+                          <Markdown>
+                            {this.props.lang === 'fr'
+                              ? job.description_fr
+                              : job.description}
+                          </Markdown>{' '}
+                        </div>
+                      </CardContent>
+                      {job.Skills.map(Skill => (
                         <Chip
-                          avatar={
-                            <Avatar>
-                              <PlaceIcon />
-                            </Avatar>
-                          }
-                          label={job.locality ? job.locality : job.country}
-                          className={classes.chip}
-                        />
-                        <Chip
-                          avatar={
-                            <Avatar>
-                              <EuroSymbolIcon />
-                            </Avatar>
-                          }
-                          label={
-                            job.hasMonthlySalary
-                              ? job.minimumMonthlySalary +
-                                '-' +
-                                job.maximumMonthlySalary
-                              : job.minimumYearlySalary / 1000 +
-                                'k' +
-                                '-' +
-                                job.maximumYearlySalary / 1000 +
-                                'k'
-                          }
-                          className={classes.chip}
-                        />
-                        <Chip
-                          avatar={
-                            <Avatar>
-                              <WorkIcon />
-                            </Avatar>
-                          }
-                          label={
-                            new Date().getFullYear() - job.Company.yearFounded >
-                            3
-                              ? i18n.t('Company (>3 years)')
-                              : i18n.t('Startup (<3 years)')
-                          }
-                          className={classes.chip}
-                        />
-                      </>
-                    }
-                  />
-                  <CardActionArea className={classes.cardActionArea}>
-                    <CardContent>
-                      <div>
-                        <Markdown>
-                          {this.props.lang === 'fr'
-                            ? job.description_fr
-                            : job.description}
-                        </Markdown>{' '}
-                      </div>
-                    </CardContent>
-                    {job.Skills.map(Skill => (
-                      <Chip
-                        key={Skill.Skill}
-                        label={Skill.Skill}
-                        className={classes.chiptags}
-                        color="secondary"
-                      />
-                    ))}
-                  </CardActionArea>
-                  <CardActions>
-                    {job.applyDirectly ? (
-                      <a
-                        style={{
-                          textDecoration: 'none',
-                        }}
-                        href={job.applicationUrl}
-                        target="_blank">
-                        <Button
-                          variant="contained"
+                          key={Skill.Skill}
+                          label={Skill.Skill}
+                          className={classes.chiptags}
                           color="secondary"
-                          style={{color: '#FFF', marginLeft: '15px'}}>
-                          Apply On Company Site
-                        </Button>
-                      </a>
-                    ) : (
-                      <>
-                        {this.props.userInfo === null ||
-                        this.props.userInfo.github ? (
+                        />
+                      ))}
+                    </>
+                    <CardActions>
+                      {job.applyDirectly ? (
+                        <a
+                          style={{
+                            textDecoration: 'none',
+                          }}
+                          href={job.applicationUrl}
+                          target="_blank">
                           <Button
-                            onClick={this.handleClickApply}
                             variant="contained"
                             color="secondary"
                             style={{color: '#FFF', marginLeft: '15px'}}>
-                            {i18n.t('APPLY NOW')}
+                            Apply On Company Site
                           </Button>
-                        ) : null}
-                      </>
-                    )}
-                  </CardActions>
-                </Card>
-              </div>
+                        </a>
+                      ) : (
+                        <>
+                          {this.props.userInfo === null ||
+                          this.props.userInfo.github ? (
+                            <Button
+                              onClick={this.handleClickApply}
+                              variant="contained"
+                              color="secondary"
+                              style={{color: '#FFF', marginLeft: '15px'}}>
+                              {i18n.t('APPLY NOW')}
+                            </Button>
+                          ) : null}
+                        </>
+                      )}
+                    </CardActions>
+                  </Card>
+                </div>
+              </Grid>
             </Grid>
-          </Grid>
+          </div>
           <Dialog
             open={this.state.apply}
             onClose={this.handleClose}
