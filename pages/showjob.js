@@ -505,7 +505,7 @@ class ShowJob extends React.Component {
                           disableRipple={true}
                           disableFocusRipple={true}
                           className={classes.iconButton}
-                          aria-label="Delete">
+                          aria-label="Map">
                           <PlaceIcon className={classes.headerIcons} />{' '}
                           <a
                             href={
@@ -521,7 +521,7 @@ class ShowJob extends React.Component {
                           disableRipple={true}
                           disableFocusRipple={true}
                           className={classes.iconButton}
-                          aria-label="Delete">
+                          aria-label="Employee count">
                           <PeopleIcon className={classes.headerIcons} />{' '}
                           {job.Company.employeeCount} {i18n.t('employees')}
                         </IconButton>
@@ -530,7 +530,7 @@ class ShowJob extends React.Component {
                             disableRipple={true}
                             disableFocusRipple={true}
                             className={classes.iconButton}
-                            aria-label="Delete"
+                            aria-label="Company URL"
                             style={{cursor: 'pointer'}}>
                             <LinkIcon className={classes.headerIcons} />{' '}
                             {job.Company.url
@@ -553,7 +553,7 @@ class ShowJob extends React.Component {
                           disableRipple={true}
                           disableFocusRipple={true}
                           className={classes.iconButton}
-                          aria-label="Delete">
+                          aria-label="Company's year founded">
                           <PlaceIcon className={classes.headerIcons} />{' '}
                           <a
                             href={
@@ -567,20 +567,22 @@ class ShowJob extends React.Component {
                         </IconButton>
                       </div>
                       <div className={classes.mobileCompanyInfo}>
+                        /*{' '}
                         <IconButton
                           disableRipple={true}
                           disableFocusRipple={true}
                           className={classes.iconButton}
-                          aria-label="Delete">
+                          aria-label="Employees count">
                           <PeopleIcon className={classes.headerIcons} />{' '}
                           {job.Company.employeeCount} {i18n.t('employees')}
                         </IconButton>
+                        */
                         <a href={job.Company.url} target="_blank">
                           <IconButton
                             disableRipple={true}
                             disableFocusRipple={true}
                             className={classes.iconButton}
-                            aria-label="Delete"
+                            aria-label="Company's URL"
                             style={{cursor: 'pointer'}}>
                             <LinkIcon className={classes.headerIcons} />{' '}
                             {job.Company.url
@@ -619,7 +621,7 @@ class ShowJob extends React.Component {
                                   disableRipple={true}
                                   disableFocusRipple={true}
                                   className={classes.iconButton}
-                                  aria-label="Delete">
+                                  aria-label="Company's year founded">
                                   <PlaceIcon className={classes.headerIcons} />{' '}
                                   <a
                                     href={
@@ -635,7 +637,7 @@ class ShowJob extends React.Component {
                                   disableRipple={true}
                                   disableFocusRipple={true}
                                   className={classes.iconButton}
-                                  aria-label="Delete">
+                                  aria-label="Employee's count">
                                   <PeopleIcon className={classes.headerIcons} />{' '}
                                   {job.Company.employeeCount} employees
                                 </IconButton>
@@ -644,7 +646,7 @@ class ShowJob extends React.Component {
                                     disableRipple={true}
                                     disableFocusRipple={true}
                                     className={classes.iconButton}
-                                    aria-label="Delete"
+                                    aria-label="Company's URL"
                                     style={{cursor: 'pointer'}}>
                                     <LinkIcon className={classes.headerIcons} />{' '}
                                     {job.Company.url
