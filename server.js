@@ -361,7 +361,7 @@ app.prepare().then(() => {
                             `/tmp/github-avatar-${req.userId}.png`,
                             (err, info) => {
                               if (err) {
-                                originalRes.status(500).json(err);
+                                console.log(err, info);
                               }
                               uploadToGCE(
                                 process.env.GOOGLE_STORAGE_BUCKET,
@@ -508,7 +508,7 @@ app.prepare().then(() => {
                                 `/tmp/github-avatar-${req.userId}.png`,
                                 (err, info) => {
                                   if (err) {
-                                    originalRes.status(500).json(err);
+                                    console.log(err, info);
                                   }
                                   uploadToGCE(
                                     process.env.GOOGLE_STORAGE_BUCKET,
@@ -520,7 +520,6 @@ app.prepare().then(() => {
                                     `/tmp/github-avatar-${req.userId}.png`,
                                   );
                                   console.log(err, info);
-                                  res.status(200).json('ok');
                                 },
                               );
                             },
