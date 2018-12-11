@@ -345,39 +345,43 @@ app.prepare().then(() => {
                       filename: `github-avatar-${req.userId}.jpeg`,
                     };
 
-                    download(url, options, function(err) {
-                      if (err) console.log(err);
-                      console.log('meow');
+                    if (url) {
+                      download(url, options, function(err) {
+                        if (err) console.log(err);
+                        console.log('meow');
 
-                      sharp(options.directory + '/' + options.filename).toFile(
-                        `/tmp/github-avatar-${req.userId}.webp`,
-                        (err, info) => {
-                          if (err) {
-                            console.log(err);
-                          }
-                          sharp(
-                            options.directory + '/' + options.filename,
-                          ).toFile(
-                            `/tmp/github-avatar-${req.userId}.png`,
-                            (err, info) => {
-                              if (err) {
+                        sharp(
+                          options.directory + '/' + options.filename,
+                        ).toFile(
+                          `/tmp/github-avatar-${req.userId}.webp`,
+                          (err, info) => {
+                            if (err) {
+                              console.log(err);
+                            }
+                            sharp(
+                              options.directory + '/' + options.filename,
+                            ).toFile(
+                              `/tmp/github-avatar-${req.userId}.png`,
+                              (err, info) => {
+                                if (err) {
+                                  console.log(err, info);
+                                }
+                                uploadToGCE(
+                                  process.env.GOOGLE_STORAGE_BUCKET,
+                                  `/tmp/github-avatar-${req.userId}.webp`,
+                                );
+
+                                uploadToGCE(
+                                  process.env.GOOGLE_STORAGE_BUCKET,
+                                  `/tmp/github-avatar-${req.userId}.png`,
+                                );
                                 console.log(err, info);
-                              }
-                              uploadToGCE(
-                                process.env.GOOGLE_STORAGE_BUCKET,
-                                `/tmp/github-avatar-${req.userId}.webp`,
-                              );
-
-                              uploadToGCE(
-                                process.env.GOOGLE_STORAGE_BUCKET,
-                                `/tmp/github-avatar-${req.userId}.png`,
-                              );
-                              console.log(err, info);
-                            },
-                          );
-                        },
-                      );
-                    });
+                              },
+                            );
+                          },
+                        );
+                      });
+                    }
                     next();
                     return;
                   }
@@ -490,41 +494,43 @@ app.prepare().then(() => {
                           filename: `github-avatar-${req.userId}.jpeg`,
                         };
 
-                        download(url, options, function(err) {
-                          if (err) throw err;
-                          console.log('meow');
+                        if (url) {
+                          download(url, options, function(err) {
+                            if (err) throw err;
+                            console.log('meow');
 
-                          sharp(
-                            options.directory + '/' + options.filename,
-                          ).toFile(
-                            `/tmp/github-avatar-${req.userId}.webp`,
-                            (err, info) => {
-                              if (err) {
-                                originalRes.status(500).json(err);
-                              }
-                              sharp(
-                                options.directory + '/' + options.filename,
-                              ).toFile(
-                                `/tmp/github-avatar-${req.userId}.png`,
-                                (err, info) => {
-                                  if (err) {
+                            sharp(
+                              options.directory + '/' + options.filename,
+                            ).toFile(
+                              `/tmp/github-avatar-${req.userId}.webp`,
+                              (err, info) => {
+                                if (err) {
+                                  console.log(err);
+                                }
+                                sharp(
+                                  options.directory + '/' + options.filename,
+                                ).toFile(
+                                  `/tmp/github-avatar-${req.userId}.png`,
+                                  (err, info) => {
+                                    if (err) {
+                                      console.log(err, info);
+                                    }
+                                    uploadToGCE(
+                                      process.env.GOOGLE_STORAGE_BUCKET,
+                                      `/tmp/github-avatar-${req.userId}.webp`,
+                                    );
+
+                                    uploadToGCE(
+                                      process.env.GOOGLE_STORAGE_BUCKET,
+                                      `/tmp/github-avatar-${req.userId}.png`,
+                                    );
                                     console.log(err, info);
-                                  }
-                                  uploadToGCE(
-                                    process.env.GOOGLE_STORAGE_BUCKET,
-                                    `/tmp/github-avatar-${req.userId}.webp`,
-                                  );
-
-                                  uploadToGCE(
-                                    process.env.GOOGLE_STORAGE_BUCKET,
-                                    `/tmp/github-avatar-${req.userId}.png`,
-                                  );
-                                  console.log(err, info);
-                                },
-                              );
-                            },
-                          );
-                        });
+                                  },
+                                );
+                              },
+                            );
+                          });
+                        }
                         console.log('userid', req.userId);
                         next();
                         return;
@@ -694,47 +700,50 @@ app.prepare().then(() => {
                       req.linkedin = true;
                       req.currentUser = currentUser;
                       let url = currentUser.linkedinAvatarUrl;
+                      console.log('current', currentUser);
                       console.log(url);
                       let options = {
                         directory: '/tmp',
                         filename: `linkedin-avatar-${req.userId}.jpeg`,
                       };
 
-                      download(url, options, function(err) {
-                        if (err) console.log(err);
-                        console.log('meow');
+                      if (url) {
+                        download(url, options, function(err) {
+                          if (err) console.log(err);
+                          console.log('meow');
 
-                        sharp(
-                          options.directory + '/' + options.filename,
-                        ).toFile(
-                          `/tmp/linkedin-avatar-${req.userId}.webp`,
-                          (err, info) => {
-                            if (err) {
-                              console.log(err);
-                            }
-                            sharp(
-                              options.directory + '/' + options.filename,
-                            ).toFile(
-                              `/tmp/linkedin-avatar-${req.userId}.png`,
-                              (err, info) => {
-                                if (err) {
-                                  originalRes.status(500).json(err);
-                                }
-                                uploadToGCE(
-                                  process.env.GOOGLE_STORAGE_BUCKET,
-                                  `/tmp/linkedin-avatar-${req.userId}.webp`,
-                                );
+                          sharp(
+                            options.directory + '/' + options.filename,
+                          ).toFile(
+                            `/tmp/linkedin-avatar-${req.userId}.webp`,
+                            (err, info) => {
+                              if (err) {
+                                console.log(err);
+                              }
+                              sharp(
+                                options.directory + '/' + options.filename,
+                              ).toFile(
+                                `/tmp/linkedin-avatar-${req.userId}.png`,
+                                (err, info) => {
+                                  if (err) {
+                                    originalRes.status(500).json(err);
+                                  }
+                                  uploadToGCE(
+                                    process.env.GOOGLE_STORAGE_BUCKET,
+                                    `/tmp/linkedin-avatar-${req.userId}.webp`,
+                                  );
 
-                                uploadToGCE(
-                                  process.env.GOOGLE_STORAGE_BUCKET,
-                                  `/tmp/linkedin-avatar-${req.userId}.png`,
-                                );
-                                console.log(err, info);
-                              },
-                            );
-                          },
-                        );
-                      });
+                                  uploadToGCE(
+                                    process.env.GOOGLE_STORAGE_BUCKET,
+                                    `/tmp/linkedin-avatar-${req.userId}.png`,
+                                  );
+                                  console.log(err, info);
+                                },
+                              );
+                            },
+                          );
+                        });
+                      }
                       next();
                       return;
                     }
@@ -823,6 +832,7 @@ app.prepare().then(() => {
                       req.github = false;
                       req.linkedin = true;
                       req.currentUser = currentUser;
+                      console.log('current', currentUser);
                       let url = currentUser.linkedinAvatarUrl;
 
                       let options = {
@@ -830,41 +840,43 @@ app.prepare().then(() => {
                         filename: `linkedin-avatar-${req.userId}.jpeg`,
                       };
 
-                      download(url, options, function(err) {
-                        if (err) console.log(err);
-                        console.log('meow');
+                      if (url) {
+                        download(url, options, function(err) {
+                          if (err) console.log(err);
+                          console.log('meow');
 
-                        sharp(
-                          options.directory + '/' + options.filename,
-                        ).toFile(
-                          `/tmp/linkedin-avatar-${req.userId}.webp`,
-                          (err, info) => {
-                            if (err) {
-                              console.log(err);
-                            }
-                            sharp(
-                              options.directory + '/' + options.filename,
-                            ).toFile(
-                              `/tmp/linkedin-avatar-${req.userId}.png`,
-                              (err, info) => {
-                                if (err) {
-                                  originalRes.status(500).json(err);
-                                }
-                                uploadToGCE(
-                                  process.env.GOOGLE_STORAGE_BUCKET,
-                                  `/tmp/linkedin-avatar-${req.userId}.webp`,
-                                );
+                          sharp(
+                            options.directory + '/' + options.filename,
+                          ).toFile(
+                            `/tmp/linkedin-avatar-${req.userId}.webp`,
+                            (err, info) => {
+                              if (err) {
+                                console.log(err);
+                              }
+                              sharp(
+                                options.directory + '/' + options.filename,
+                              ).toFile(
+                                `/tmp/linkedin-avatar-${req.userId}.png`,
+                                (err, info) => {
+                                  if (err) {
+                                    originalRes.status(500).json(err);
+                                  }
+                                  uploadToGCE(
+                                    process.env.GOOGLE_STORAGE_BUCKET,
+                                    `/tmp/linkedin-avatar-${req.userId}.webp`,
+                                  );
 
-                                uploadToGCE(
-                                  process.env.GOOGLE_STORAGE_BUCKET,
-                                  `/tmp/linkedin-avatar-${req.userId}.png`,
-                                );
-                                console.log(err, info);
-                              },
-                            );
-                          },
-                        );
-                      });
+                                  uploadToGCE(
+                                    process.env.GOOGLE_STORAGE_BUCKET,
+                                    `/tmp/linkedin-avatar-${req.userId}.png`,
+                                  );
+                                  console.log(err, info);
+                                },
+                              );
+                            },
+                          );
+                        });
+                      }
 
                       next();
                       return;
