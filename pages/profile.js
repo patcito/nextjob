@@ -465,8 +465,11 @@ class Profile extends React.Component {
                                 <ListItemText
                                   primary={
                                     <>
-                                      [{repo.primaryLanguage.name}]{' '}
-                                      {repo.nameWithOwner} (
+                                      [
+                                      {repo.primaryLanguage
+                                        ? repo.primaryLanguage.name
+                                        : null}
+                                      ] {repo.nameWithOwner} (
                                       {repo.stargazers.totalCount} ⭐'s)
                                     </>
                                   }
