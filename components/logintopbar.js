@@ -211,14 +211,18 @@ class LoginAppBarTop extends React.Component {
             </Button>
           ) : (
             <>
-              <a
-                href={`https://github.com/login/oauth/authorize?client_id=${
-                  publicRuntimeConfig.githubId
-                }&scope=read:public_repo user:email`}>
-                <Button color="inherit" style={{color: 'white'}}>
-                  {i18n.t('common:Login as Applicant')}
-                </Button>
-              </a>
+              <Button
+                color="inherit"
+                style={{color: 'white'}}
+                component={
+                  <Link
+                    href={`https://github.com/login/oauth/authorize?client_id=${
+                      publicRuntimeConfig.githubId
+                    }&scope=public_repo%20user:email`}>
+                    {i18n.t('common:Login as Applicant')}
+                  </Link>
+                }
+              />
               <a
                 className={classes.hideOnMobile}
                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
