@@ -419,7 +419,12 @@ class Profile extends React.Component {
                       <>
                         {this.props.isCurrentUserProfile ? (
                           <CardActions>
-                            <a href="https://www.linkedin.com/oauth/v2/authorization?client_id=86in1o0kvqc348&response_type=code&redirect_uri=http://localhost:4000&scope=r_basicprofile%20r_emailaddress">
+                            <a
+                              href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
+                                publicRuntimeConfig.linkedinId
+                              }&response_type=code&redirect_uri=${
+                                publicRuntimeConfig.publicHostname
+                              }&scope=r_basicprofile%20r_emailaddress`}>
                               Connect to linkedin to fill your positions
                               automatically
                             </a>
