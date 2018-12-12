@@ -304,6 +304,7 @@ class ShowJob extends React.Component {
                       description
                       description_fr
                       Industry
+                      remote
                       country
                       route
                       street_number
@@ -712,7 +713,13 @@ class ShowJob extends React.Component {
                                 <PlaceIcon />
                               </Avatar>
                             }
-                            label={job.locality ? job.locality : job.country}
+                            label={
+                              job.remote
+                                ? 'remote'
+                                : job.locality
+                                  ? job.locality
+                                  : job.country
+                            }
                             className={classes.chip}
                           />
                           <Chip

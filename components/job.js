@@ -156,7 +156,13 @@ class Job extends React.Component {
                         <PlaceIcon />
                       </Avatar>
                     }
-                    label={job.locality ? job.locality : job.country}
+                    label={
+                      job.remote
+                        ? 'remote'
+                        : job.locality
+                          ? job.locality
+                          : job.country
+                    }
                     className={classes.chip}
                   />
                   <Chip
