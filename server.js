@@ -47,12 +47,19 @@ app.prepare().then(() => {
       const {Storage} = require('@google-cloud/storage');
 
       // Creates a client
-      const storage = new Storage({
-        credentials: {
-          private_key: process.env.GOOGLE_STORAGE_PRIVATE_KEY,
-          client_email: process.env.GOOGLE_STORAGE_CLIENT_EMAIL,
-        },
-      });
+      let storageOpts = {};
+      if (
+        !process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+        process.env.GOOGLE_STORAGE_PRIVATE_KEY
+      ) {
+        storageOpts = {
+          credentials: {
+            private_key: process.env.GOOGLE_STORAGE_PRIVATE_KEY,
+            client_email: process.env.GOOGLE_STORAGE_CLIENT_EMAIL,
+          },
+        };
+      }
+      const storage = new Storage(storageOpts);
 
       /**
        * TODO(developer): Uncomment the following lines before running the sample.
