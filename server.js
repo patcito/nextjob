@@ -324,7 +324,7 @@ app.prepare().then(() => {
                       },
                       process.env.JWT_SECRET,
                       {
-                        expiresIn: '200 days', // expires in 24 hours
+                        expiresIn: '365d', // expires in 24 hours
                       },
                     );
                     /*return originalRes.status(200).send({
@@ -473,7 +473,7 @@ app.prepare().then(() => {
                           },
                           process.env.JWT_SECRET,
                           {
-                            expiresIn: 864000, // expires in 24 hours
+                            expiresIn: '365d', // expires in 24 hours
                           },
                         );
                         /*return originalRes.status(200).send({
@@ -685,7 +685,7 @@ app.prepare().then(() => {
                         },
                         process.env.JWT_SECRET,
                         {
-                          expiresIn: 86400, // expires in 24 hours
+                          expiresIn: '365d', // expires in 24 hours
                         },
                       );
                       currentUser.recruiter = true;
@@ -818,7 +818,7 @@ app.prepare().then(() => {
                         },
                         process.env.JWT_SECRET,
                         {
-                          expiresIn: 86400, // expires in 24 hours
+                          expiresIn: '365d', // expires in 24 hours
                         },
                       );
 
