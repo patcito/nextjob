@@ -401,14 +401,20 @@ class Profile extends React.Component {
                               }
                               secondary={
                                 <>
-                                  from {position.startDate.month}/
-                                  {position.startDate.year}
-                                  {position.isCurrent
+                                  {position.startDate
+                                    ? 'from ' + position.startDate.month + '/'
+                                    : null}
+                                  {position.startDate
+                                    ? position.startDate.year
+                                    : null}
+                                  {position.isCurrent && position.startDate
                                     ? ' to present'
-                                    : 'until ' +
-                                      position.endDate.month +
-                                      '/' +
-                                      position.endDate.year}
+                                    : position.endDate
+                                      ? 'until ' +
+                                        position.endDate.month +
+                                        '/' +
+                                        position.endDate.year
+                                      : null}
                                 </>
                               }
                             />
