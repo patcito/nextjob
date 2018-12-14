@@ -68,8 +68,12 @@ app.prepare().then(() => {
       // const filename = 'Local file to upload, e.g. ./local/path/to/file.txt';
       console.log(bucketName, filename);
       // Uploads a local file to the bucket
+      let assetsDir = '/assets/';
+      if (process.env.DEV === 'true') {
+        assetsDir = '/assetsdev/';
+      }
       await storage.bucket(bucketName).upload(filename, {
-        destination: '/assets/' + filename.split('/').pop(),
+        destination: assetsDir + filename.split('/').pop(),
         // Support for HTTP requests made with `Accept-Encoding: gzip`
         gzip: true,
         public: true,
