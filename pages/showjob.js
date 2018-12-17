@@ -202,25 +202,34 @@ class ShowJob extends React.Component {
       uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `
-				mutation upsert_application($jobId: Int, $applicantId: Int,
-				$coverLetter: String, $hasResumePdf: Boolean) {
-				  insert_JobApplication(
-					objects: [
-					  {jobId: $jobId, applicantId: $applicantId,
-						coverLetter: $coverLetter, hasResumePdf: $hasResumePdf}
-					],
-					on_conflict: {
-					  constraint: JobApplication_pkey,
-					  update_columns: [coverLetter, hasResumePdf]
-					}
-				  ) {
-					affected_rows
-					returning{
-					  coverLetter, hasResumePdf
-					}
-				  }
-				}
-        `,
+        mutation upsert_application(
+          $jobId: Int
+          $applicantId: Int
+          $coverLetter: String
+          $hasResumePdf: Boolean
+        ) {
+          insert_JobApplication(
+            objects: [
+              {
+                jobId: $jobId
+                applicantId: $applicantId
+                coverLetter: $coverLetter
+                hasResumePdf: $hasResumePdf
+              }
+            ]
+            on_conflict: {
+              constraint: JobApplication_pkey
+              update_columns: [coverLetter, hasResumePdf]
+            }
+          ) {
+            affected_rows
+            returning {
+              coverLetter
+              hasResumePdf
+            }
+          }
+        }
+      `,
       headers: {
         'x-access-token': Cookies.get('token'),
         'x-access-role': 'userType',
@@ -298,87 +307,100 @@ class ShowJob extends React.Component {
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
-      query: `query JobCompanies($id: Int){
-              Job(where: {id: {_eq: $id}}){
-                                id
-                      description
-                      description_fr
-                      Industry
-                      remote
-                      country
-                      route
-                      street_number
-                      locality
-                      administrative_area_level_1
-                      postal_code
-                      location
-                  Industries {
-                            IndustryName
-
-                  }
-                  Skills {Skill}
-                  Company {
-                  id
-                  description
-                  description_fr
-                  ownerId
-                  updatedAt
-                  yearFounded
-                  employeeCount
-                  devCount
-                  quote1
-                  quote2
-                  employee1
-                  employee2
-                  media1
-                  media2
-                  media3
-                  Industry
-                  name
-                  url
-                  twitter
-                  Skills{
-                  Skill
-                  }
-                  Perks{Perk}
-                  country
-                  route
-                  street_number
-                  locality
-                  administrative_area_level_1
-                  postal_code
-                  location
-                  }
-                      SeniorityLevel
-                      EmployementType
-                      Industry
-                      minimumExperienceYears
-                      maximumExperienceYears
-                      SalaryBracket
-                      createdAt
-                      updatedAt
-                      isPublished
-                      JobTitle
-                      route
-                      street_number
-                      locality
-                      administrative_area_level_1
-                      postal_code
-                      applicationUrl
-                      applicationEmail
-                      applyDirectly
-                      lat
-                      lng
-                      location
-                      minimumYearlySalary
-                      maximumYearlySalary
-                      minimumMonthlySalary
-                      maximumMonthlySalary
-                      hasMonthlySalary
-              }
-
+      query: `
+        query JobCompanies($id: Int, $userId: Int) {
+          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+            aggregate {
+              count
+            }
+            nodes {
+              id
+              name
+            }
           }
-                    `,
+
+          Job(where: {id: {_eq: $id}}) {
+            id
+            description
+            description_fr
+            Industry
+            remote
+            country
+            route
+            street_number
+            locality
+            administrative_area_level_1
+            postal_code
+            location
+            Industries {
+              IndustryName
+            }
+            Skills {
+              Skill
+            }
+            Company {
+              id
+              description
+              description_fr
+              ownerId
+              updatedAt
+              yearFounded
+              employeeCount
+              devCount
+              quote1
+              quote2
+              employee1
+              employee2
+              media1
+              media2
+              media3
+              Industry
+              name
+              url
+              twitter
+              Skills {
+                Skill
+              }
+              Perks {
+                Perk
+              }
+              country
+              route
+              street_number
+              locality
+              administrative_area_level_1
+              postal_code
+              location
+            }
+            SeniorityLevel
+            EmployementType
+            Industry
+            minimumExperienceYears
+            maximumExperienceYears
+            SalaryBracket
+            createdAt
+            updatedAt
+            isPublished
+            JobTitle
+            route
+            street_number
+            locality
+            administrative_area_level_1
+            postal_code
+            applicationUrl
+            applicationEmail
+            applyDirectly
+            lat
+            lng
+            location
+            minimumYearlySalary
+            maximumYearlySalary
+            minimumMonthlySalary
+            maximumMonthlySalary
+            hasMonthlySalary
+          }
+        }
+      `,
       headers: {
         'x-access-token': token,
       },
@@ -388,14 +410,23 @@ class ShowJob extends React.Component {
     });
     let job = await client.request(queryOpts.query, {
       id: jobId,
+      userId: userInfo.userId,
     });
+    let companiesCount = job.Company_aggregate;
 
     if (job.Job.length > 0) {
       job = job.Job[0];
     } else {
       job = null;
     }
-    return {translations, jobId, userInfo, job, lang};
+    return {
+      translations,
+      jobId,
+      userInfo,
+      job,
+      lang,
+      companiesCount,
+    };
   }
   constructor(props) {
     super(props);
@@ -464,11 +495,19 @@ class ShowJob extends React.Component {
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
-          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
+          <NewJobBar
+            i18n={this.i18n}
+            userInfo={this.props.userInfo}
+            companyCount={this.props.companiesCount}
+          />
           <div style={{paddingLeft: 12, paddingRight: 12}}>
             <Grid container spacing={24}>
               <Grid item xs={12} md={3}>
-                <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+                <MenuList
+                  i18n={i18n}
+                  userInfo={this.props.userInfo}
+                  companyCount={this.props.companiesCount}
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <div style={{background: 'white'}}>

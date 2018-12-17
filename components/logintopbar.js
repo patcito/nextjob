@@ -256,7 +256,12 @@ class LoginAppBarTop extends React.Component {
           )}
         </Toolbar>
         <Drawer open={this.state.open} onClose={this.toggleDrawer}>
-          <MenuList i18n={i18n} userInfo={this.props.userInfo} drawer={true} />
+          <MenuList
+            i18n={i18n}
+            userInfo={this.props.userInfo}
+            drawer={true}
+            companyCount={this.props.companyCount}
+          />
         </Drawer>
       </>
     );

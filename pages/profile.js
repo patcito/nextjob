@@ -241,31 +241,42 @@ class Profile extends React.Component {
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
-      query: `query User($id: Int!){
-  						User(where: {id: {_eq: $id}}) {
-						  id
-						  githubEmail
-                          githubAvatarUrl
-                          githubUsername
-                          linkedinEmail
-                          linkedinProfile
-                          bio
-                          githubBlogUrl
-                          firstName
-                          lastName
-						  name
-                          pullRequests
-                          githubRepositories
-						  Companies {
-							id
-							name
-							description
-							url
-							Industry
-							yearFounded
-						  }
-						}
-						}`,
+      query: `
+        query User($id: Int!, $userId: Int) {
+          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+            aggregate {
+              count
+            }
+            nodes {
+              id
+              name
+            }
+          }
+          User(where: {id: {_eq: $id}}) {
+            id
+            githubEmail
+            githubAvatarUrl
+            githubUsername
+            linkedinEmail
+            linkedinProfile
+            bio
+            githubBlogUrl
+            firstName
+            lastName
+            name
+            pullRequests
+            githubRepositories
+            Companies {
+              id
+              name
+              description
+              url
+              Industry
+              yearFounded
+            }
+          }
+        }
+      `,
       headers: {
         'x-access-token': userInfo.token,
       },
@@ -278,7 +289,9 @@ class Profile extends React.Component {
     }
     let user = await client.request(queryOpts.query, {
       id: userId,
+      userId: userInfo.userId,
     });
+    let companiesCount = user.Company_aggregate;
 
     if (user.User.length > 0) {
       user = user.User[0];
@@ -286,7 +299,14 @@ class Profile extends React.Component {
       user = null;
     }
     const isCurrentUserProfile = user.id === userInfo.userId;
-    return {translations, userId, userInfo, user, isCurrentUserProfile};
+    return {
+      translations,
+      userId,
+      userInfo,
+      user,
+      isCurrentUserProfile,
+      companiesCount,
+    };
   }
   constructor(props) {
     super(props);
@@ -313,10 +333,18 @@ class Profile extends React.Component {
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
-          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
+          <NewJobBar
+            i18n={this.i18n}
+            userInfo={this.props.userInfo}
+            companyCount={this.props.companiesCount}
+          />
           <Grid container spacing={24}>
             <Grid item xs={12} md={3}>
-              <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+              <MenuList
+                i18n={i18n}
+                userInfo={this.props.userInfo}
+                companyCount={this.props.companiesCount}
+              />
             </Grid>
             <Grid item xs={12} md={6}>
               <div style={{background: 'white'}}>

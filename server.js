@@ -1003,6 +1003,10 @@ app.prepare().then(() => {
     return app.render(req, res, '/', {companies: true, me: true});
   });
 
+  server.get('/me/jobs', (req, res) => {
+    return app.render(req, res, '/', {mejobs: true});
+  });
+
   server.get('/companies/:companyId', (req, res) => {
     return app.render(req, res, '/showcompany', {
       companyId: req.params.companyId,

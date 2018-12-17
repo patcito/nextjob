@@ -227,45 +227,58 @@ class EditCompany extends React.Component {
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
-      query: `query JobCompanies($ownerId: Int, $companyId: Int){
-              Company(where: {_and: [{id: {_eq: $companyId}},
-                  {ownerId: {_eq: $ownerId}}]}){
-                  id
-                  description
-                  description_fr
-                  ownerId
-				  updatedAt
-                  yearFounded
-                  employeeCount
-                  devCount
-                  quote1
-                  quote2
-                  employee1
-                  employee2
-                  media1
-                  media2
-                  media3
-                  Industry
-                  name
-                  url
-                  twitter
-                  Skills{
-                  Skill
-                  }
-                  Perks{Perk}
-                  country
-                  route
-                  street_number
-                  locality
-                  administrative_area_level_1
-                  postal_code
-                  location
-                  Moderators{
-                    userEmail
-                  }
-              }
-	}
-          `,
+      query: `
+        query JobCompanies($userId: Int, $ownerId: Int, $companyId: Int) {
+          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+            aggregate {
+              count
+            }
+            nodes {
+              id
+              name
+            }
+          }
+          Company(
+            where: {_and: [{id: {_eq: $companyId}}, {ownerId: {_eq: $ownerId}}]}
+          ) {
+            id
+            description
+            description_fr
+            ownerId
+            updatedAt
+            yearFounded
+            employeeCount
+            devCount
+            quote1
+            quote2
+            employee1
+            employee2
+            media1
+            media2
+            media3
+            Industry
+            name
+            url
+            twitter
+            Skills {
+              Skill
+            }
+            Perks {
+              Perk
+            }
+            country
+            route
+            street_number
+            locality
+            administrative_area_level_1
+            postal_code
+            location
+            Moderators {
+              userEmail
+            }
+          }
+        }
+      `,
       headers: {
         'x-access-token': token,
       },
@@ -275,8 +288,10 @@ class EditCompany extends React.Component {
     });
     let company = await client.request(queryOpts.query, {
       ownerId: userId,
+      userId: userInfo.userId,
       companyId: companyId,
     });
+    let companiesCount = company.Company_aggregate;
 
     if (company.Company.length > 0) {
       company = company.Company[0];
@@ -286,7 +301,15 @@ class EditCompany extends React.Component {
     if (!company.devCount) {
       company.devCount = 5;
     }
-    return {translations, company, companyId, userInfo, lang, forceFr};
+    return {
+      translations,
+      company,
+      companyId,
+      userInfo,
+      lang,
+      forceFr,
+      companiesCount,
+    };
   }
   constructor(props) {
     super(props);
@@ -954,11 +977,19 @@ class EditCompany extends React.Component {
               }}
             />
           ) : null}
-          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
+          <NewJobBar
+            i18n={this.i18n}
+            userInfo={this.props.userInfo}
+            companyCount={this.props.companiesCount}
+          />
           <div style={{paddingLeft: 12, paddingRight: 16}}>
             <Grid container spacing={24}>
               <Grid item xs={12} md={3}>
-                <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+                <MenuList
+                  i18n={i18n}
+                  userInfo={this.props.userInfo}
+                  companyCount={this.props.companiesCount}
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <div style={{background: 'white'}}>

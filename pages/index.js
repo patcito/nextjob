@@ -102,6 +102,7 @@ class Index extends React.Component {
     let remote = null;
     let country = null;
     let locality = null;
+    let meId = null;
 
     if (query.skill) {
       skill = query.skill;
@@ -124,7 +125,9 @@ class Index extends React.Component {
     if (query.remote) {
       remote = true;
     }
-
+    if (query.mejobs) {
+      meId = userInfo.userId;
+    }
     const getJobsopts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
@@ -132,7 +135,9 @@ class Index extends React.Component {
         query JobCompanies(
           $country: String
           $locality: String
+          $userId: Int
           $ownerId: Int
+          $meId: Int
           $companyId: Int
           $skill: String
           $description: String
@@ -141,8 +146,20 @@ class Index extends React.Component {
           $employementType: [String]
           $nocompany: String
         ) {
-          Company(where: {_and: [{ownerId: {_eq: $ownerId}},
-            {name: {_eq: $nocompany}} ]}) {
+          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+            aggregate {
+              count
+            }
+            nodes {
+              id
+              name
+            }
+          }
+          Company(
+            where: {
+              _and: [{ownerId: {_eq: $ownerId}}, {name: {_eq: $nocompany}}]
+            }
+          ) {
             id
             updatedAt
             description
@@ -180,6 +197,13 @@ class Index extends React.Component {
                   _and: [
                     {country: {_eq: $country}}
                     {locality: {_eq: $locality}}
+                  ]
+                }
+                {
+                  _or: [
+                    {ownerId: {_eq: $meId}}
+                    {Company: {ownerId: {_eq: $meId}}}
+                    {Company: {Moderators: {User: {id: {_eq: $meId}}}}}
                   ]
                 }
                 {Skills: {Skill: {_ilike: $skill}}}
@@ -282,6 +306,8 @@ class Index extends React.Component {
     });
     let jobsAndCompanies = await client.request(getJobsopts.query, {
       ownerId: userId,
+      userId: userInfo.userId,
+      meId: meId,
       companyId: companyId,
       skill: skill,
       description: description,
@@ -291,8 +317,7 @@ class Index extends React.Component {
       locality: locality,
       nocompany: query.companies ? null : '_no_company_',
     });
-    console.log('query', query);
-    return {translations, jobsAndCompanies, query, userInfo, lang};
+    return {translations, jobsAndCompanies, query, userInfo, lang, companyId};
   }
 
   content = () => {
@@ -329,11 +354,17 @@ class Index extends React.Component {
             i18n={this.i18n}
             userInfo={userInfo}
             group_by_location={this.props.jobsAndCompanies.group_by_location}
+            companyCount={this.props.jobsAndCompanies.Company_aggregate}
           />
           <div style={{paddingLeft: 12, paddingRight: 12}}>
             <Grid container spacing={24}>
               <Grid item xs={12} md={3}>
-                <MenuList i18n={i18n} userInfo={userInfo} />
+                <MenuList
+                  i18n={i18n}
+                  userInfo={userInfo}
+                  me={this.props.query.me || this.props.companyId}
+                  companyCount={this.props.jobsAndCompanies.Company_aggregate}
+                />
               </Grid>
               <Grid item xs={12} md={8}>
                 {this.content()}

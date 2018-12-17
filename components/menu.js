@@ -19,6 +19,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
+import Router from 'next/router';
+import {withRouter} from 'next/router';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
 
 const styles = theme => ({
   root: {
@@ -44,12 +48,26 @@ const lang = 'fr';
 class MenuList extends React.Component {
   state = {
     open: false,
+    anchorEl: null,
+    selectedIndex: 1,
   };
 
   handleClose = () => {
     this.setState({
       open: false,
     });
+  };
+
+  handleClickListItem = event => {
+    this.setState({anchorEl: event.currentTarget});
+  };
+
+  handleMenuItemClick = (event, index) => {
+    this.setState({selectedIndex: index, anchorEl: null});
+  };
+
+  handleCloseMenu = () => {
+    this.setState({anchorEl: null});
   };
 
   handleClick = () => {
@@ -69,12 +87,14 @@ class MenuList extends React.Component {
   handleSwitchChange = name => event => {
     this.setState({[name]: event.target.checked});
   };
+
   constructor(props) {
     super(props);
   }
 
   render(props) {
     const {classes} = this.props;
+    const {anchorEl} = this.state;
     const {open} = this.state;
     const i18n = this.props.i18n;
     const isLoggedIn = this.props.userInfo && this.props.userInfo.userId;
@@ -83,14 +103,20 @@ class MenuList extends React.Component {
         <List
           component="nav"
           className={this.props.drawer ? null : classes.drawer}>
-          <Link href="/">
-            <ListItem button>
-              <ListItemIcon>
-                <ViewHeadlineIcon />
-              </ListItemIcon>
-              <ListItemText primary={i18n.t('Latest jobs')} />
-            </ListItem>
-          </Link>
+          {(Router.router &&
+            Router.router.route &&
+            Router.router.route !== '/') ||
+          this.props.me ? (
+            <Link href="/">
+              <ListItem button>
+                <ListItemIcon>
+                  <ViewHeadlineIcon />
+                </ListItemIcon>
+                <ListItemText primary={i18n.t('Latest jobs')} />
+              </ListItem>
+            </Link>
+          ) : null}
+
           <Link href="/companies">
             <ListItem button>
               <ListItemIcon>
@@ -106,7 +132,7 @@ class MenuList extends React.Component {
             <List
               component="nav"
               className={this.props.drawer ? null : classes.drawer}>
-              <Link href="/applications">
+              <Link href="/applications" prefetch>
                 <ListItem button>
                   <ListItemIcon>
                     <InboxIcon />
@@ -115,16 +141,49 @@ class MenuList extends React.Component {
                 </ListItem>
               </Link>
               {this.props.userInfo.linkedin ? (
-                <Link href="/me/companies">
-                  <ListItem button>
-                    <ListItemIcon>
-                      <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={i18n.t('My Company Details')} />
-                  </ListItem>
-                </Link>
+                <ListItem button onClick={this.handleClickListItem}>
+                  <ListItemIcon>
+                    <InboxIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={i18n.t('My Company Details')} />
+                </ListItem>
               ) : null}
             </List>
+            {/*`*/}
+            <Menu
+              id="lock-menu"
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={this.handleClose}>
+              {this.props.companyCount.nodes.map((company, index) => (
+                <>
+                  <Link href={'/companies/' + company.id}>
+                    <MenuItem
+                      key={company.id}
+                      onClick={event => this.handleMenuItemClick(event, index)}>
+                      {company.name}
+                      's Profile
+                    </MenuItem>
+                  </Link>
+                  <Link href={'/companies/' + company.id + '/edit'}>
+                    <MenuItem
+                      key={company.id}
+                      onClick={event => this.handleMenuItemClick(event, index)}>
+                      Edit {company.name}
+                      's Profile
+                    </MenuItem>
+                  </Link>
+                  <Link href={'/jobs/companies/' + company.id + '/team'}>
+                    <MenuItem
+                      key={company.id}
+                      onClick={event => this.handleMenuItemClick(event, index)}>
+                      {company.name}
+                      's Job
+                    </MenuItem>
+                  </Link>
+                </>
+              ))}
+            </Menu>
           </>
         ) : null}
       </div>

@@ -232,45 +232,58 @@ class ShowCompany extends React.Component {
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
-      query: `query JobCompanies($ownerId: Int, $companyId: Int){
-              Company(where: {_and: [{id: {_eq: $companyId}},
-                  {ownerId: {_eq: $ownerId}}]}){
-                  id
-                  description
-                  description_fr
-                  ownerId
-                  yearFounded
-                  updatedAt
-                  employeeCount
-                  devCount
-                  quote1
-                  quote2
-                  employee1
-                  employee2
-                  media1
-                  media2
-                  media3
-                  Industry
-                  name
-                  url
-                  twitter
-                  Skills{
-                  Skill
-                  }
-                  Perks{Perk}
-                  country
-                  route
-                  street_number
-                  locality
-                  administrative_area_level_1
-                  postal_code
-                  location
-                  Moderators{
-                    userEmail
-                  }
-              }
-	}
-          `,
+      query: `
+        query JobCompanies($ownerId: Int, $companyId: Int, $userId: Int) {
+          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+            aggregate {
+              count
+            }
+            nodes {
+              id
+              name
+            }
+          }
+          Company(
+            where: {_and: [{id: {_eq: $companyId}}, {ownerId: {_eq: $ownerId}}]}
+          ) {
+            id
+            description
+            description_fr
+            ownerId
+            yearFounded
+            updatedAt
+            employeeCount
+            devCount
+            quote1
+            quote2
+            employee1
+            employee2
+            media1
+            media2
+            media3
+            Industry
+            name
+            url
+            twitter
+            Skills {
+              Skill
+            }
+            Perks {
+              Perk
+            }
+            country
+            route
+            street_number
+            locality
+            administrative_area_level_1
+            postal_code
+            location
+            Moderators {
+              userEmail
+            }
+          }
+        }
+      `,
       headers: {
         'x-access-token': token,
       },
@@ -279,9 +292,11 @@ class ShowCompany extends React.Component {
       headers: queryOpts.headers,
     });
     let qcompany = await client.request(queryOpts.query, {
+      userId: userInfo.userId,
       ownerId: userId,
       companyId: companyId,
     });
+    let companiesCount = qcompany.Company_aggregate;
 
     if (qcompany.Company.length > 0) {
       qcompany = qcompany.Company[0];
@@ -353,7 +368,14 @@ class ShowCompany extends React.Component {
     delete company['Skills'];
     delete company['Perks'];
     delete company['Moderators'];
-    return {translations, company, companyId, userInfo, lang};
+    return {
+      translations,
+      company,
+      companyId,
+      userInfo,
+      lang,
+      companiesCount,
+    };
   }
   constructor(props) {
     super(props);
@@ -776,11 +798,19 @@ insert_Moderator(objects: $moderators){
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
-          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
+          <NewJobBar
+            i18n={this.i18n}
+            userInfo={this.props.userInfo}
+            companyCount={this.props.companiesCount}
+          />
           <div style={{paddingLeft: 12, paddingRight: 12}}>
             <Grid container spacing={24}>
               <Grid item xs={12} md={3}>
-                <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+                <MenuList
+                  i18n={i18n}
+                  userInfo={this.props.userInfo}
+                  companyCount={this.props.companiesCount}
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <div style={{background: 'white'}}>

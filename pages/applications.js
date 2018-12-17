@@ -459,6 +459,15 @@ class IndexApplications extends React.Component {
       json: true,
       query: `
         query Applications($userId: Int) {
+          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+            aggregate {
+              count
+            }
+            nodes {
+              id
+              name
+            }
+          }
           JobApplication(
             where: {
               _or: [
@@ -512,16 +521,17 @@ class IndexApplications extends React.Component {
     const client = new grequest.GraphQLClient(queryOpts.uri, {
       headers: queryOpts.headers,
     });
-    let applications = await client.request(queryOpts.query, {
+    let applicationsData = await client.request(queryOpts.query, {
       userId: userId,
     });
+    let applications = [];
 
-    if (applications.JobApplication.length > 0) {
-      applications = applications.JobApplication;
-    } else {
-      applications = [];
+    if (applicationsData.JobApplication.length > 0) {
+      applications = applicationsData.JobApplication;
     }
-    return {translations, userInfo, applications};
+    let companiesCount = applicationsData.Company_aggregate;
+    console.log(applications);
+    return {translations, userInfo, applications, companiesCount};
   }
   constructor(props) {
     super(props);
@@ -598,11 +608,19 @@ class IndexApplications extends React.Component {
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
-          <NewJobBar i18n={this.i18n} userInfo={this.props.userInfo} />
+          <NewJobBar
+            i18n={this.i18n}
+            userInfo={this.props.userInfo}
+            companyCount={this.props.companiesCount}
+          />
           <div style={{paddingLeft: 12, paddingRight: 12}}>
             <Grid container spacing={24}>
               <Grid item xs={12} md={3}>
-                <MenuList i18n={i18n} userInfo={this.props.userInfo} />
+                <MenuList
+                  i18n={i18n}
+                  userInfo={this.props.userInfo}
+                  companyCount={this.props.companiesCount}
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <div style={{background: 'white'}}>
