@@ -41,8 +41,8 @@ class IndexJobs extends React.Component {
     const {page, url, jobs, query} = this.props;
     return (
       <>
-        {jobs.map(job => (
-          <Job key={job.id} i18n={i18n} query={query} job={job} />
+        {jobs.map((job, i) => (
+          <Job key={job.id} i18n={i18n} query={query} job={job} i={i} />
         ))}
       </>
     );

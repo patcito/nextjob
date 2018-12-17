@@ -116,8 +116,9 @@ class Job extends React.Component {
   }
 
   render(props) {
-    const {classes, job, i18n} = this.props;
+    const {classes, job, i18n, i} = this.props;
     const {open} = this.state;
+    console.log(i);
     return (
       <Link href={'/jobs/' + job.id}>
         <Card className={classes.card} style={{cursor: 'pointer'}}>

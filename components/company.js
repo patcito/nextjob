@@ -28,6 +28,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import EuroSymbolIcon from '@material-ui/icons/EuroSymbol';
 import WorkIcon from '@material-ui/icons/Work';
 import getConfig from 'next/config';
+import removeMd from 'remove-markdown';
 
 const {publicRuntimeConfig} = getConfig();
 const styles = theme => ({
@@ -38,6 +39,24 @@ const styles = theme => ({
       marginRight: 10,
     },
     '@media (max-width: 728px)': {},
+  },
+  cover: {
+    backgroundColor: '#fff',
+    marginTop: '-80px',
+    '@media (min-width: 728px)': {
+      width: 70,
+      height: 70,
+    },
+    '@media (max-width: 728px)': {
+      width: 70,
+      height: 70,
+      marginTop: 5,
+      marginLeft: 5,
+      img: {
+        width: 50,
+        height: 50,
+      },
+    },
   },
 
   cardActionArea: {
@@ -100,17 +119,40 @@ class Company extends React.Component {
                 '-' +
                 company.ownerId +
                 '-' +
-                'logo.png?updatedAt=' +
+                (company.media1 && company.media1.published
+                  ? '1media.png'
+                  : 'logo.png') +
+                '?updatedAt=' +
                 company.updatedAt
               }
               title="Contemplative Reptile"
             />
 
             <CardContent className={classes.card}>
-              <Typography gutterBottom variant="headline" component="h2">
-                {company.name}
-              </Typography>
-              <Typography component="p">{company.description}</Typography>
+              <CardMedia
+                className={classes.cover}
+                image={
+                  publicRuntimeConfig.cdn +
+                  company.id +
+                  '-' +
+                  company.ownerId +
+                  '-' +
+                  'logo.png?u=' +
+                  company.updatedAt
+                }
+                title={company.name}
+              />
+              <div className={classes.details}>
+                <CardContent className={classes.content}>
+                  <Typography variant="headline">{company.name}</Typography>
+                  <Typography variant="subheading" color="textSecondary" />
+                  <Typography>
+                    {i18n.language === 'fr'
+                      ? removeMd(company.description_fr).slice(0, 40)
+                      : removeMd(company.description).slice(0, 40)}
+                  </Typography>
+                </CardContent>
+              </div>
             </CardContent>
           </CardActionArea>
         </Link>
