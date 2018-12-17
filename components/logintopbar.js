@@ -31,6 +31,7 @@ const styles = theme => ({
   menuButton: {
     marginLeft: -12,
     marginRight: 20,
+    color: '#FFF',
   },
   button: {
     margin: theme.spacing.unit,
@@ -153,8 +154,18 @@ class LoginAppBarTop extends React.Component {
     const isRecruiter =
       this.state.currentUser && this.state.currentUser.recruiter;
     const {classes} = this.props;
+
     const {open} = this.state;
     const i18n = this.props.i18n;
+    const ApplicantLoginLink = () => (
+      <a
+        href={`https://github.com/login/oauth/authorize?client_id=${
+          publicRuntimeConfig.githubId
+        }&scope=public_repo%20user:email`}>
+        {i18n.t('common:Login as Applicant')}
+      </a>
+    );
+    //`
     return (
       <>
         <Toolbar>
@@ -175,29 +186,29 @@ class LoginAppBarTop extends React.Component {
             </Typography>
           </Link>
           {isLoggedIn && this.props.userInfo.github ? (
-            <Link href="/profile">
-              <Button
-                variant="contained"
-                color="secondary"
-                style={{color: '#FFF', marginLeft: '15px'}}>
-                {i18n.t('My Profile')}
-              </Button>
-            </Link>
+            <Button
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+              href="/profile"
+              style={{color: '#FFF', marginLeft: '15px'}}>
+              {i18n.t('My Profile')}
+            </Button>
           ) : null}
           {isLoggedIn && this.props.userInfo.linkedin ? (
-            <Link href="/newjob">
-              <Button
-                variant="contained"
-                color="secondary"
-                cyylassName={classes.hideOnMobile}
-                style={{color: '#FFF', marginLeft: '15px'}}>
-                {i18n.t('Post a job')}
-              </Button>
-            </Link>
+            <Button
+              href="/newjob"
+              variant="contained"
+              color="secondary"
+              className={classes.hideOnMobile}
+              style={{color: '#FFF', marginLeft: '15px'}}>
+              {i18n.t('Post a job')}
+            </Button>
           ) : null}
           <Button
             className={classes.hideOnMobile}
             variant="contained"
+            href="/"
             style={{
               marginLeft: '15px',
               backgroundColor: '#f50057',
@@ -211,25 +222,25 @@ class LoginAppBarTop extends React.Component {
             </Button>
           ) : (
             <>
-              <a
+              <Button
+                color="inherit"
+                style={{color: 'white'}}
                 href={`https://github.com/login/oauth/authorize?client_id=${
                   publicRuntimeConfig.githubId
                 }&scope=public_repo%20user:email`}>
-                <Button color="inherit" style={{color: 'white'}}>
-                  {i18n.t('common:Login as Applicant')}
-                </Button>
-              </a>
-              <a
-                className={classes.hideOnMobile}
+                {i18n.t('common:Login as Applicant')}
+              </Button>
+
+              <Button
+                color="inherit"
+                style={{color: 'white'}}
                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
                   publicRuntimeConfig.linkedinId
                 }&response_type=code&redirect_uri=${
                   publicRuntimeConfig.publicHostname
                 }&scope=r_basicprofile%20r_emailaddress`}>
-                <Button color="inherit" style={{color: 'white'}}>
-                  {i18n.t('common:Login as HR to post a job')}
-                </Button>
-              </a>
+                {i18n.t('common:Login as HR to post a job')}
+              </Button>
               <a
                 className={classes.showOnMobile}
                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
