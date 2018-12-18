@@ -318,19 +318,22 @@ class Index extends React.Component {
     const client = new grequest.GraphQLClient(getJobsopts.uri, {
       headers: getJobsopts.headers,
     });
-    let jobsAndCompanies = await client.request(getJobsopts.query, {
-      ownerId: userId,
-      userId: userInfo.userId,
-      meId: meId,
-      companyId: companyId,
-      skill: skill,
-      description: description,
-      remote: remote,
-      employementType: employementType,
-      country: country,
-      locality: locality,
-      nocompany: query.companies ? null : '_no_company_',
-    });
+    let jobsAndCompanies = await client
+      .request(getJobsopts.query, {
+        ownerId: userId,
+        userId: userInfo.userId,
+        meId: meId,
+        companyId: companyId,
+        skill: skill,
+        description: description,
+        remote: remote,
+        employementType: employementType,
+        country: country,
+        locality: locality,
+        nocompany: query.companies ? null : '_no_company_',
+      })
+      .catch(err => console.log('catch', err));
+
     console.log('QUERY', getJobsopts.query);
     console.log('ARGS', {
       ownerId: userId,
