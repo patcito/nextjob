@@ -125,8 +125,30 @@ class Index extends React.Component {
     if (query.remote) {
       remote = true;
     }
+    let companyModsquery = '';
+    let companyAggregatequery = '';
+
     if (query.mejobs) {
       meId = userInfo.userId;
+      companyModsquery = '{Company: {Moderators: {User: {id: {_eq: $meId}}}}}';
+    }
+    if (userInfo.userId) {
+      companyAggregatequery = `Company_aggregate(where:
+      { _or: [
+                    {ownerId: {_eq: $userId}}
+                    {ownerId: {_eq: $userId}}
+					{Moderators: {User: {id: {_eq: $userId}}}}
+                  ]
+		})
+		{
+            aggregate {
+              count
+            }
+            nodes {
+             id
+              name
+            }
+          }`;
     }
     const getJobsopts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
@@ -146,16 +168,8 @@ class Index extends React.Component {
           $employementType: [String]
           $nocompany: String
         ) {
-          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
-            aggregate {
-              count
-            }
-            nodes {
-              id
-              name
-            }
-          }
-          Company(
+			${companyAggregatequery}
+              Company(
             where: {
               _and: [{ownerId: {_eq: $ownerId}}, {name: {_eq: $nocompany}}]
             }
@@ -203,7 +217,7 @@ class Index extends React.Component {
                   _or: [
                     {ownerId: {_eq: $meId}}
                     {Company: {ownerId: {_eq: $meId}}}
-                    {Company: {Moderators: {User: {id: {_eq: $meId}}}}}
+                    ${companyModsquery}
                   ]
                 }
                 {Skills: {Skill: {_ilike: $skill}}}
@@ -305,6 +319,20 @@ class Index extends React.Component {
       headers: getJobsopts.headers,
     });
     let jobsAndCompanies = await client.request(getJobsopts.query, {
+      ownerId: userId,
+      userId: userInfo.userId,
+      meId: meId,
+      companyId: companyId,
+      skill: skill,
+      description: description,
+      remote: remote,
+      employementType: employementType,
+      country: country,
+      locality: locality,
+      nocompany: query.companies ? null : '_no_company_',
+    });
+    console.log('QUERY', getJobsopts.query);
+    console.log('ARGS', {
       ownerId: userId,
       userId: userInfo.userId,
       meId: meId,

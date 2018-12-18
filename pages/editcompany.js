@@ -229,7 +229,15 @@ class EditCompany extends React.Component {
       json: true,
       query: `
         query JobCompanies($userId: Int, $ownerId: Int, $companyId: Int) {
-          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+          Company_aggregate(
+            where: {
+              _or: [
+                {ownerId: {_eq: $userId}}
+                {ownerId: {_eq: $userId}}
+                {Moderators: {User: {id: {_eq: $userId}}}}
+              ]
+            }
+          ) {
             aggregate {
               count
             }
@@ -239,7 +247,7 @@ class EditCompany extends React.Component {
             }
           }
           Company(
-            where: {_and: [{id: {_eq: $companyId}}, {ownerId: {_eq: $ownerId}}]}
+            where: {_and: [{id: {_eq: $companyId}}]}
           ) {
             id
             description

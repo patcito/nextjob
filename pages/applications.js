@@ -459,7 +459,15 @@ class IndexApplications extends React.Component {
       json: true,
       query: `
         query Applications($userId: Int) {
-          Company_aggregate(where: {ownerId: {_eq: $userId}}) {
+          Company_aggregate(
+            where: {
+              _or: [
+                {ownerId: {_eq: $userId}}
+                {ownerId: {_eq: $userId}}
+                {Moderators: {User: {id: {_eq: $userId}}}}
+              ]
+            }
+          ) {
             aggregate {
               count
             }
