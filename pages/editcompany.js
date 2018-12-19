@@ -1403,8 +1403,6 @@ class EditCompany extends React.Component {
                               publicRuntimeConfig.cdn +
                               this.state.company.id +
                               '-' +
-                              this.state.company.ownerId +
-                              '-' +
                               'employee1avatar.png?u=' +
                               this.state.employee1Uploaded +
                               this.state.company.updatedAt
@@ -1593,8 +1591,6 @@ class EditCompany extends React.Component {
                               publicRuntimeConfig.cdn +
                               this.state.company.id +
                               '-' +
-                              this.state.company.ownerId +
-                              '-' +
                               'employee2avatar.png?u=' +
                               this.state.employee2Uploaded +
                               this.state.company.updatedAt
@@ -1781,8 +1777,6 @@ class EditCompany extends React.Component {
                               publicRuntimeConfig.cdn +
                               this.state.company.id +
                               '-' +
-                              this.state.company.ownerId +
-                              '-' +
                               '1media.png?u=' +
                               this.state.media1Uploaded +
                               this.state.company.updatedAt
@@ -1867,8 +1861,6 @@ class EditCompany extends React.Component {
                               publicRuntimeConfig.cdn +
                               this.state.company.id +
                               '-' +
-                              this.state.company.ownerId +
-                              '-' +
                               '2media.png?u=' +
                               this.state.media2Uploaded +
                               this.state.company.updatedAt
@@ -1951,8 +1943,6 @@ class EditCompany extends React.Component {
                             image={
                               publicRuntimeConfig.cdn +
                               this.state.company.id +
-                              '-' +
-                              this.state.company.ownerId +
                               '-' +
                               '3media.png?u=' +
                               this.state.media3Uploaded +

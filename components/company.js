@@ -29,6 +29,10 @@ import EuroSymbolIcon from '@material-ui/icons/EuroSymbol';
 import WorkIcon from '@material-ui/icons/Work';
 import getConfig from 'next/config';
 import removeMd from 'remove-markdown';
+import supportsWebP from 'supports-webp';
+
+let ext = 'png';
+supportsWebP ? (ext = 'webp') : (ext = 'png');
 
 const {publicRuntimeConfig} = getConfig();
 const styles = theme => ({
@@ -117,11 +121,9 @@ class Company extends React.Component {
                 publicRuntimeConfig.cdn +
                 company.id +
                 '-' +
-                company.ownerId +
-                '-' +
                 (company.media1 && company.media1.published
-                  ? '1media.png'
-                  : 'logo.png') +
+                  ? '1media.' + ext
+                  : 'logo.' + ext) +
                 '?updatedAt=' +
                 company.updatedAt
               }
@@ -135,9 +137,9 @@ class Company extends React.Component {
                   publicRuntimeConfig.cdn +
                   company.id +
                   '-' +
-                  company.ownerId +
-                  '-' +
-                  'logo.png?u=' +
+                  'logo.' +
+                  ext +
+                  '?u=' +
                   company.updatedAt
                 }
                 title={company.name}

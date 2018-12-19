@@ -1292,7 +1292,7 @@ The ReactEurope jobs team
   server.post('/upload', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-logo';
+    const path = '/tmp/' + req.get('companyId') + '-logo';
     sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
       if (err) {
         res.status(500).json(err);
@@ -1313,8 +1313,7 @@ The ReactEurope jobs team
   server.post('/uploadEmployee1Avatar', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    const path =
-      '/tmp/' + req.get('companyId') + '-' + req.userId + '-employee1avatar';
+    const path = '/tmp/' + req.get('companyId') + '-employee1avatar';
     sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
       if (err) {
         res.status(500).json(err);
@@ -1335,8 +1334,7 @@ The ReactEurope jobs team
   server.post('/uploadEmployee2Avatar', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    const path =
-      '/tmp/' + req.get('companyId') + '-' + req.userId + '-employee2avatar';
+    const path = '/tmp/' + req.get('companyId') + '-employee2avatar';
     sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
       if (err) {
         res.status(500).json(err);
@@ -1357,7 +1355,7 @@ The ReactEurope jobs team
   server.post('/uploadMedia1Image', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-1media';
+    const path = '/tmp/' + req.get('companyId') + '-1media';
     sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
       if (err) {
         res.status(500).json(err);
@@ -1378,7 +1376,7 @@ The ReactEurope jobs team
   server.post('/uploadMedia2Image', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-2media';
+    const path = '/tmp/' + req.get('companyId') + '-2media';
     sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
       if (err) {
         res.status(500).json(err);
@@ -1399,7 +1397,7 @@ The ReactEurope jobs team
   server.post('/uploadMedia3Image', function(req, res) {
     if (!req.files) return res.status(400).json('No files were uploaded.');
     let sampleFile = req.files.file;
-    const path = '/tmp/' + req.get('companyId') + '-' + req.userId + '-3media';
+    const path = '/tmp/' + req.get('companyId') + '-3media';
     sharp(sampleFile.data).toFile(path + '.webp', (err, info) => {
       if (err) {
         res.status(500).json(err);

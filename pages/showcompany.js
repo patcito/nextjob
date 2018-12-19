@@ -82,6 +82,10 @@ import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
 import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import supportsWebP from 'supports-webp';
+
+let ext = 'png'
+supportsWebP ? ext = 'webp' : ext = 'png'
 
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -831,9 +835,7 @@ insert_Moderator(objects: $moderators){
                             publicRuntimeConfig.cdn +
                             company.id +
                             '-' +
-                            company.ownerId +
-                            '-' +
-                            'logo.png?u=' +
+                            'logo.'+ext+'?u=' +
                             company.updatedAt
                           }
                           className={classes.avatar}
@@ -906,9 +908,7 @@ insert_Moderator(objects: $moderators){
                                 publicRuntimeConfig.cdn +
                                 company.id +
                                 '-' +
-                                company.ownerId +
-                                '-' +
-                                '1media.png?u=' +
+                                '1media.'+ext+'?u=' +
                                 company.updatedAt
                               }
                               title={company.name + ' media'}
@@ -992,9 +992,7 @@ insert_Moderator(objects: $moderators){
                               publicRuntimeConfig.cdn +
                               company.id +
                               '-' +
-                              company.ownerId +
-                              '-' +
-                              '2media.png?u=' +
+                              '2media.'+ext+'?u=' +
                               company.updatedAt
                             }
                             title={company.name + ' media'}
@@ -1039,9 +1037,7 @@ insert_Moderator(objects: $moderators){
                                       publicRuntimeConfig.cdn +
                                       company.id +
                                       '-' +
-                                      company.ownerId +
-                                      '-' +
-                                      'employee1avatar.png?u=' +
+                                      'employee1avatar.'+ext+'?u=' +
                                       company.updatedAt
                                     }
                                   />
@@ -1091,9 +1087,7 @@ insert_Moderator(objects: $moderators){
                               publicRuntimeConfig.cdn +
                               company.id +
                               '-' +
-                              company.ownerId +
-                              '-' +
-                              '3media.png?u=' +
+                              '3media.'+ext+'?u=' +
                               company.updatedAt
                             }
                             title={company.name + ' media'}
@@ -1117,9 +1111,7 @@ insert_Moderator(objects: $moderators){
                                       publicRuntimeConfig.cdn +
                                       company.id +
                                       '-' +
-                                      company.ownerId +
-                                      '-' +
-                                      'employee2avatar.png?u=' +
+                                      'employee2avatar.'+ext+'?u=' +
                                       company.updatedAt
                                     }
                                   />

@@ -80,7 +80,10 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Snackbar from '@material-ui/core/Snackbar';
 import Markdown from 'markdown-to-jsx';
+import supportsWebP from 'supports-webp';
 
+let ext = 'png'
+supportsWebP ? ext = 'webp' : ext = 'png'
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 
 const TooltipRange = createSliderWithTooltip(Range);
@@ -527,9 +530,7 @@ class ShowJob extends React.Component {
                             publicRuntimeConfig.cdn +
                             job.Company.id +
                             '-' +
-                            job.Company.ownerId +
-                            '-' +
-                            'logo.png?u=' +
+                            'logo.'+ext+'?u=' +
                             job.Company.updatedAt
                           }
                           className={classes.avatar}
@@ -654,9 +655,7 @@ class ShowJob extends React.Component {
                                 publicRuntimeConfig.cdn +
                                 job.Company.id +
                                 '-' +
-                                job.Company.ownerId +
-                                '-' +
-                                '1media.png?u=' +
+                                '1media.'+ext+'?u=' +
                                 job.Company.updatedAt
                               }
                               title={job.Company.name + ' media'}
