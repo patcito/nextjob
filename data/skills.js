@@ -1068,7 +1068,7 @@ const SKILLS = [
     id: 392,
   },
   {
-    name: 'Go',
+    name: 'Golang',
     id: 393,
   },
   {
