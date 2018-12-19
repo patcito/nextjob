@@ -84,8 +84,8 @@ import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import supportsWebP from 'supports-webp';
 
-let ext = 'png'
-supportsWebP ? ext = 'webp' : ext = 'png'
+let ext = 'png';
+supportsWebP ? (ext = 'webp') : (ext = 'png');
 
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -233,29 +233,32 @@ class ShowCompany extends React.Component {
         ? (userId = JSON.parse(localStorage.getItem('currentUser')).id)
         : (userId = null);
     }
+    let companyAggregatequery = '';
+    if (userInfo.userId) {
+      companyAggregatequery = `Company_aggregate(where:
+      { _or: [
+                    {ownerId: {_eq: $userId}}
+                    {ownerId: {_eq: $userId}}
+					{Moderators: {User: {id: {_eq: $userId}}}}
+                  ]
+		})
+		{
+            aggregate {
+              count
+            }
+            nodes {
+             id
+              name
+            }
+          }`;
+    }
 
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `
         query JobCompanies($ownerId: Int, $companyId: Int, $userId: Int) {
-          Company_aggregate(
-            where: {
-              _or: [
-                {ownerId: {_eq: $userId}}
-                {ownerId: {_eq: $userId}}
-                {Moderators: {User: {id: {_eq: $userId}}}}
-              ]
-            }
-          ) {
-            aggregate {
-              count
-            }
-            nodes {
-              id
-              name
-            }
-          }
+			${companyAggregatequery}
           Company(
             where: {_and: [{id: {_eq: $companyId}}, {ownerId: {_eq: $ownerId}}]}
           ) {
@@ -836,7 +839,9 @@ insert_Moderator(objects: $moderators){
                             publicRuntimeConfig.cdn +
                             company.id +
                             '-' +
-                            'logo.'+ext+'?u=' +
+                            'logo.' +
+                            ext +
+                            '?u=' +
                             company.updatedAt
                           }
                           className={classes.avatar}
@@ -909,7 +914,9 @@ insert_Moderator(objects: $moderators){
                                 publicRuntimeConfig.cdn +
                                 company.id +
                                 '-' +
-                                '1media.'+ext+'?u=' +
+                                '1media.' +
+                                ext +
+                                '?u=' +
                                 company.updatedAt
                               }
                               title={company.name + ' media'}
@@ -993,7 +1000,9 @@ insert_Moderator(objects: $moderators){
                               publicRuntimeConfig.cdn +
                               company.id +
                               '-' +
-                              '2media.'+ext+'?u=' +
+                              '2media.' +
+                              ext +
+                              '?u=' +
                               company.updatedAt
                             }
                             title={company.name + ' media'}
@@ -1038,7 +1047,9 @@ insert_Moderator(objects: $moderators){
                                       publicRuntimeConfig.cdn +
                                       company.id +
                                       '-' +
-                                      'employee1avatar.'+ext+'?u=' +
+                                      'employee1avatar.' +
+                                      ext +
+                                      '?u=' +
                                       company.updatedAt
                                     }
                                   />
@@ -1088,7 +1099,9 @@ insert_Moderator(objects: $moderators){
                               publicRuntimeConfig.cdn +
                               company.id +
                               '-' +
-                              '3media.'+ext+'?u=' +
+                              '3media.' +
+                              ext +
+                              '?u=' +
                               company.updatedAt
                             }
                             title={company.name + ' media'}
@@ -1112,7 +1125,9 @@ insert_Moderator(objects: $moderators){
                                       publicRuntimeConfig.cdn +
                                       company.id +
                                       '-' +
-                                      'employee2avatar.'+ext+'?u=' +
+                                      'employee2avatar.' +
+                                      ext +
+                                      '?u=' +
                                       company.updatedAt
                                     }
                                   />

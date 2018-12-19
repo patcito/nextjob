@@ -30,8 +30,8 @@ import getConfig from 'next/config';
 import removeMd from 'remove-markdown';
 import supportsWebP from 'supports-webp';
 
-let ext = 'png'
-supportsWebP ? ext = 'webp' : ext = 'png'
+let ext = 'png';
+supportsWebP ? (ext = 'webp') : (ext = 'png');
 
 const {publicRuntimeConfig} = getConfig();
 const styles = theme => ({
@@ -132,7 +132,9 @@ class Job extends React.Component {
               publicRuntimeConfig.cdn +
               job.companyId +
               '-' +
-              'logo.'+ext+'?u=' +
+              'logo.' +
+              ext +
+              '?u=' +
               job.Company.updatedAt
             }
             title={job.title}
@@ -148,8 +150,8 @@ class Job extends React.Component {
               </Typography>
               <Typography>
                 {i18n.language === 'fr'
-                  ? removeMd(job.Company.description_fr)
-                  : removeMd(job.Company.description)}
+                  ? removeMd(job.Company.description_fr.slice(0.120))
+                  : removeMd(job.Company.description.slice(0.120))}
               </Typography>
               <Grid item>
                 <div className={classes.root}>

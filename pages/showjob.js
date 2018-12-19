@@ -82,8 +82,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Markdown from 'markdown-to-jsx';
 import supportsWebP from 'supports-webp';
 
-let ext = 'png'
-supportsWebP ? ext = 'webp' : ext = 'png'
+let ext = 'png';
+supportsWebP ? (ext = 'webp') : (ext = 'png');
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 
 const TooltipRange = createSliderWithTooltip(Range);
@@ -308,28 +308,32 @@ class ShowJob extends React.Component {
         ? (userId = JSON.parse(localStorage.getItem('currentUser')).id)
         : (userId = null);
     }
+    let companyAggregatequery = '';
+    if (userInfo.userId) {
+      companyAggregatequery = `Company_aggregate(where:
+      { _or: [
+                    {ownerId: {_eq: $userId}}
+                    {ownerId: {_eq: $userId}}
+					{Moderators: {User: {id: {_eq: $userId}}}}
+                  ]
+		})
+		{
+            aggregate {
+              count
+            }
+            nodes {
+             id
+              name
+            }
+          }`;
+    }
+
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
       query: `
         query JobCompanies($id: Int, $userId: Int) {
-          Company_aggregate(
-            where: {
-              _or: [
-                {ownerId: {_eq: $userId}}
-                {ownerId: {_eq: $userId}}
-                {Moderators: {User: {id: {_eq: $userId}}}}
-              ]
-            }
-          ) {
-            aggregate {
-              count
-            }
-            nodes {
-              id
-              name
-            }
-          }
+          ${companyAggregatequery}
           Job(where: {id: {_eq: $id}}) {
             id
             description
@@ -531,7 +535,9 @@ class ShowJob extends React.Component {
                             publicRuntimeConfig.cdn +
                             job.Company.id +
                             '-' +
-                            'logo.'+ext+'?u=' +
+                            'logo.' +
+                            ext +
+                            '?u=' +
                             job.Company.updatedAt
                           }
                           className={classes.avatar}
@@ -656,7 +662,9 @@ class ShowJob extends React.Component {
                                 publicRuntimeConfig.cdn +
                                 job.Company.id +
                                 '-' +
-                                '1media.'+ext+'?u=' +
+                                '1media.' +
+                                ext +
+                                '?u=' +
                                 job.Company.updatedAt
                               }
                               title={job.Company.name + ' media'}
