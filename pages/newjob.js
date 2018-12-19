@@ -184,81 +184,74 @@ class NewJob extends React.Component {
     }
 
     const updateQuery = `
-	  mutation update_job( $remote: Boolean,
-$id: Int,
-  $companyId: Int,
-  $applyDirectly: Boolean,
-  $isPublished: Boolean,
-$hasMonthlySalary: Boolean,
-  $minimumExperienceYears: Int,
-  $maximumExperienceYears: Int,
-      $minimumYearlySalary: Int,
-      $maximumYearlySalary: Int,
-      $maximumMonthlySalary: Int,
-      $minimumMonthlySalary: Int,
-    $applicationEmail: String,
-      $applicationUrl: String,
- $ownerId: Int,
-  $location: geography,
-  $street_number: String,
- $route: String,
- $locality: String,
- $administrative_area_level_1: String,
- $country: String,
- $postal_code: String,
- $description: String,
- $description_fr: String,
- $EmployementType: String,
- $SeniorityLevel: String,
-		$JobTitle: String ){
-			update_Job(where: {id: {_eq: $id}},
-_set:{
-				remote: $remote,
-				companyId: $companyId,
-				isPublished: $isPublished,
-				applyDirectly: $applyDirectly,
-hasMonthlySalary: $hasMonthlySalary,
-				minimumExperienceYears: $minimumExperienceYears,
-				maximumExperienceYears: $maximumExperienceYears,
-				ownerId: $ownerId,
-      minimumYearlySalary: $minimumYearlySalary,
-      maximumYearlySalary: $maximumYearlySalary,
-      maximumMonthlySalary: $maximumMonthlySalary,
-      minimumMonthlySalary: $minimumMonthlySalary,
-    applicationEmail:  $applicationEmail,
-      applicationUrl:  $applicationUrl ,
-
-				    location: $location,
-		  				street_number: $street_number,
-		  				route: $route,
-				locality: $locality,
-				administrative_area_level_1: $administrative_area_level_1,
-				country: $country,
-				postal_code: $postal_code,
-				description: $description,
-				description_fr: $description_fr,
-				EmployementType: $EmployementType,
-				SeniorityLevel: $SeniorityLevel,
-				JobTitle: $JobTitle,
-
-
-}
-){
-				returning{
-					      id
-          description
-          description_fr
-
-
-}
-
-
-}
-
-
-}
-
-`;
+      mutation update_job(
+        $remote: Boolean
+        $id: Int
+        $companyId: Int
+        $applyDirectly: Boolean
+        $isPublished: Boolean
+        $hasMonthlySalary: Boolean
+        $minimumExperienceYears: Int
+        $maximumExperienceYears: Int
+        $minimumYearlySalary: Int
+        $maximumYearlySalary: Int
+        $maximumMonthlySalary: Int
+        $minimumMonthlySalary: Int
+        $applicationEmail: String
+        $applicationUrl: String
+        $ownerId: Int
+        $location: geography
+        $street_number: String
+        $route: String
+        $locality: String
+        $administrative_area_level_1: String
+        $country: String
+        $postal_code: String
+        $description: String
+        $description_fr: String
+        $EmployementType: String
+        $SeniorityLevel: String
+        $JobTitle: String
+      ) {
+        update_Job(
+          where: {id: {_eq: $id}}
+          _set: {
+            remote: $remote
+            companyId: $companyId
+            isPublished: $isPublished
+            applyDirectly: $applyDirectly
+            hasMonthlySalary: $hasMonthlySalary
+            minimumExperienceYears: $minimumExperienceYears
+            maximumExperienceYears: $maximumExperienceYears
+            ownerId: $ownerId
+            minimumYearlySalary: $minimumYearlySalary
+            maximumYearlySalary: $maximumYearlySalary
+            maximumMonthlySalary: $maximumMonthlySalary
+            minimumMonthlySalary: $minimumMonthlySalary
+            applicationEmail: $applicationEmail
+            applicationUrl: $applicationUrl
+            location: $location
+            street_number: $street_number
+            route: $route
+            locality: $locality
+            administrative_area_level_1: $administrative_area_level_1
+            country: $country
+            postal_code: $postal_code
+            description: $description
+            description_fr: $description_fr
+            EmployementType: $EmployementType
+            SeniorityLevel: $SeniorityLevel
+            JobTitle: $JobTitle
+          }
+        ) {
+          returning {
+            id
+            description
+            description_fr
+          }
+        }
+      }
+    `;
     const insertQuery = `mutation insert_job( $remote: Boolean,
  $companyId: Int,
  $applyDirectly: Boolean,

@@ -888,10 +888,10 @@ class EditCompany extends React.Component {
               Perk
             }
           }
-          delete_Moderator(where: {companyId: {_eq: $id}}) {
-            affected_rows
-          }
-          insert_Moderator(objects: $moderators) {
+          insert_Moderator(objects: $moderators,on_conflict: {
+            update_columns: [],
+            constraint: Moderator_pkey
+          }){
             returning {
               userEmail
             }
