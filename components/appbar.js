@@ -68,7 +68,7 @@ class AppBarTop extends React.Component {
         />
         <SearchFilters
           i18n={i18n}
-          group_by_location={this.props.group_by_location}
+          group_by_location={this.props.group_by_location || []}
         />
       </AppBar>
     );
