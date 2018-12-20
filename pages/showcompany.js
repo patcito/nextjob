@@ -142,6 +142,9 @@ const styles = theme => ({
   iconButton: {
     fontSize: '14px',
     width: '25%',
+    '@media (max-width: 728px)': {
+      width: '50%',
+    },
     '&:hover': {
       backgroundColor: 'transparent',
       cursor: 'auto',
@@ -865,102 +868,55 @@ insert_Moderator(objects: $moderators){
                         </Typography>
                       }
                       subheader={
-                        <div className={classes.hideOnMobile}>
-                          <span>
-                            {i18n.t('Since')} {company.yearFounded}
-                          </span>
-                          <IconButton
-                            disableRipple={true}
-                            disableFocusRipple={true}
-                            className={classes.iconButton}
-                            aria-label="Delete">
-                            <PlaceIcon className={classes.headerIcons} />{' '}
-                            <a
-                              href={
-                                'https://www.google.com/maps/search/' +
-                                this.state.currentAddressDescription
-                              }
-                              style={{color: 'rgba(0, 0, 0, 0.54)'}}
-                              target="_blank">
-                              {company.locality}
-                            </a>
-                          </IconButton>
-                          <IconButton
-                            disableRipple={true}
-                            disableFocusRipple={true}
-                            className={classes.iconButton}
-                            aria-label="Delete">
-                            <PeopleIcon className={classes.headerIcons} />{' '}
-                            {company.employeeCount} {i18n.t('employees')}
-                          </IconButton>
-                          <a href={company.url} target="_blank">
+                        <>
+                          <div className={classes.hideOnMobile}>
+                            <span>
+                              {i18n.t('Since')} {company.yearFounded}
+                            </span>
                             <IconButton
                               disableRipple={true}
                               disableFocusRipple={true}
                               className={classes.iconButton}
-                              aria-label="Delete"
-                              style={{cursor: 'pointer'}}>
-                              <LinkIcon className={classes.headerIcons} />{' '}
-                              {company.url
-                                .replace('http://wwww.', '')
-                                .replace('https://wwww.', '')
-                                .replace('https://', '')
-                                .replace('http://', '')}
+                              aria-label="Delete">
+                              <PlaceIcon className={classes.headerIcons} />{' '}
+                              <a
+                                href={
+                                  'https://www.google.com/maps/search/' +
+                                  this.state.currentAddressDescription
+                                }
+                                style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                                target="_blank">
+                                {company.locality}
+                              </a>
                             </IconButton>
-                          </a>
-                        </div>
+                            <IconButton
+                              disableRipple={true}
+                              disableFocusRipple={true}
+                              className={classes.iconButton}
+                              aria-label="Delete">
+                              <PeopleIcon className={classes.headerIcons} />{' '}
+                              {company.employeeCount} {i18n.t('employees')}
+                            </IconButton>
+                            <a href={company.url} target="_blank">
+                              <IconButton
+                                disableRipple={true}
+                                disableFocusRipple={true}
+                                className={classes.iconButton}
+                                aria-label="Delete"
+                                style={{cursor: 'pointer'}}>
+                                <LinkIcon className={classes.headerIcons} />{' '}
+                                {company.url
+                                  .replace('http://wwww.', '')
+                                  .replace('https://wwww.', '')
+                                  .replace('https://', '')
+                                  .replace('http://', '')}
+                              </IconButton>
+                            </a>
+                          </div>
+                        </>
                       }
                     />
                     <CardActionArea className={classes.cardActionArea}>
-                      <div className={classes.showOnMobile}>
-                        <div className={classes.mobileCompanyInfo}>
-                          <span>
-                            {i18n.t('Since')} {company.yearFounded}
-                          </span>
-                          <IconButton
-                            disableRipple={true}
-                            disableFocusRipple={true}
-                            className={classes.iconButton}
-                            aria-label="Company's year founded">
-                            <PlaceIcon className={classes.headerIcons} />{' '}
-                            <a
-                              href={
-                                'https://www.google.com/maps/search/' +
-                                this.state.currentAddressDescription
-                              }
-                              style={{color: 'rgba(0, 0, 0, 0.54)'}}
-                              target="_blank">
-                              {company.locality}
-                            </a>
-                          </IconButton>
-                        </div>
-                        <div className={classes.mobileCompanyInfo}>
-                          <IconButton
-                            disableRipple={true}
-                            disableFocusRipple={true}
-                            className={classes.iconButton}
-                            aria-label="Employees count">
-                            <PeopleIcon className={classes.headerIcons} />{' '}
-                            {company.employeeCount} {i18n.t('employees')}
-                          </IconButton>
-                          <a href={company.url} target="_blank">
-                            <IconButton
-                              disableRipple={true}
-                              disableFocusRipple={true}
-                              className={classes.iconButton}
-                              aria-label="Company's URL"
-                              style={{cursor: 'pointer'}}>
-                              <LinkIcon className={classes.headerIcons} />{' '}
-                              {company.url
-                                .replace('http://wwww.', '')
-                                .replace('https://wwww.', '')
-                                .replace('https://', '')
-                                .replace('http://', '')}
-                            </IconButton>
-                          </a>
-                        </div>
-                      </div>
-
                       {company.media1.published ? (
                         <>
                           {company.media1.hasVideo ? (
@@ -1002,6 +958,63 @@ insert_Moderator(objects: $moderators){
                           <Button>Twitter</Button>
                         </a>
                       </CardActions>
+                    </CardActionArea>
+                  </Card>
+                  <Card>
+                    <CardActionArea>
+                      <div className={classes.showOnMobile}>
+                        <div>
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Founded in">
+                            <HistoryIcon className={classes.headerIcons} />{' '}
+                            {i18n.t('Since')} {company.yearFounded}
+                          </IconButton>
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Company's year founded">
+                            <PlaceIcon className={classes.headerIcons} />{' '}
+                            <a
+                              href={
+                                'https://www.google.com/maps/search/' +
+                                this.state.currentAddressDescription
+                              }
+                              style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                              target="_blank">
+                              {company.locality}
+                            </a>
+                          </IconButton>
+                        </div>
+                        <div>
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Employees count">
+                            <PeopleIcon className={classes.headerIcons} />{' '}
+                            {company.employeeCount} {i18n.t('employees')}
+                          </IconButton>
+                          <a href={company.url} target="_blank">
+                            <IconButton
+                              disableRipple={true}
+                              disableFocusRipple={true}
+                              className={classes.iconButton}
+                              aria-label="Company's URL"
+                              style={{cursor: 'pointer'}}>
+                              <LinkIcon className={classes.headerIcons} />{' '}
+                              {company.url
+                                .replace('http://wwww.', '')
+                                .replace('https://wwww.', '')
+                                .replace('https://', '')
+                                .replace('http://', '')}
+                            </IconButton>
+                          </a>
+                        </div>
+                      </div>
                     </CardActionArea>
                   </Card>
 
