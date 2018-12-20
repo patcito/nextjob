@@ -585,7 +585,7 @@ $applicationEmail: String,
     let linkedin = false;
 
     if (req) {
-      query.me && req.userId ? (userId = req.userId) : (userId = null);
+      query.me || req.userId ? (userId = req.userId) : (userId = null);
       token = req.token || null;
       github = req.github;
       linkedin = req.linkedin;

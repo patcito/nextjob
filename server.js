@@ -653,19 +653,26 @@ app.prepare().then(() => {
                   json: true,
                   query: `
                     query User($linkedinId: String!) {
+                      Company(
+                        where: {
+                          _or: [
+                            {Owner: {linkedinId: {_eq: $linkedinId}}}
+                            {Moderators: {User: {linkedinId: {_eq: $linkedinId}}}}
+                          ]
+                        }
+                      ) {
+                        id
+                        name
+                        description
+                        url
+                        Industry
+                        yearFounded
+                      }
                       User(where: {linkedinId: {_eq: $linkedinId}}) {
                         id
                         linkedinEmail
                         name
                         linkedinAvatarUrl
-                        Companies {
-                          id
-                          name
-                          description
-                          url
-                          Industry
-                          yearFounded
-                        }
                       }
                     }
                   `,
@@ -685,8 +692,10 @@ app.prepare().then(() => {
                 client
                   .request(checkUserRequestopts.query, checkUserRequestVars)
                   .then(ugdata => {
-                    const currentUser = ugdata.User[0];
+                    let currentUser = ugdata.User[0];
+                    const companies = ugdata.Company;
                     if (currentUser && currentUser.id) {
+                      currentUser.Companies = companies;
                       const token = jwt.sign(
                         {
                           token: otoken,
