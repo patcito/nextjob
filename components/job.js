@@ -49,6 +49,10 @@ const styles = theme => ({
       margin: 5,
     },
   },
+  media: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   details: {
     display: 'flex',
     flexDirection: 'column',
@@ -57,6 +61,7 @@ const styles = theme => ({
     flex: '1 0 auto',
   },
   cover: {
+    backgroundSize: 'contain',
     '@media (min-width: 728px)': {
       width: 151,
       height: 151,
@@ -66,10 +71,7 @@ const styles = theme => ({
       height: 70,
       marginTop: 5,
       marginLeft: 5,
-      img: {
-        width: 50,
-        height: 50,
-      },
+      img: {},
     },
   },
   chip: {
@@ -150,8 +152,8 @@ class Job extends React.Component {
               </Typography>
               <Typography>
                 {i18n.language === 'fr'
-                  ? removeMd(job.Company.description_fr.slice(0.120))
-                  : removeMd(job.Company.description.slice(0.120))}
+                  ? removeMd(job.Company.description_fr.slice(0, 120))
+                  : removeMd(job.Company.description.slice(0, 120))}
               </Typography>
               <Grid item>
                 <div className={classes.root}>

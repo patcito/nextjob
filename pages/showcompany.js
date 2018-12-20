@@ -1057,22 +1057,26 @@ insert_Moderator(objects: $moderators){
                                 title={
                                   <>
                                     {company.employee1.name}
-                                    <a
-                                      style={{color: 'black'}}
-                                      href={
-                                        'https://twitter.com/' +
-                                        company.employee1.twitter
-                                      }>
-                                      <TwitterCircle />
-                                    </a>
-                                    <a
-                                      style={{color: 'black'}}
-                                      href={
-                                        'https://github.com/' +
-                                        company.employee1.github
-                                      }>
-                                      <GithubCircle />
-                                    </a>
+                                    {company.employee1.twitter ? (
+                                      <a
+                                        style={{color: 'black'}}
+                                        href={
+                                          'https://twitter.com/' +
+                                          company.employee1.twitter
+                                        }>
+                                        <TwitterCircle />
+                                      </a>
+                                    ) : null}
+                                    {company.employee1.github ? (
+                                      <a
+                                        style={{color: 'black'}}
+                                        href={
+                                          'https://github.com/' +
+                                          company.employee1.github
+                                        }>
+                                        <GithubCircle />
+                                      </a>
+                                    ) : null}
                                   </>
                                 }
                                 subheader={<>{company.employee1.title}</>}
@@ -1135,22 +1139,26 @@ insert_Moderator(objects: $moderators){
                                 title={
                                   <>
                                     {company.employee2.name}
-                                    <a
-                                      style={{color: 'black'}}
-                                      href={
-                                        'https://twitter.com/' +
-                                        company.employee2.twitter
-                                      }>
-                                      <TwitterCircle />
-                                    </a>
-                                    <a
-                                      style={{color: 'black'}}
-                                      href={
-                                        'https://github.com/' +
-                                        company.employee2.github
-                                      }>
-                                      <GithubCircle />
-                                    </a>
+                                    {company.employee2.twitter ? (
+                                      <a
+                                        style={{color: 'black'}}
+                                        href={
+                                          'https://twitter.com/' +
+                                          company.employee2.twitter
+                                        }>
+                                        <TwitterCircle />
+                                      </a>
+                                    ) : null}
+                                    {company.employee2.github ? (
+                                      <a
+                                        style={{color: 'black'}}
+                                        href={
+                                          'https://github.com/' +
+                                          company.employee2.github
+                                        }>
+                                        <GithubCircle />
+                                      </a>
+                                    ) : null}
                                   </>
                                 }
                                 subheader={<>{company.employee2.title}</>}
