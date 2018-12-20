@@ -111,6 +111,19 @@ const styles = theme => ({
     marginTop: 10,
     marginRight: 10,
   },
+  mobileCompanyInfo: {
+    textAlign: 'center',
+  },
+  showOnMobile: {
+    '@media (min-width: 728px)': {
+      display: 'none',
+    },
+  },
+  hideOnMobile: {
+    '@media (max-width: 728px)': {
+      display: 'none',
+    },
+  },
 
   cardActionArea: {
     width: '100%',
@@ -853,7 +866,7 @@ insert_Moderator(objects: $moderators){
                         </Typography>
                       }
                       subheader={
-                        <>
+                        <div className={classes.hideOnMobile}>
                           <span>
                             {i18n.t('Since')} {company.yearFounded}
                           </span>
@@ -896,10 +909,59 @@ insert_Moderator(objects: $moderators){
                                 .replace('http://', '')}
                             </IconButton>
                           </a>
-                        </>
+                        </div>
                       }
                     />
                     <CardActionArea className={classes.cardActionArea}>
+                      <div className={classes.showOnMobile}>
+                        <div className={classes.mobileCompanyInfo}>
+                          <span>
+                            {i18n.t('Since')} {company.yearFounded}
+                          </span>
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Company's year founded">
+                            <PlaceIcon className={classes.headerIcons} />{' '}
+                            <a
+                              href={
+                                'https://www.google.com/maps/search/' +
+                                this.state.currentAddressDescription
+                              }
+                              style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                              target="_blank">
+                              {company.locality}
+                            </a>
+                          </IconButton>
+                        </div>
+                        <div className={classes.mobileCompanyInfo}>
+                          <IconButton
+                            disableRipple={true}
+                            disableFocusRipple={true}
+                            className={classes.iconButton}
+                            aria-label="Employees count">
+                            <PeopleIcon className={classes.headerIcons} />{' '}
+                            {company.employeeCount} {i18n.t('employees')}
+                          </IconButton>
+                          <a href={company.url} target="_blank">
+                            <IconButton
+                              disableRipple={true}
+                              disableFocusRipple={true}
+                              className={classes.iconButton}
+                              aria-label="Company's URL"
+                              style={{cursor: 'pointer'}}>
+                              <LinkIcon className={classes.headerIcons} />{' '}
+                              {company.url
+                                .replace('http://wwww.', '')
+                                .replace('https://wwww.', '')
+                                .replace('https://', '')
+                                .replace('http://', '')}
+                            </IconButton>
+                          </a>
+                        </div>
+                      </div>
+
                       {company.media1.published ? (
                         <>
                           {company.media1.hasVideo ? (
