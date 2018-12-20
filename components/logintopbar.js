@@ -233,6 +233,7 @@ class LoginAppBarTop extends React.Component {
 
               <Button
                 color="inherit"
+                className={classes.hideOnMobile}
                 style={{color: 'white'}}
                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
                   publicRuntimeConfig.linkedinId
@@ -241,17 +242,17 @@ class LoginAppBarTop extends React.Component {
                 }&scope=r_basicprofile%20r_emailaddress`}>
                 {i18n.t('common:Login as HR to post a job')}
               </Button>
-              <a
+              <Button
+                color="inherit"
                 className={classes.showOnMobile}
+                style={{color: 'white'}}
                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
                   publicRuntimeConfig.linkedinId
                 }&response_type=code&redirect_uri=${
                   publicRuntimeConfig.publicHostname
                 }&scope=r_basicprofile%20r_emailaddress`}>
-                <Button color="inherit" style={{color: 'white'}}>
-                  {i18n.t('common:Login as HR')}
-                </Button>
-              </a>
+                {i18n.t('common:Login as HR')}
+              </Button>
             </>
           )}
         </Toolbar>
