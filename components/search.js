@@ -254,7 +254,7 @@ class SearchFilters extends React.Component {
     const {open} = this.state;
     const i18n = this.props.i18n;
     const {value} = this.state;
-    const cities = group_by_location.map(location => ({
+    const cities = (group_by_location || []).map(location => ({
       value: location,
       label: location.locality + ' (' + location.country + ')',
     }));
