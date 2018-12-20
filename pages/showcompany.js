@@ -129,7 +129,6 @@ const styles = theme => ({
     width: '100%',
   },
   media: {
-    width: '100%',
     height: 400,
     backgroundSize: 'contain',
   },
