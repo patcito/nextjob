@@ -178,7 +178,9 @@ class Job extends React.Component {
                         <PeopleIcon />
                       </Avatar>
                     }
-                    label={i18n.t('<3 employees')}
+                    label={i18n.t(
+                      job.employeeCount < 3 ? '<3 employees' : '>3 employees',
+                    )}
                     className={classes.chip}
                   />
                   <Chip
