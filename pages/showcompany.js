@@ -1031,7 +1031,7 @@ insert_Moderator(objects: $moderators){
                                 component="h1"
                                 key={perk.label}
                                 variant="h4"
-                                style={{fontSize: '40'}}>
+                                style={{fontSize: 30}}>
                                 ✓ {perk.label}
                               </Typography>
                             ))}
