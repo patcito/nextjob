@@ -94,6 +94,10 @@ class MenuList extends React.Component {
 
   render(props) {
     const {classes} = this.props;
+    let companyCount = this.props.companyCount;
+    if (!companyCount) {
+      companyCount = {nodes: []};
+    }
     const {anchorEl} = this.state;
     const {open} = this.state;
     const i18n = this.props.i18n;
@@ -155,7 +159,7 @@ class MenuList extends React.Component {
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={this.handleClose}>
-              {this.props.companyCount.nodes.map((company, index) => (
+              {companyCount.nodes.map((company, index) => (
                 <>
                   <Link href={'/companies/' + company.id}>
                     <MenuItem
