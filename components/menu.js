@@ -158,7 +158,7 @@ class MenuList extends React.Component {
               id="lock-menu"
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
-              onClose={this.handleClose}>
+              onClose={this.handleCloseMenu}>
               {companyCount.nodes.map((company, index) => (
                 <>
                   <Link href={'/companies/' + company.id}>
