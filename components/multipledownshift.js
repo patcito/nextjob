@@ -65,7 +65,7 @@ function getSuggestions(inputValue, suggestions) {
       (!inputValue ||
         suggestion.label.toLowerCase().indexOf(inputValue.toLowerCase()) !==
           -1) &&
-      count < 5;
+      count < 25;
 
     if (keep) {
       count += 1;
