@@ -109,9 +109,9 @@ class Index extends React.Component {
     }
     if (query.description) {
       description = '%' + query.description + '%';
+      description_fr = '%' + query.description + '%';
     }
     if (query.description_fr) {
-      description_fr = '%' + query.description_fr + '%';
     }
     if (query.jobEmployementType && query.jobEmployementType.length > 0) {
       employementType = query.jobEmployementType.split(',');
@@ -326,6 +326,7 @@ class Index extends React.Component {
         companyId: companyId,
         skill: skill,
         description: description,
+        description_fr: description,
         remote: remote,
         employementType: employementType,
         country: country,
