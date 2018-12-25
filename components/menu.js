@@ -23,10 +23,23 @@ import Router from 'next/router';
 import {withRouter} from 'next/router';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import {
+  TwitterCircle,
+  GithubCircle,
+  Medium,
+  FacebookBox,
+  Instagram,
+} from 'mdi-material-ui';
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
+  },
+  socialIcons: {
+    color: 'black !important',
+    a: {
+      color: 'black',
+    },
   },
   drawer: {
     '@media (max-width: 992px)': {
@@ -190,6 +203,40 @@ class MenuList extends React.Component {
             </Menu>
           </>
         ) : null}
+        <Divider className={this.props.drawer ? null : classes.drawer} />
+        <List
+          component="nav"
+          className={this.props.drawer ? null : classes.drawer}>
+          <ListItem>
+            <ListItemIcon>
+              <a
+                className={classes.socialIcons}
+                href="https://github.com/patcito/nextjob"
+                target="_blank"
+                button>
+                <GithubCircle />
+              </a>
+              <a
+                className={classes.socialIcons}
+                href="https://twitter.com/ReactEurope"
+                target="_blank">
+                <TwitterCircle />
+              </a>
+              <a
+                className={classes.socialIcons}
+                href="https://medium.com/@ReactEurope"
+                target="_blank">
+                <Medium />
+              </a>
+              <a
+                className={classes.socialIcons}
+                href="https://www.facebook.com/ReactEurope"
+                target="_blank">
+                <FacebookBox />
+              </a>
+            </ListItemIcon>
+          </ListItem>
+        </List>
       </div>
     );
   }
