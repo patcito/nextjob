@@ -718,6 +718,12 @@ $applicationEmail: String,
       this.props.job
     ) {
       this.setState({
+        jobFunction: [
+          {
+            value: 'Engineering',
+            label: this.i18n.t('jobfunctions:Engineering'),
+          },
+        ],
         selectedEmployementType: {
           value: 'FullTime',
           label: this.i18n.t('employementtypes:Full-time'),
@@ -796,6 +802,19 @@ $applicationEmail: String,
           },
         };
         this.setState(jobState);
+      } else {
+        this.setState({
+          jobFunction: [
+            {
+              value: 'Engineering',
+              label: this.i18n.t('jobfunctions:Engineering'),
+            },
+          ],
+          selectedEmployementType: {
+            value: 'FullTime',
+            label: this.i18n.t('employementtypes:Full-time'),
+          },
+        });
       }
       const token = localStorage.getItem('token');
       const user = localStorage.getItem('currentUser');
@@ -806,6 +825,16 @@ $applicationEmail: String,
         }
         const companies = currentUser.Companies;
         if (companies && companies.length > 0) {
+          if (!job || (job.Industries && job.Industries.length === 0)) {
+            this.setState({
+              companyIndustries: [
+                {
+                  value: companies[0].Industry,
+                  label: this.i18n.t('industries:' + companies[0].Industry),
+                },
+              ],
+            });
+          }
           this.setState({
             currentUser: currentUser,
             token: localStorage.getItem('token'),
@@ -821,6 +850,18 @@ $applicationEmail: String,
             token: localStorage.getItem('token'),
             addNewCompany: true,
             applicationEmail: currentUser.linkedinEmail,
+            companyIndustries: [
+              {
+                value: 'Computer_Software',
+                label: this.i18n.t('industries:Computer_Software'),
+              },
+              {
+                value: 'Information_Technology_and_Services',
+                label: this.i18n.t(
+                  'industries:Information_Technology_and_Services',
+                ),
+              },
+            ],
           });
         }
       }
