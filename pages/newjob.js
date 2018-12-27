@@ -1082,8 +1082,10 @@ $applicationEmail: String,
                   <DownshiftSelect
                     i18n={this.i18n}
                     suggestions={jobstitles}
-                    defaultInputValue={this.state.jobTitle}
-                    label={this.i18n.t('newjob:Job title')}
+                    selectedItem={this.state.jobTitle}
+                    label={
+                      this.state.jobTitle || this.i18n.t('newjob:Job title')
+                    }
                     onBlur={e => this.handleBlur(e, true)}
                     onFocus={e => this.handleFocus(e, true)}
                     handleParentChange={this.handleChangeJobTitle}

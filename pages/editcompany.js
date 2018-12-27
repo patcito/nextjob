@@ -46,7 +46,6 @@ import EMPLOYEMENTTYPES from '../data/employementtypes';
 import SENIORITYLEVELS from '../data/senioritylevels';
 import SKILLS from '../data/skills';
 
-import SingleSelect from '../components/select';
 import DownshiftSelect from '../components/downshift';
 import MultipleDownshiftSelect from '../components/multipledownshift';
 
@@ -1091,12 +1090,8 @@ class EditCompany extends React.Component {
                       <DownshiftSelect
                         i18n={i18n}
                         suggestions={industries}
-                        defaultInputValue={this.state.industry}
-                        label={this.state.industry.label || i18n.t('Industry')}
-                        onBlur={e => this.handleBlur(e, true)}
-                        onFocus={e => this.handleFocus(e, true)}
+                        selectedItem={this.state.industry}
                         handleParentChange={this.handleChangeIndustry}
-                        handleParentBlur={this.handleBlurIndustry}
                         name="industry"
                         id="jobIndustry"
                         required={true}
