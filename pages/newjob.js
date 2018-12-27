@@ -844,14 +844,20 @@ $applicationEmail: String,
               ? this.props.job.companyId
               : companies[0].id,
             addNewCompany: false,
-            applicationEmail: currentUser.linkedinEmail,
+            applicationEmail:
+              this.props.job && this.props.job.applicationEmail
+                ? this.props.job.applicationEmail
+                : currentUser.linkedinEmail,
           });
         } else {
           this.setState({
             currentUser: JSON.parse(localStorage.getItem('currentUser')),
             token: localStorage.getItem('token'),
             addNewCompany: true,
-            applicationEmail: currentUser.linkedinEmail,
+            applicationEmail:
+              this.props.job && this.props.job.applicationEmail
+                ? this.props.job.applicationEmail
+                : currentUser.linkedinEmail,
             companyIndustries: [
               {
                 value: 'Computer_Software',
