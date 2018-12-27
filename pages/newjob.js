@@ -767,13 +767,15 @@ $applicationEmail: String,
           },
           hasMonthlySalary: job.hasMonthlySalary,
           currentAddressDescription:
-            job.street_number +
-            ' ' +
-            job.route +
-            ' ' +
-            job.locality +
-            ', ' +
-            job.country,
+            job.street_number || job.route || job.locality
+              ? job.street_number +
+                ' ' +
+                job.route +
+                ' ' +
+                job.locality +
+                ', ' +
+                job.country
+              : job.country,
           jobDescription: job.description,
           jobDescriptionFr: job.description_fr,
           jobFunction: job.JobFunctions.map(v => ({

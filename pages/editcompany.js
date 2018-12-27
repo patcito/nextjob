@@ -393,13 +393,15 @@ class EditCompany extends React.Component {
       company.media3 = {url: ''};
     }
     let currentAddressDescription =
-      company.street_number +
-      ' ' +
-      company.route +
-      ' ' +
-      company.locality +
-      ', ' +
-      company.country;
+      company.street_number || company.route || company.locality
+        ? company.street_number +
+          ' ' +
+          company.route +
+          ' ' +
+          company.locality +
+          ', ' +
+          company.country
+        : company.country;
     currentAddressDescription === 'null null null, null'
       ? (currentAddressDescription = null)
       : null;
