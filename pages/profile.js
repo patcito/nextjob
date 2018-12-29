@@ -347,6 +347,7 @@ class Profile extends React.Component {
         : (user = null);
     }
   }
+
   handleEditBioDialog = () => {
     this.setState({openEditBio: true, bio: this.props.bio});
   };
