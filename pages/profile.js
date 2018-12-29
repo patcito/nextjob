@@ -315,6 +315,9 @@ class Profile extends React.Component {
       user = null;
     }
     const isCurrentUserProfile = user.id === userInfo.userId;
+    let bio = '';
+    user && user.manualBio ? (bio = user.manualBio) : (bio = user.bio);
+
     return {
       translations,
       userId,
@@ -323,6 +326,7 @@ class Profile extends React.Component {
       isCurrentUserProfile,
       companiesCount,
       ownProfile,
+      bio,
     };
   }
   constructor(props) {
@@ -344,7 +348,7 @@ class Profile extends React.Component {
     }
   }
   handleEditBioDialog = () => {
-    this.setState({openEditBio: true, bio: this.props.user.bio});
+    this.setState({openEditBio: true, bio: this.props.bio});
   };
 
   handleBioChange = event => {
@@ -389,8 +393,7 @@ class Profile extends React.Component {
     const {classes, user} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
-    let bio = user.bio;
-    user.manualBio ? (bio = user.manualBio) : null;
+    let bio = this.props.bio;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
