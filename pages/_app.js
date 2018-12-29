@@ -26,9 +26,6 @@ class MyApp extends App {
     const {Component, pageProps} = this.props;
     return (
       <Container>
-        <Head>
-          <title>NextJob</title>
-        </Head>
         {/* Wrap every page in Jss and Theme providers */}
         <JssProvider
           registry={this.pageContext.sheetsRegistry}

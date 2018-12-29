@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
 import getConfig from 'next/config';
 import {getHasuraHost} from '../lib/getHasuraHost';
+import Head from '../components/head';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -976,9 +977,11 @@ class EditCompany extends React.Component {
     const industries = this.INDUSTRIES;
     const skills = this.SKILLS;
     const perks = this.PERKS;
+    let title = this.i18n.t('ReactEurope Jobs - Edit Company');
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
+          <Head title={title} />
           {typeof google === 'undefined' ? (
             <DynamicMaps
               setGoogleMaps={() => {

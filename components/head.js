@@ -22,7 +22,7 @@ const Head = props => (
       }
     />
     {/* PWA primary color */}
-    <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
+    {/*<meta name="theme-color" content={pageContext.theme.palette.primary.main} />*/}
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" sizes="192x192" href="/static/touch-icon.png" />
@@ -33,11 +33,6 @@ const Head = props => (
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
     />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    />
-
     <meta property="og:url" content={props.url || defaultOGURL} />
     <meta property="og:title" content={props.title || ''} />
     <meta

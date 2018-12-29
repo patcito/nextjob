@@ -35,7 +35,11 @@ const styles = theme => ({
   root: {
     flexGrow: 1,
   },
+  techLinks: {
+    display: 'inline',
+  },
   socialIcons: {
+    marginRight: '5px',
     color: 'black !important',
     a: {
       color: 'black',
@@ -195,7 +199,7 @@ class MenuList extends React.Component {
                       key={company.id}
                       onClick={event => this.handleMenuItemClick(event, index)}>
                       {company.name}
-                      's Job
+                      's Jobs
                     </MenuItem>
                   </Link>
                 </>
@@ -207,6 +211,35 @@ class MenuList extends React.Component {
         <List
           component="nav"
           className={this.props.drawer ? null : classes.drawer}>
+          <ListItem>
+            <span>
+              <a href="https://github.com/patcito/nextjob" target="_blank">
+                Made
+              </a>{' '}
+              with 💖 using{' '}
+              <a
+                href="https://nextjs.org"
+                target="_blank"
+                className="techLinks">
+                Next.js
+              </a>
+              ,{' '}
+              <a
+                href="https://material-ui.com/"
+                target="_blank"
+                className="techLinks">
+                MaterialUI
+              </a>{' '}
+              and{' '}
+              <a
+                href="https://hasura.io/"
+                target="_blank"
+                className="techLinks">
+                Hasura
+              </a>
+            </span>
+          </ListItem>
+
           <ListItem>
             <ListItemIcon>
               <a
@@ -241,7 +274,6 @@ class MenuList extends React.Component {
     );
   }
 }
-
 MenuList.propTypes = {
   classes: PropTypes.object.isRequired,
 };

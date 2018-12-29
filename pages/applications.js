@@ -74,6 +74,7 @@ import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
 import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Head from '../components/head';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -539,6 +540,7 @@ class IndexApplications extends React.Component {
     }
     let companiesCount = applicationsData.Company_aggregate;
     console.log(applications);
+
     return {translations, userInfo, applications, companiesCount};
   }
   constructor(props) {
@@ -613,9 +615,11 @@ class IndexApplications extends React.Component {
     const {classes, applications} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
+    let title = this.i18n.t('ReactEurope Jobs - Applications');
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
+          <Head title={title} />
           <NewJobBar
             i18n={this.i18n}
             userInfo={this.props.userInfo}

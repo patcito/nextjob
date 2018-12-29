@@ -14,6 +14,7 @@ import IndexJobs from '../components/indexjobs';
 import IndexCompanies from '../components/indexcompanies';
 import getConfig from 'next/config';
 import {getHasuraHost} from '../lib/getHasuraHost';
+import Head from '../components/head';
 const {publicRuntimeConfig} = getConfig();
 const grequest = require('graphql-request');
 
@@ -171,7 +172,7 @@ class Index extends React.Component {
 			${companyAggregatequery}
               Company(
             where: {
-              _and: [{ownerId: {_eq: $ownerId}}, {name: {_eq: $nocompany}}]
+              _and: [{id: {_eq: $companyId}}]
             }
           ) {
             id
@@ -347,9 +348,30 @@ class Index extends React.Component {
       employementType: employementType,
       country: country,
       locality: locality,
-      nocompany: query.companies ? null : '_no_company_',
+      nocompany: query.companyId ? companyId : '_no_company_',
     });
-    return {translations, jobsAndCompanies, query, userInfo, lang, companyId};
+    let title = 'ReactEurope Jobs';
+    if (query.companies) {
+      title += ' - Companies';
+    }
+    console.log(jobsAndCompanies, jobsAndCompanies.Company);
+    if (
+      companyId &&
+      jobsAndCompanies.Company &&
+      jobsAndCompanies.Company.length > 0
+    ) {
+      title += ` - ${jobsAndCompanies.Company[0].name} listing`;
+    }
+
+    return {
+      translations,
+      jobsAndCompanies,
+      query,
+      userInfo,
+      lang,
+      companyId,
+      title,
+    };
   }
 
   content = () => {
@@ -389,6 +411,7 @@ class Index extends React.Component {
             companyCount={this.props.jobsAndCompanies.Company_aggregate}
           />
           <div style={{paddingLeft: 12, paddingRight: 12}}>
+            <Head title={this.props.title} />
             <Grid container spacing={24}>
               <Grid item xs={12} md={3}>
                 <MenuList

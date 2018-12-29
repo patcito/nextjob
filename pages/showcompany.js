@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import React from 'react';
+import Head from '../components/head';
 import AppBarTop from '../components/appbar';
 import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
@@ -399,6 +400,7 @@ class ShowCompany extends React.Component {
     delete company['Skills'];
     delete company['Perks'];
     delete company['Moderators'];
+    let title = `ReactEurope Jobs - ${company.company.name}`;
     return {
       translations,
       company,
@@ -406,6 +408,7 @@ class ShowCompany extends React.Component {
       userInfo,
       lang,
       companiesCount,
+      title,
     };
   }
   constructor(props) {
@@ -828,6 +831,7 @@ insert_Moderator(objects: $moderators){
     const perks = this.props.company.perks;
     return (
       <I18nextProvider i18n={this.i18n}>
+        <Head title={this.props.title} />
         <div>
           <NewJobBar
             i18n={this.i18n}

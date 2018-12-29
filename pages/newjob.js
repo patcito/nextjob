@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 const grequest = require('graphql-request');
 import {getHasuraHost} from '../lib/getHasuraHost';
+import Head from '../components/head';
 
 import NewJobBar from '../components/newjobbar';
 import {withStyles} from '@material-ui/core/styles';
@@ -1731,9 +1732,13 @@ $applicationEmail: String,
     const employementtypes = this.EMPLOYEMENTTYPES;
     const senioritylevels = this.SENIORITYLEVELS;
     const skills = this.SKILLS;
+    let title = this.props.job
+      ? this.i18n.t('ReactEurope Jobs - Edit Job')
+      : this.i18n.t('ReactEurope Jobs - New Job');
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
+          <Head title={title} />
           {typeof google === 'undefined' ? (
             <DynamicMaps
               setGoogleMaps={() => {
