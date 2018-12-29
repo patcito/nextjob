@@ -69,7 +69,6 @@ import Link from 'next/link';
 import Cookies from 'js-cookie';
 
 import CloseIcon from '@material-ui/icons/Close';
-import TextField from '@material-ui/core/TextField';
 import ReactPlayer from 'react-player';
 import ReactTimeout from 'react-timeout';
 import PERKS from '../data/perks';
@@ -92,6 +91,15 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
+
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Markdown from 'markdown-to-jsx';
+
 import 'rc-slider/assets/index.css';
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 
@@ -150,8 +158,10 @@ const styles = theme => ({
 class Profile extends React.Component {
   state = {
     open: false,
+    openEditBio: false,
     skills: [],
     industry: {},
+    bio: '',
     moderators: [],
     company: {
       yearFounded: 2006,
@@ -181,11 +191,6 @@ class Profile extends React.Component {
       media2: {url: '', published: false},
       media3: {url: '', published: false},
     },
-  };
-  handleBlurIndustry = (value, required) => {
-    this.setState({
-      industryvalid: value || !required ? true : false,
-    });
   };
 
   static async getInitialProps({req, query}) {
@@ -268,6 +273,7 @@ class Profile extends React.Component {
             linkedinEmail
             linkedinProfile
             bio
+            manualBio
             githubBlogUrl
             firstName
             lastName
@@ -292,7 +298,9 @@ class Profile extends React.Component {
     const client = new grequest.GraphQLClient(queryOpts.uri, {
       headers: queryOpts.headers,
     });
+    let ownProfile = true;
     if (query && query.userProfileId && query.userProfileId !== null) {
+      if (query.userProfileId !== userId) ownProfile = false;
       userId = query.userProfileId;
     }
     let user = await client.request(queryOpts.query, {
@@ -314,6 +322,7 @@ class Profile extends React.Component {
       user,
       isCurrentUserProfile,
       companiesCount,
+      ownProfile,
     };
   }
   constructor(props) {
@@ -334,13 +343,99 @@ class Profile extends React.Component {
         : (user = null);
     }
   }
+  handleEditBioDialog = () => {
+    this.setState({openEditBio: true, bio: this.props.user.bio});
+  };
+
+  handleBioChange = event => {
+    if (event.target.value.length <= 1024) {
+      this.setState({[event.target.name]: event.target.value});
+    }
+  };
+
+  handleClose = () => {
+    this.setState({openEditBio: false});
+  };
+
+  handleSaveBio = async () => {
+    this.setState({openEditBio: false});
+    const {userInfo, userId} = this.props;
+    const queryOpts = {
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
+      json: true,
+      query: `
+        mutation updateBio($userId: Int, $bio: String!) {
+          update_User(where: {id: {_eq: $userId}}, _set: {manualBio: $bio}) {
+            returning {
+              manualBio
+            }
+          }
+        }
+      `,
+      headers: {
+        'x-access-token': userInfo.token,
+      },
+    };
+    const client = new grequest.GraphQLClient(queryOpts.uri, {
+      headers: queryOpts.headers,
+    });
+    let user = await client.request(queryOpts.query, {
+      userId: userId,
+      bio: this.state.bio,
+    });
+    Router.push('/profile');
+  };
   render(props) {
     const {classes, user} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
+    let bio = user.bio;
+    user.manualBio ? (bio = user.manualBio) : null;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
+          <Dialog
+            open={this.state.openEditBio}
+            onClose={this.handleClose}
+            aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">
+              {i18n.t('Edit your bio')}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                {i18n.t(
+                  'We fetch your bio automatically from your Github account but you can edit it. Markdown accepted. 1024 charcters max',
+                )}
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                value={this.state.bio}
+                name="bio"
+                id="bio"
+                label={i18n.t('Bio')}
+                onChange={this.handleBioChange}
+                maxlength={1024}
+                type="text"
+                multiline={true}
+                fullWidth
+              />
+            </DialogContent>
+            <DialogActions>
+              <Typography
+                style={{
+                  color: this.state.bio.length === 1024 ? 'red' : 'black',
+                }}>
+                {this.state.bio.length} chars
+              </Typography>
+              <Button onClick={this.handleClose} color="primary">
+                {i18n.t('Cancel')}
+              </Button>
+              <Button onClick={this.handleSaveBio} color="primary">
+                {i18n.t('Save')}
+              </Button>
+            </DialogActions>
+          </Dialog>
           <NewJobBar
             i18n={this.i18n}
             userInfo={this.props.userInfo}
@@ -371,12 +466,17 @@ class Profile extends React.Component {
                       </Typography>
                     }
                     subheader={
-                      user.bio ? (
+                      bio ? (
                         <>
-                          {user.bio}
+                          <Markdown>{bio}</Markdown>{' '}
                           <a href={user.githubBlogUrl} target="_blank">
                             {user.githubBlogUrl}
-                          </a>
+                          </a>{' '}
+                          {this.props.ownProfile ? (
+                            <Button onClick={this.handleEditBioDialog}>
+                              edit
+                            </Button>
+                          ) : null}
                         </>
                       ) : null
                     }

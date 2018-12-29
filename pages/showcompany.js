@@ -948,7 +948,7 @@ insert_Moderator(objects: $moderators){
                       <CardContent>
                         <Typography component="p">
                           <Markdown>
-                            {this.props.lang === 'fr'
+                            {this.props.lang === 'fr' && company.description_fr
                               ? company.description_fr
                               : company.description}
                           </Markdown>
