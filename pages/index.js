@@ -386,6 +386,7 @@ class Index extends React.Component {
       companyId,
       title,
       metaDescription,
+      url,
     };
   }
 
