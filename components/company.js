@@ -30,6 +30,7 @@ import WorkIcon from '@material-ui/icons/Work';
 import getConfig from 'next/config';
 import removeMd from 'remove-markdown';
 import supportsWebP from 'supports-webp';
+import slugify from 'slugify';
 
 let ext = 'png';
 supportsWebP ? (ext = 'webp') : (ext = 'png');
@@ -114,7 +115,7 @@ class Company extends React.Component {
 
     return (
       <Card className={classes.card}>
-        <Link href={'/companies/' + company.id}>
+        <Link href={'/companies/' + company.id + '/' + slugify(company.name)}>
           <CardActionArea className={classes.cardActionArea}>
             <CardMedia
               className={classes.media}
@@ -175,12 +176,13 @@ class Company extends React.Component {
             </>
           ) : (
             <>
-              <Link href={'/jobs/companies/' + company.id}>
+              <Link href={'/jobs/companies/' + company.id + '/' + slugify(company.name)}>
                 <Button size="small" color="primary">
                   {i18n.t('JOBS')}
                 </Button>
               </Link>
-              <Link href={'/jobs/companies/' + company.id}>
+              <Link
+                href={'/companies/' + company.id + '/' + slugify(company.name)}>
                 <Button size="small" color="primary">
                   {i18n.t('common:Learn More')}
                 </Button>

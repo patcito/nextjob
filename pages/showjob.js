@@ -81,6 +81,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Snackbar from '@material-ui/core/Snackbar';
 import Markdown from 'markdown-to-jsx';
 import supportsWebP from 'supports-webp';
+import slugify from 'slugify';
 
 let ext = 'png';
 supportsWebP ? (ext = 'webp') : (ext = 'png');
@@ -545,7 +546,7 @@ class ShowJob extends React.Component {
                       }
                       title={
                         <Typography gutterBottom variant="h3" component="h1">
-                          <Link href={'/companies/' + job.Company.id}>
+                          <Link href={'/companies/' + job.Company.id+'/'+slugify(job.Company.name)}>
                             <a className={classes.companyName}>
                               {job.Company.name}
                             </a>

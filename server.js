@@ -1004,6 +1004,11 @@ app.prepare().then(() => {
     });
   });
 
+  server.get('/jobs/companies/:companyId/:slug', (req, res) => {
+    return app.render(req, res, '/', {companyId: req.params.companyId});
+  });
+
+
   server.get('/companies', (req, res) => {
     return app.render(req, res, '/', {companies: true});
   });
@@ -1030,6 +1035,14 @@ app.prepare().then(() => {
       lang: 'fr',
     });
   });
+
+  server.get('/companies/:companyId/:slug', (req, res) => {
+    return app.render(req, res, '/showcompany', {
+      companyId: req.params.companyId,
+      action: 'showCompany',
+    });
+  });
+
 
   server.get('/jobs/:jobId', (req, res) => {
     return app.render(req, res, '/showjob', {

@@ -84,6 +84,7 @@ import Tooltip from 'rc-tooltip';
 import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import supportsWebP from 'supports-webp';
+import slugify from 'slugify'
 
 let ext = 'png';
 supportsWebP ? (ext = 'webp') : (ext = 'png');
@@ -955,7 +956,7 @@ insert_Moderator(objects: $moderators){
                         </Typography>
                       </CardContent>
                       <CardActions>
-                        <Link href={'/jobs/companies/' + company.id}>
+                        <Link href={'/jobs/companies/' + company.id + '/' + slugify(company.name)}>
                           <Button>{i18n.t('JOBS')}</Button>
                         </Link>
                         <a href={'https://twitter.com/' + company.twitter}>
