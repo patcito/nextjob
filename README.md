@@ -13,7 +13,7 @@ Find the most recent version of this guide at [here](https://github.com/segmenti
 
 After cloning this repo, you need to run:
 ```bash
-$ yarn install`
+yarn install
 ```
 
 Then you need to install Hasura, you can either run it from [Heroku](https://heroku.com/deploy?template=https://github.com/hasura/graphql-engine-heroku), [DigitalOcean](https://cloud.digitalocean.com/droplets/new?image=hasura-18-04&utm_source=hasura&utm_campaign=docs) or Docker.
