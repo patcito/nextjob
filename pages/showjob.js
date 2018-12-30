@@ -72,6 +72,7 @@ import Slider, {Range} from 'rc-slider';
 import Tooltip from 'rc-tooltip';
 import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Head from '../components/head';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -429,12 +430,19 @@ class ShowJob extends React.Component {
       userId: userInfo.userId,
     });
     let companiesCount = job.Company_aggregate;
+    let title = 'ReactEurope Jobs - ';
 
     if (job.Job.length > 0) {
       job = job.Job[0];
+      title += job.JobTitle + ' at ' + job.Company.name;
     } else {
       job = null;
     }
+    let url;
+    req
+      ? (url = publicRuntimeConfig.host + req.path)
+      : (url = publicRuntimeConfig.host + Router.pathname);
+
     return {
       translations,
       jobId,
@@ -442,6 +450,8 @@ class ShowJob extends React.Component {
       job,
       lang,
       companiesCount,
+      title,
+      url,
     };
   }
   constructor(props) {
@@ -507,10 +517,23 @@ class ShowJob extends React.Component {
     const {classes, job} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
-    console.log(i18n.language);
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
+          <Head
+            title={this.props.title}
+            description={job.description}
+            url={this.props.url}
+            ogImage={
+              publicRuntimeConfig.cdn +
+              job.Company.id +
+              '-' +
+              'logo.' +
+              ext +
+              '?u=' +
+              job.Company.updatedAt
+            }
+          />
           <NewJobBar
             i18n={this.i18n}
             userInfo={this.props.userInfo}
@@ -546,7 +569,13 @@ class ShowJob extends React.Component {
                       }
                       title={
                         <Typography gutterBottom variant="h3" component="h1">
-                          <Link href={'/companies/' + job.Company.id+'/'+slugify(job.Company.name)}>
+                          <Link
+                            href={
+                              '/companies/' +
+                              job.Company.id +
+                              '/' +
+                              slugify(job.Company.name)
+                            }>
                             <a className={classes.companyName}>
                               {job.Company.name}
                             </a>

@@ -84,7 +84,7 @@ import Tooltip from 'rc-tooltip';
 import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import supportsWebP from 'supports-webp';
-import slugify from 'slugify'
+import slugify from 'slugify';
 
 let ext = 'png';
 supportsWebP ? (ext = 'webp') : (ext = 'png');
@@ -212,7 +212,6 @@ class ShowCompany extends React.Component {
     if (query.lang === 'fr') {
       lang = 'fr';
     }
-
     const translations = await getTranslation(
       lang,
       [
@@ -402,6 +401,10 @@ class ShowCompany extends React.Component {
     delete company['Perks'];
     delete company['Moderators'];
     let title = `ReactEurope Jobs - ${company.company.name}`;
+    let url;
+    req
+      ? (url = publicRuntimeConfig.host + req.path)
+      : (url = publicRuntimeConfig.host + Router.pathname);
     return {
       translations,
       company,
@@ -410,6 +413,7 @@ class ShowCompany extends React.Component {
       lang,
       companiesCount,
       title,
+      url,
     };
   }
   constructor(props) {
@@ -832,7 +836,20 @@ insert_Moderator(objects: $moderators){
     const perks = this.props.company.perks;
     return (
       <I18nextProvider i18n={this.i18n}>
-        <Head title={this.props.title} />
+        <Head
+          title={this.props.title}
+          description={company.description}
+          url={this.props.url}
+          ogImage={
+            publicRuntimeConfig.cdn +
+            company.id +
+            '-' +
+            'logo.' +
+            ext +
+            '?u=' +
+            company.updatedAt
+          }
+        />
         <div>
           <NewJobBar
             i18n={this.i18n}
@@ -956,7 +973,13 @@ insert_Moderator(objects: $moderators){
                         </Typography>
                       </CardContent>
                       <CardActions>
-                        <Link href={'/jobs/companies/' + company.id + '/' + slugify(company.name)}>
+                        <Link
+                          href={
+                            '/jobs/companies/' +
+                            company.id +
+                            '/' +
+                            slugify(company.name)
+                          }>
                           <Button>{i18n.t('JOBS')}</Button>
                         </Link>
                         <a href={'https://twitter.com/' + company.twitter}>

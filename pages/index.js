@@ -15,6 +15,7 @@ import IndexCompanies from '../components/indexcompanies';
 import getConfig from 'next/config';
 import {getHasuraHost} from '../lib/getHasuraHost';
 import Head from '../components/head';
+import Router from 'next/router';
 const {publicRuntimeConfig} = getConfig();
 const grequest = require('graphql-request');
 
@@ -351,9 +352,18 @@ class Index extends React.Component {
       nocompany: query.companyId ? companyId : '_no_company_',
     });
     let title = 'ReactEurope Jobs';
+    query.skill ? (title += ' - ' + query.skill) : null;
     if (query.companies) {
       title += ' - Companies';
     }
+    let techs = 'React, React Native, GraphQL and more';
+    query.skill ? (techs = query.skill) : null;
+    let metaDescription = 'Find a job working with ' + techs + ' at ';
+
+    query.companyId
+      ? (metaDescription += jobsAndCompanies.Company[0].name)
+      : (metaDescription += 'top companies');
+
     console.log(jobsAndCompanies, jobsAndCompanies.Company);
     if (
       companyId &&
@@ -362,6 +372,10 @@ class Index extends React.Component {
     ) {
       title += ` - ${jobsAndCompanies.Company[0].name} listing`;
     }
+    let url;
+    req
+      ? (url = publicRuntimeConfig.host + req.path)
+      : (url = publicRuntimeConfig.host + Router.pathname);
 
     return {
       translations,
@@ -371,6 +385,7 @@ class Index extends React.Component {
       lang,
       companyId,
       title,
+      metaDescription,
     };
   }
 
@@ -411,7 +426,12 @@ class Index extends React.Component {
             companyCount={this.props.jobsAndCompanies.Company_aggregate}
           />
           <div style={{paddingLeft: 12, paddingRight: 12}}>
-            <Head title={this.props.title} />
+            <Head
+              title={this.props.title}
+              description={this.props.metaDescription}
+              url={this.props.url}
+              ogImage={publicRuntimeConfig.host + '/static/touch-icon.png'}
+            />
             <Grid container spacing={24}>
               <Grid item xs={12} md={3}>
                 <MenuList
