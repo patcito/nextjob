@@ -448,263 +448,270 @@ class Profile extends React.Component {
             userInfo={this.props.userInfo}
             companyCount={this.props.companiesCount}
           />
-          <Grid container spacing={24}>
-            <Grid item xs={12} md={3}>
-              <MenuList
-                i18n={i18n}
-                userInfo={this.props.userInfo}
-                companyCount={this.props.companiesCount}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <div style={{background: 'white'}}>
-                <Card className={classes.card}>
-                  <CardHeader
-                    avatar={
-                      <Avatar
-                        aria-label={user.name}
-                        src={user.githubAvatarUrl}
-                        className={classes.avatar}
-                      />
-                    }
-                    title={
-                      <Typography gutterBottom variant="h3" component="h1">
-                        {user.name}
-                      </Typography>
-                    }
-                    subheader={
-                      bio ? (
-                        <>
-                          <Markdown>{bio}</Markdown>{' '}
-                          <a href={user.githubBlogUrl} target="_blank">
-                            {user.githubBlogUrl}
-                          </a>{' '}
-                          {this.props.ownProfile ? (
-                            <Button onClick={this.handleEditBioDialog}>
-                              edit
-                            </Button>
-                          ) : null}
-                        </>
-                      ) : null
-                    }
-                  />
-                  <CardActionArea className={classes.cardActionArea}>
-                    <CardMedia
-                      className={classes.media}
-                      title={user.name}
+          <div style={{paddingLeft: 12, paddingRight: 12}}>
+            <Grid container spacing={24}>
+              <Grid item xs={12} md={3}>
+                <MenuList
+                  i18n={i18n}
+                  userInfo={this.props.userInfo}
+                  companyCount={this.props.companiesCount}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <div style={{background: 'white'}}>
+                  <Card className={classes.card}>
+                    <CardHeader
+                      avatar={
+                        <Avatar
+                          aria-label={user.name}
+                          src={user.githubAvatarUrl}
+                          className={classes.avatar}
+                        />
+                      }
+                      title={
+                        <Typography gutterBottom variant="h3" component="h1">
+                          {user.name}
+                        </Typography>
+                      }
                       subheader={
-                        <>
-                          <IconButton
-                            disableRipple={true}
-                            disableFocusRipple={true}
-                            className={classes.iconButton}
-                            aria-label="Delete">
-                            <PlaceIcon className={classes.headerIcons} />{' '}
-                            <a
-                              href={
-                                'https://www.google.com/maps/search/' +
-                                this.state.currentAddressDescription
-                              }
-                              style={{color: 'rgba(0, 0, 0, 0.54)'}}
-                              target="_blank">
-                              lol
-                            </a>
-                          </IconButton>
-                          <a href={user.name} target="_blank">
+                        bio ? (
+                          <>
+                            <Markdown>{bio}</Markdown>{' '}
+                            <a href={user.githubBlogUrl} target="_blank">
+                              {user.githubBlogUrl}
+                            </a>{' '}
+                            {this.props.ownProfile ? (
+                              <Button onClick={this.handleEditBioDialog}>
+                                edit
+                              </Button>
+                            ) : null}
+                          </>
+                        ) : null
+                      }
+                    />
+                    <CardActionArea className={classes.cardActionArea}>
+                      <CardMedia
+                        className={classes.media}
+                        title={user.name}
+                        subheader={
+                          <>
                             <IconButton
                               disableRipple={true}
                               disableFocusRipple={true}
                               className={classes.iconButton}
-                              aria-label="Delete"
-                              style={{cursor: 'pointer'}}
-                            />
-                          </a>
-                        </>
-                      }
-                    />
-                  </CardActionArea>
-                </Card>
-                <Card className={classes.card}>
-                  <CardContent>
-                    <Typography
-                      variant="h4"
-                      gutterBottom
-                      className={classes.title}>
-                      Positions
-                    </Typography>
-                    {user.linkedinProfile && user.linkedinProfile.positions ? (
-                      user.linkedinProfile.positions.values.map(position => (
-                        <List key={position.title} dense={true}>
-                          <ListItem>
-                            <ListItemText
-                              primary={
-                                <>
-                                  {position.title} @ {position.company.name}
-                                </>
-                              }
-                              secondary={
-                                <>
-                                  {position.startDate
-                                    ? i18n.t('from ') +
-                                      position.startDate.month +
-                                      '/'
-                                    : null}
-                                  {position.startDate
-                                    ? position.startDate.year
-                                    : null}
-                                  {position.isCurrent && position.startDate
-                                    ? i18n.t(' to present')
-                                    : position.endDate
-                                      ? i18n.t('until ') +
-                                        position.endDate.month +
-                                        '/' +
-                                        position.endDate.year
-                                      : null}
-                                </>
-                              }
-                            />
-                          </ListItem>
-                        </List>
-                      ))
-                    ) : (
-                      <>
-                        {this.props.isCurrentUserProfile ? (
-                          <CardActions>
-                            <a
-                              href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
-                                publicRuntimeConfig.linkedinId
-                              }&response_type=code&redirect_uri=${
-                                publicRuntimeConfig.publicHostname
-                              }&scope=r_basicprofile%20r_emailaddress`}>
-                              i18n.t('Connect to linkedin to fill your positions
-                              automatically')
+                              aria-label="Delete">
+                              <PlaceIcon className={classes.headerIcons} />{' '}
+                              <a
+                                href={
+                                  'https://www.google.com/maps/search/' +
+                                  this.state.currentAddressDescription
+                                }
+                                style={{color: 'rgba(0, 0, 0, 0.54)'}}
+                                target="_blank">
+                                lol
+                              </a>
+                            </IconButton>
+                            <a href={user.name} target="_blank">
+                              <IconButton
+                                disableRipple={true}
+                                disableFocusRipple={true}
+                                className={classes.iconButton}
+                                aria-label="Delete"
+                                style={{cursor: 'pointer'}}
+                              />
                             </a>
-                          </CardActions>
-                        ) : (
-                          i18n.t('This user has not filled their profile yet')
-                        )}
-                      </>
-                    )}
-                    <Typography
-                      variant="h4"
-                      gutterBottom
-                      className={classes.title}>
-                      {i18n.t('Open Source Contributions')}
-                    </Typography>
-                    <Typography
-                      variant="p"
-                      component="p"
-                      className={classes.title}>
-                      {i18n.t(
-                        'Keep in mind that any lack of open source contributions ' +
-                          'does not mean lack of skills and that all candidates should ' +
-                          'be investigated further based on other factors such' +
-                          ' as  as skills, previous positions, education, interview process etc',
-                      )}
-                    </Typography>
-                    <p />
-                    {user.githubRepositories &&
-                    user.githubRepositories.nodes &&
-                    user.githubRepositories.nodes.length > 0 ? (
-                      <>
-                        <Typography
-                          variant="h4"
-                          gutterBottom
-                          className={classes.title}>
-                          {i18n.t('Repositories contributed to')}
-                        </Typography>
-                        {user.githubRepositories.nodes.map(repo => (
-                          <>
-                            <List key={repo.nameWithOwner} dense={true}>
-                              <ListItem>
-                                <ListItemAvatar>
-                                  <Avatar src={repo.owner.avatarUrl} />
-                                </ListItemAvatar>
-                                <ListItemText
-                                  primary={
-                                    <>
-                                      [
-                                      {repo.primaryLanguage
-                                        ? repo.primaryLanguage.name
+                          </>
+                        }
+                      />
+                    </CardActionArea>
+                  </Card>
+                  <Card className={classes.card}>
+                    <CardContent>
+                      <Typography
+                        variant="h4"
+                        gutterBottom
+                        className={classes.title}>
+                        Positions
+                      </Typography>
+                      {user.linkedinProfile &&
+                      user.linkedinProfile.positions ? (
+                        user.linkedinProfile.positions.values.map(position => (
+                          <List key={position.title} dense={true}>
+                            <ListItem>
+                              <ListItemText
+                                primary={
+                                  <>
+                                    {position.title} @ {position.company.name}
+                                  </>
+                                }
+                                secondary={
+                                  <>
+                                    {position.startDate
+                                      ? i18n.t('from ') +
+                                        position.startDate.month +
+                                        '/'
+                                      : null}
+                                    {position.startDate
+                                      ? position.startDate.year
+                                      : null}
+                                    {position.isCurrent && position.startDate
+                                      ? i18n.t(' to present')
+                                      : position.endDate
+                                        ? i18n.t('until ') +
+                                          position.endDate.month +
+                                          '/' +
+                                          position.endDate.year
                                         : null}
-                                      ] {repo.nameWithOwner} (
-                                      {repo.stargazers.totalCount} ⭐'s)
-                                    </>
-                                  }
-                                  secondary={repo.description}
-                                />
-                                <ListItemSecondaryAction>
-                                  <a
-                                    href={
-                                      repo.url +
-                                      '/commits?author=' +
-                                      user.githubUsername
+                                  </>
+                                }
+                              />
+                            </ListItem>
+                          </List>
+                        ))
+                      ) : (
+                        <>
+                          {this.props.isCurrentUserProfile ? (
+                            <CardActions>
+                              <a
+                                href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${
+                                  publicRuntimeConfig.linkedinId
+                                }&response_type=code&redirect_uri=${
+                                  publicRuntimeConfig.publicHostname
+                                }&scope=r_basicprofile%20r_emailaddress`}>
+                                i18n.t('Connect to linkedin to fill your
+                                positions automatically')
+                              </a>
+                            </CardActions>
+                          ) : (
+                            i18n.t('This user has not filled their profile yet')
+                          )}
+                        </>
+                      )}
+                      <Typography
+                        variant="h4"
+                        gutterBottom
+                        className={classes.title}>
+                        {i18n.t('Open Source Contributions')}
+                      </Typography>
+                      <Typography
+                        variant="p"
+                        component="p"
+                        className={classes.title}>
+                        {i18n.t(
+                          'Keep in mind that any lack of open source contributions ' +
+                            'does not mean lack of skills and that all candidates should ' +
+                            'be investigated further based on other factors such' +
+                            ' as  as skills, previous positions, education, interview process etc',
+                        )}
+                      </Typography>
+                      <p />
+                      {user.githubRepositories &&
+                      user.githubRepositories.nodes &&
+                      user.githubRepositories.nodes.length > 0 ? (
+                        <>
+                          <Typography
+                            variant="h4"
+                            gutterBottom
+                            className={classes.title}>
+                            {i18n.t('Repositories contributed to')}
+                          </Typography>
+                          {user.githubRepositories.nodes.map(repo => (
+                            <>
+                              <List key={repo.nameWithOwner} dense={true}>
+                                <ListItem>
+                                  <ListItemAvatar>
+                                    <Avatar src={repo.owner.avatarUrl} />
+                                  </ListItemAvatar>
+                                  <ListItemText
+                                    primary={
+                                      <>
+                                        [
+                                        {repo.primaryLanguage
+                                          ? repo.primaryLanguage.name
+                                          : null}
+                                        ] {repo.nameWithOwner} (
+                                        {repo.stargazers.totalCount} ⭐'s)
+                                      </>
                                     }
-                                    target="_blank">
-                                    <IconButton aria-label="Delete">
-                                      <OpenInNew />
-                                    </IconButton>
-                                  </a>
-                                </ListItemSecondaryAction>
-                              </ListItem>
-                            </List>
-                          </>
-                        ))}
-                      </>
-                    ) : null}
-                    {user.pullRequests &&
-                    user.pullRequests.nodes &&
-                    user.pullRequests.nodes.length > 0 ? (
-                      <>
-                        <Typography
-                          variant="h4"
-                          gutterBottom
-                          className={classes.title}>
-                          {i18n.t('Merged Pull Requests')}
-                        </Typography>
-                        {user.pullRequests.nodes.map(pr => (
-                          <>
-                            <List key={pr.id} dense={true}>
-                              <ListItem>
-                                <ListItemAvatar>
-                                  <Avatar src={pr.repository.owner.avatarUrl} />
-                                </ListItemAvatar>
-                                <ListItemText
-                                  primary={
-                                    <>
-                                      {pr.repository.primaryLanguage ? (
-                                        <>
-                                          [{pr.repository.primaryLanguage.name}]{' '}
-                                        </>
-                                      ) : null}
-                                      {pr.title} merged in{' '}
-                                      {pr.repository.nameWithOwner}
-                                    </>
-                                  }
-                                  secondary={
-                                    pr.mergedBy
-                                      ? 'Merged by @' + pr.mergedBy.login
-                                      : null
-                                  }
-                                />
-                                <ListItemSecondaryAction>
-                                  <a href={pr.url} target="_blank">
-                                    <IconButton aria-label="Open">
-                                      <OpenInNew />
-                                    </IconButton>
-                                  </a>
-                                </ListItemSecondaryAction>
-                              </ListItem>
-                            </List>
-                          </>
-                        ))}
-                      </>
-                    ) : null}
-                  </CardContent>
-                </Card>
-              </div>
+                                    secondary={repo.description}
+                                  />
+                                  <ListItemSecondaryAction>
+                                    <a
+                                      href={
+                                        repo.url +
+                                        '/commits?author=' +
+                                        user.githubUsername
+                                      }
+                                      target="_blank">
+                                      <IconButton aria-label="Delete">
+                                        <OpenInNew />
+                                      </IconButton>
+                                    </a>
+                                  </ListItemSecondaryAction>
+                                </ListItem>
+                              </List>
+                            </>
+                          ))}
+                        </>
+                      ) : null}
+                      {user.pullRequests &&
+                      user.pullRequests.nodes &&
+                      user.pullRequests.nodes.length > 0 ? (
+                        <>
+                          <Typography
+                            variant="h4"
+                            gutterBottom
+                            className={classes.title}>
+                            {i18n.t('Merged Pull Requests')}
+                          </Typography>
+                          {user.pullRequests.nodes.map(pr => (
+                            <>
+                              <List key={pr.id} dense={true}>
+                                <ListItem>
+                                  <ListItemAvatar>
+                                    <Avatar
+                                      src={pr.repository.owner.avatarUrl}
+                                    />
+                                  </ListItemAvatar>
+                                  <ListItemText
+                                    primary={
+                                      <>
+                                        {pr.repository.primaryLanguage ? (
+                                          <>
+                                            [
+                                            {pr.repository.primaryLanguage.name}
+                                            ]{' '}
+                                          </>
+                                        ) : null}
+                                        {pr.title} merged in{' '}
+                                        {pr.repository.nameWithOwner}
+                                      </>
+                                    }
+                                    secondary={
+                                      pr.mergedBy
+                                        ? 'Merged by @' + pr.mergedBy.login
+                                        : null
+                                    }
+                                  />
+                                  <ListItemSecondaryAction>
+                                    <a href={pr.url} target="_blank">
+                                      <IconButton aria-label="Open">
+                                        <OpenInNew />
+                                      </IconButton>
+                                    </a>
+                                  </ListItemSecondaryAction>
+                                </ListItem>
+                              </List>
+                            </>
+                          ))}
+                        </>
+                      ) : null}
+                    </CardContent>
+                  </Card>
+                </div>
+              </Grid>
             </Grid>
-          </Grid>
+          </div>
         </div>
       </I18nextProvider>
     );
