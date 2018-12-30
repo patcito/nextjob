@@ -91,6 +91,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
+import Head from '../components/head';
 
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -394,10 +395,12 @@ class Profile extends React.Component {
     const {classes, user} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
+    let title = `ReactEurope Jobs - ${user.name}`;
     let bio = this.props.bio;
     return (
       <I18nextProvider i18n={this.i18n}>
         <div>
+          <Head title={title} />
           <Dialog
             open={this.state.openEditBio}
             onClose={this.handleClose}
