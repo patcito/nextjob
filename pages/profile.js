@@ -542,15 +542,17 @@ class Profile extends React.Component {
                               secondary={
                                 <>
                                   {position.startDate
-                                    ? 'from ' + position.startDate.month + '/'
+                                    ? i18n.t('from ') +
+                                      position.startDate.month +
+                                      '/'
                                     : null}
                                   {position.startDate
                                     ? position.startDate.year
                                     : null}
                                   {position.isCurrent && position.startDate
-                                    ? ' to present'
+                                    ? i18n.t(' to present')
                                     : position.endDate
-                                      ? 'until ' +
+                                      ? i18n.t('until ') +
                                         position.endDate.month +
                                         '/' +
                                         position.endDate.year
@@ -571,12 +573,12 @@ class Profile extends React.Component {
                               }&response_type=code&redirect_uri=${
                                 publicRuntimeConfig.publicHostname
                               }&scope=r_basicprofile%20r_emailaddress`}>
-                              Connect to linkedin to fill your positions
-                              automatically
+                              i18n.t('Connect to linkedin to fill your positions
+                              automatically')
                             </a>
                           </CardActions>
                         ) : (
-                          'This user has not filled their profile yet.'
+                          i18n.t('This user has not filled their profile yet')
                         )}
                       </>
                     )}
@@ -584,16 +586,18 @@ class Profile extends React.Component {
                       variant="h4"
                       gutterBottom
                       className={classes.title}>
-                      Open Source Contributions
+                      {i18n.t('Open Source Contributions')}
                     </Typography>
                     <Typography
                       variant="p"
                       component="p"
                       className={classes.title}>
-                      Keep in mind that any lack of open source contributions
-                      does not mean lack of skills and that all candidates
-                      should be investigated further based on other factors such
-                      as previous positions and education.
+                      {i18n.t(
+                        'Keep in mind that any lack of open source contributions ' +
+                          'does not mean lack of skills and that all candidates should ' +
+                          'be investigated further based on other factors such' +
+                          ' as  as skills, previous positions, education, interview process etc',
+                      )}
                     </Typography>
                     <p />
                     {user.githubRepositories &&
@@ -604,7 +608,7 @@ class Profile extends React.Component {
                           variant="h4"
                           gutterBottom
                           className={classes.title}>
-                          Repositories contributed to
+                          {i18n.t('Repositories contributed to')}
                         </Typography>
                         {user.githubRepositories.nodes.map(repo => (
                           <>
@@ -653,7 +657,7 @@ class Profile extends React.Component {
                           variant="h4"
                           gutterBottom
                           className={classes.title}>
-                          Merged Pull Requests
+                          {i18n.t('Merged Pull Requests')}
                         </Typography>
                         {user.pullRequests.nodes.map(pr => (
                           <>

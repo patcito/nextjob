@@ -87,5 +87,14 @@
   "ReactEurope Jobs - Applications": "ReactEurope Jobs - Candidatures",
   "ReactEurope Jobs - Edit Company": "ReactEurope Jobs - Modifier Société",
   "ReactEurope Jobs - Edit Job": "ReactEurope Jobs - Modifier Offre",
-  "ReactEurope Jobs - New Job": "ReactEurope Jobs - Nouvelle Offre"
+  "ReactEurope Jobs - New Job": "ReactEurope Jobs - Nouvelle Offre",
+  "from ": "depuis ",
+  "until ": "jusque ",
+  " to present": " jusqu'à présent",
+  "Connect to linkedin to fill your positions automatically": "Connectez votre compte linkedin pour remplir vos positions automatiquement",
+  "This user has not filled their profile yet": "Cet utilisateur n'a pas encore rempli son profil",
+  "Open Source Contributions": "Contributions Open Source",
+  "Keep in mind that any lack of open source contributions does not mean lack of skills and that all candidates should be investigated further based on other factors such as skills, previous positions, education, interview process etc": "Il est important de garder à l'esprit que les contributions open source ne sont qu'un indicateur parmi d'autre et qu'il est plus important de choisir un candidat en fonction de ses compétences techniques, positions antérieurs et résultat d'interview",
+  "Repositories contributed to": "Dépôts contribués",
+  "Merged Pull Requests": "Pull Requests Acceptées"
 }
