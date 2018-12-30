@@ -29,6 +29,7 @@ import WorkIcon from '@material-ui/icons/Work';
 import getConfig from 'next/config';
 import removeMd from 'remove-markdown';
 import supportsWebP from 'supports-webp';
+import slugify from 'slugify';
 
 let ext = 'png';
 supportsWebP ? (ext = 'webp') : (ext = 'png');
@@ -126,7 +127,7 @@ class Job extends React.Component {
     const {open} = this.state;
     console.log(i);
     return (
-      <Link href={'/jobs/' + job.id}>
+      <Link href={`/jobs/${job.id}/${slugify(job.JobTitle+' at '+job.Company.name)}`}>
         <Card className={classes.card} style={{cursor: 'pointer'}}>
           <CardMedia
             className={classes.cover}

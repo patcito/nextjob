@@ -1046,6 +1046,13 @@ app.prepare().then(() => {
     });
   });
 
+  server.get('/jobs/:jobId/:slug', (req, res) => {
+    return app.render(req, res, '/showjob', {
+      jobId: req.params.jobId,
+      action: 'showJob',
+    });
+  });
+
   server.get('/companies/:companyId/edit', (req, res) => {
     return app.render(req, res, '/editcompany', {
       companyId: req.params.companyId,
