@@ -1008,6 +1008,12 @@ app.prepare().then(() => {
     return app.render(req, res, '/', {companyId: req.params.companyId});
   });
 
+  server.get('/jobs/companies/:companyId/:slug/team', (req, res) => {
+    return app.render(req, res, '/', {
+      companyId: req.params.companyId,
+      team: true,
+    });
+  });
 
   server.get('/companies', (req, res) => {
     return app.render(req, res, '/', {companies: true});
@@ -1036,13 +1042,19 @@ app.prepare().then(() => {
     });
   });
 
+  server.get('/companies/:companyId/edit', (req, res) => {
+    return app.render(req, res, '/editcompany', {
+      companyId: req.params.companyId,
+      action: 'editCompany',
+    });
+  });
+
   server.get('/companies/:companyId/:slug', (req, res) => {
     return app.render(req, res, '/showcompany', {
       companyId: req.params.companyId,
       action: 'showCompany',
     });
   });
-
 
   server.get('/jobs/:jobId', (req, res) => {
     return app.render(req, res, '/showjob', {
@@ -1063,13 +1075,6 @@ app.prepare().then(() => {
     return app.render(req, res, '/showjob', {
       jobId: req.params.jobId,
       action: 'showJob',
-    });
-  });
-
-  server.get('/companies/:companyId/edit', (req, res) => {
-    return app.render(req, res, '/editcompany', {
-      companyId: req.params.companyId,
-      action: 'editCompany',
     });
   });
 

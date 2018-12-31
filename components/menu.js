@@ -23,6 +23,7 @@ import Router from 'next/router';
 import {withRouter} from 'next/router';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import slugify from 'slugify';
 import {
   TwitterCircle,
   GithubCircle,

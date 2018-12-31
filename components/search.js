@@ -23,7 +23,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Link from 'next/link';
 import SearchBar from 'material-ui-search-bar';
-import SingleSelect from '../components/select';
 import DownshiftSelect from '../components/downshift';
 import Router from 'next/router';
 

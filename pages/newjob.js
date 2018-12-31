@@ -45,7 +45,6 @@ import EMPLOYEMENTTYPES from '../data/employementtypes';
 import SENIORITYLEVELS from '../data/senioritylevels';
 import SKILLS from '../data/skills';
 
-import SingleSelect from '../components/select';
 import DownshiftSelect from '../components/downshift';
 import MultipleDownshiftSelect from '../components/multipledownshift';
 

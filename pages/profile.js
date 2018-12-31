@@ -41,7 +41,6 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormLabel from '@material-ui/core/FormLabel';
 
-import SingleSelect from '../components/select';
 import DownshiftSelect from '../components/downshift';
 import MultipleDownshiftSelect from '../components/multipledownshift';
 
