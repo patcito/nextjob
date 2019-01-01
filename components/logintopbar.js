@@ -117,8 +117,6 @@ class LoginAppBarTop extends React.Component {
   }
 
   componentDidMount(props) {
-    console.log('propppppppppppppppppps', this.props);
-    alert(1);
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const user = localStorage.getItem('currentUser');
