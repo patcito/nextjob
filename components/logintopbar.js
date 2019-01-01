@@ -117,7 +117,8 @@ class LoginAppBarTop extends React.Component {
   }
 
   componentDidMount(props) {
-    console.log('props', this.props);
+    console.log('propppppppppppppppppps', this.props);
+    alert(1);
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const user = localStorage.getItem('currentUser');
@@ -139,7 +140,10 @@ class LoginAppBarTop extends React.Component {
           JSON.stringify(this.props.userInfo.currentUser),
         );
       }
-      if (!this.props.userInfo) {
+      if (
+        !this.props.userInfo ||
+        JSON.parse(localStorage.getItem('currentUser')) === null
+      ) {
         this.logOut();
       }
     }
