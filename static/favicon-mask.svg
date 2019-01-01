@@ -15,7 +15,7 @@
    version="1.1"
    id="svg1634"
    inkscape:version="0.92.3 (unknown)"
-   sodipodi:docname="drawing.svg">
+   sodipodi:docname="favicon-mask.svg">
   <defs
      id="defs1628">
     <clipPath
@@ -59,7 +59,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="130.17492"
+     inkscape:cx="31.432509"
      inkscape:cy="119.04684"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -81,7 +81,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -210,5 +210,24 @@
         </g>
       </g>
     </g>
+    <rect
+       style="fill:#3f52ac;fill-opacity:1;stroke:none;stroke-width:0.20985591;stroke-opacity:1"
+       id="rect1045"
+       width="33.949036"
+       height="13.064388"
+       x="63.711941"
+       y="163.81593"
+       ry="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:13.24843693px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#3f52ac;fill-opacity:1;stroke:#ffffff;stroke-width:0.33121094;stroke-opacity:1"
+       x="65.324196"
+       y="174.41104"
+       id="text228-3"><tspan
+         sodipodi:role="line"
+         id="tspan226-1"
+         x="65.324196"
+         y="174.41104"
+         style="fill:#3f52ac;fill-opacity:1;stroke:#ffffff;stroke-width:0.33121094;stroke-opacity:1">JOBS</tspan></text>
   </g>
 </svg>
