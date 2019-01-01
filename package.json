@@ -42,6 +42,7 @@
     "mdi-material-ui": "^5.7.0",
     "mui-places-autocomplete": "^2.0.0",
     "next": "^7.0.2",
+    "next-ga": "^2.3.4",
     "next-plugin-graphql": "^0.0.2",
     "node-fetch": "^2.3.0",
     "rc-slider": "^8.6.4",

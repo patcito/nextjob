@@ -455,6 +455,7 @@ class IndexApplications extends React.Component {
 
       userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
+    console.log('userInfo', userInfo);
     const queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,

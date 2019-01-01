@@ -5,6 +5,10 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import JssProvider from 'react-jss/lib/JssProvider';
 import getPageContext from '../src/getPageContext';
 import Head from 'next/head';
+import getConfig from 'next/config';
+import Router from 'next/router';
+import withGA from 'next-ga';
+const {publicRuntimeConfig} = getConfig();
 
 class MyApp extends App {
   constructor(props) {
@@ -46,5 +50,4 @@ class MyApp extends App {
     );
   }
 }
-
-export default MyApp;
+export default withGA(publicRuntimeConfig.gaid, Router)(MyApp);

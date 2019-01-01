@@ -3,6 +3,7 @@ const withGraphql = require('next-plugin-graphql');
 module.exports = withGraphql(
   withCSS({
     publicRuntimeConfig: {
+      gaid: process.env.GA_ID || '',
       host: process.env.HOST || 'http://localhost:4000',
       hasura: process.env.HASURA || 'http://hasura:8080/v1alpha1/graphql',
       hasuraClient:
