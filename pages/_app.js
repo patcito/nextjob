@@ -11,7 +11,6 @@ import withGA from 'next-ga';
 import * as Sentry from '@sentry/browser';
 
 const {publicRuntimeConfig} = getConfig();
-const SENTRY_PUBLIC_DSN = '';
 
 class MyApp extends App {
   constructor(props) {

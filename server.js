@@ -20,11 +20,15 @@ const fs = require('fs');
 const sgMail = require('@sendgrid/mail');
 const showdown = require('showdown');
 const download = require('download-file');
+const Sentry = require('@sentry/node');
+Sentry.init({dsn: process.env.SENTRY_PUBLIC_DSN});
 
 app.prepare().then(() => {
   const server = express();
   //const staticPath = __dirname + '/tmp';
   const staticPath = '/tmp';
+  server.use(Sentry.Handlers.requestHandler());
+  server.use(Sentry.Handlers.errorHandler());
 
   server.use(acceptWebp(staticPath, ['jpg', 'jpeg', 'png']));
   server.use(express.static(staticPath));
