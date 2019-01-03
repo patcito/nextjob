@@ -4,6 +4,7 @@ module.exports = withGraphql(
   withCSS({
     publicRuntimeConfig: {
       gaid: process.env.GA_ID || '',
+      sentryPublicDNS: process.env.SENTRY_PUBLIC_DSN || '',
       host: process.env.HOST || 'http://localhost:4000',
       hasura: process.env.HASURA || 'http://hasura:8080/v1alpha1/graphql',
       hasuraClient:

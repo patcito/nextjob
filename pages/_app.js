@@ -8,12 +8,16 @@ import Head from 'next/head';
 import getConfig from 'next/config';
 import Router from 'next/router';
 import withGA from 'next-ga';
+import * as Sentry from '@sentry/browser';
+
 const {publicRuntimeConfig} = getConfig();
+const SENTRY_PUBLIC_DSN = '';
 
 class MyApp extends App {
   constructor(props) {
     super(props);
     this.pageContext = getPageContext();
+    Sentry.init({dsn: publicRuntimeConfig.sentryPublicDNS});
   }
 
   pageContext = null;
@@ -24,6 +28,26 @@ class MyApp extends App {
     if (jssStyles && jssStyles.parentNode) {
       jssStyles.parentNode.removeChild(jssStyles);
     }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.clear();
+      document.cookie.split(';').forEach(function(c) {
+        document.cookie = c
+          .replace(/^ +/, '')
+          .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+      });
+    }
+    Sentry.configureScope(scope => {
+      Object.keys(errorInfo).forEach(key => {
+        scope.setExtra(key, errorInfo[key]);
+      });
+    });
+    Sentry.captureException(error);
+
+    // This is needed to render errors correctly in development / production
+    super.componentDidCatch(error, errorInfo);
   }
 
   render() {
