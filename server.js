@@ -1455,7 +1455,8 @@ The ReactEurope jobs team
     });
   });
   server.get('/robots.txt', (req, res) => {
-    res.sendFile('robots.txt', {root: path.join(__dirname, 'static')});
+    res.set('Content-Type', 'text/plain');
+    res.send(new Buffer('User-Agent: *\nDisallow: /*?*'));
   });
 
   server.get('/*logo.png', (req, res) => {
