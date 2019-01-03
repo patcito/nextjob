@@ -21,6 +21,8 @@ const sgMail = require('@sendgrid/mail');
 const showdown = require('showdown');
 const download = require('download-file');
 const Sentry = require('@sentry/node');
+const path = require('path');
+
 Sentry.init({dsn: process.env.SENTRY_PUBLIC_DSN});
 
 app.prepare().then(() => {
@@ -1452,6 +1454,10 @@ The ReactEurope jobs team
       });
     });
   });
+  server.get('/robots.txt', (req, res) => {
+    res.sendFile('robots.txt', {root: path.join(__dirname, 'static')});
+  });
+
   server.get('/*logo.png', (req, res) => {
     res.sendFile(staticPath + '/defaultlogo.png');
   });
