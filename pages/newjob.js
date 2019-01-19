@@ -927,7 +927,9 @@ $applicationEmail: String,
     });
     client.request(createCompanyopts.query, newCompany).then(gdata => {
       const currentUser = that.state.currentUser;
-      currentUser.Companies.push(gdata.insert_Company.returning[0]);
+      const companies = currentUser.Companies || [];
+      companies.push(gdata.insert_Company.returning[0]);
+      currentUser.Companies = companies; //.push(gdata.insert_Company.returning[0]);
 
       this.upload(gdata.insert_Company.returning[0].id);
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
