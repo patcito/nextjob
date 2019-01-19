@@ -115,6 +115,7 @@ class NewJob extends React.Component {
     selectedCompany: '',
     selectedEmployementType: {value: 'FullTime', label: 'Full-time'},
     selectedSeniorityLevel: {value: 'EntryLevel', label: 'Entry level'},
+    jobTitle: {value: 'frontend developer', label: 'frontend developer'},
     activeStep: 0,
     addNewCompany: false,
     minSalary: 10,
@@ -1093,9 +1094,7 @@ $applicationEmail: String,
                     i18n={this.i18n}
                     suggestions={jobstitles}
                     selectedItem={this.state.jobTitle}
-                    label={
-                      this.state.jobTitle || this.i18n.t('newjob:Job title')
-                    }
+                    label={this.i18n.t('jobstitles:frontend developer')}
                     onBlur={e => this.handleBlur(e, true)}
                     onFocus={e => this.handleFocus(e, true)}
                     handleParentChange={this.handleChangeJobTitle}
