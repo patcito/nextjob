@@ -256,12 +256,12 @@ class SearchFilters extends React.Component {
     let cities = [];
     (group_by_location || []).map(
       location =>
-        location.locality && location.country
+        location && location.locality && location.country
           ? cities.push({
               value: location,
               label: location.locality + ' (' + location.country + ')',
             })
-          : location.countrylocation.country
+          : location.country
             ? cities.push({value: location, label: location.country})
             : null,
     );
