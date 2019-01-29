@@ -31,6 +31,7 @@ import getConfig from 'next/config';
 import removeMd from 'remove-markdown';
 import supportsWebP from 'supports-webp';
 import slugify from 'slugify';
+import ellipsis from 'text-ellipsis';
 
 let ext = 'png';
 supportsWebP ? (ext = 'webp') : (ext = 'png');
@@ -152,8 +153,8 @@ class Company extends React.Component {
                   <Typography variant="subheading" color="textSecondary" />
                   <Typography>
                     {i18n.language === 'fr'
-                      ? removeMd(company.description_fr).slice(0, 40)
-                      : removeMd(company.description).slice(0, 40)}
+                      ? removeMd(ellipsis(company.description_fr, 40))
+                      : removeMd(ellipsis(company.description, 40))}
                   </Typography>
                 </CardContent>
               </div>
@@ -176,7 +177,10 @@ class Company extends React.Component {
             </>
           ) : (
             <>
-              <Link href={'/jobs/companies/' + company.id + '/' + slugify(company.name)}>
+              <Link
+                href={
+                  '/jobs/companies/' + company.id + '/' + slugify(company.name)
+                }>
                 <Button size="small" color="primary">
                   {i18n.t('JOBS')}
                 </Button>

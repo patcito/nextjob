@@ -30,7 +30,7 @@ import getConfig from 'next/config';
 import removeMd from 'remove-markdown';
 import supportsWebP from 'supports-webp';
 import slugify from 'slugify';
-
+import ellipsis from 'text-ellipsis';
 let ext = 'png';
 supportsWebP ? (ext = 'webp') : (ext = 'png');
 
@@ -127,7 +127,10 @@ class Job extends React.Component {
     const {open} = this.state;
     console.log(i);
     return (
-      <Link href={`/jobs/${job.id}/${slugify(job.JobTitle+' at '+job.Company.name)}`}>
+      <Link
+        href={`/jobs/${job.id}/${slugify(
+          job.JobTitle + ' at ' + job.Company.name,
+        )}`}>
         <Card className={classes.card} style={{cursor: 'pointer'}}>
           <CardMedia
             className={classes.cover}
@@ -153,8 +156,8 @@ class Job extends React.Component {
               </Typography>
               <Typography>
                 {i18n.language === 'fr'
-                  ? removeMd(job.Company.description_fr.slice(0, 120))
-                  : removeMd(job.Company.description.slice(0, 120))}
+                  ? removeMd(ellipsis(job.Company.description_fr, 120))
+                  : removeMd(ellipsis(job.Company.description, 120))}
               </Typography>
               <Grid item>
                 <div className={classes.root}>
