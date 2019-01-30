@@ -134,7 +134,7 @@ class Index extends React.Component {
       meId = userInfo.userId;
       companyModsquery = '{Company: {Moderators: {User: {id: {_eq: $meId}}}}}';
     }
-    if (userInfo.userId) {
+    if (userInfo.userId && parseInt(userInfo.userId)) {
       companyAggregatequery = `Company_aggregate(where:
       { _or: [
                     {ownerId: {_eq: $userId}}
@@ -364,7 +364,6 @@ class Index extends React.Component {
       ? (metaDescription += jobsAndCompanies.Company[0].name)
       : (metaDescription += 'top companies');
 
-    console.log(jobsAndCompanies, jobsAndCompanies.Company);
     if (
       companyId &&
       jobsAndCompanies.Company &&
