@@ -656,6 +656,7 @@ $applicationEmail: String,
 	}`,
       headers: {
         'x-access-token': token,
+        'x-access-role': 'userType',
       },
     };
     const client = new grequest.GraphQLClient(createCompanyopts.uri, {

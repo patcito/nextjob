@@ -405,7 +405,6 @@ class ShowJob extends React.Component {
             administrative_area_level_1
             postal_code
             applicationUrl
-            applicationEmail
             applyDirectly
             lat
             lng
