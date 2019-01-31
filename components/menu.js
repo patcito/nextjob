@@ -212,7 +212,7 @@ class MenuList extends React.Component {
         <List
           component="nav"
           className={this.props.drawer ? null : classes.drawer}>
-          <ListItem style={{iicolor: '#48a9dc', backgroundColor: '#e0e0e0'}}>
+          <ListItem style={{backgroundColor: '#e0e0e0'}}>
             <strong>
               <p>
                 Post a react job or apply for
@@ -220,7 +220,7 @@ class MenuList extends React.Component {
               </p>
               <p>
                 Reach thousands of passionate
-                <br /> React developpers today.
+                <br /> React developers today.
               </p>
             </strong>
           </ListItem>
