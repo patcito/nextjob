@@ -212,6 +212,18 @@ class MenuList extends React.Component {
         <List
           component="nav"
           className={this.props.drawer ? null : classes.drawer}>
+          <ListItem style={{iicolor: '#48a9dc', backgroundColor: '#e0e0e0'}}>
+            <strong>
+              <p>
+                Post a react job or apply for
+                <br /> one for free!
+              </p>
+              <p>
+                Reach thousands of passionate
+                <br /> React developpers today.
+              </p>
+            </strong>
+          </ListItem>
           <ListItem>
             <span>
               <a href="https://github.com/patcito/nextjob" target="_blank">
@@ -224,7 +236,7 @@ class MenuList extends React.Component {
                 className="techLinks">
                 Next.js
               </a>
-              ,{' '}
+              ,<br />
               <a
                 href="https://material-ui.com/"
                 target="_blank"
