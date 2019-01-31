@@ -220,7 +220,9 @@ class MenuList extends React.Component {
               </p>
               <p>
                 Reach thousands of passionate
-                <br /> React developers today.
+                <br /> React developers today <br />
+                visiting our conference site <br />
+                and social media accounts.
               </p>
             </strong>
           </ListItem>
