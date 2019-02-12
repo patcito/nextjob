@@ -155,7 +155,7 @@ class Job extends React.Component {
                 </>
               </Typography>
               <Typography>
-                {i18n.language === 'fr'
+                {i18n.language === 'fr' && job.Company.description_fr
                   ? removeMd(ellipsis(job.Company.description_fr + '', 120))
                   : removeMd(ellipsis(job.Company.description + '', 120))}
               </Typography>

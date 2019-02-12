@@ -152,7 +152,7 @@ class Company extends React.Component {
                   <Typography variant="headline">{company.name}</Typography>
                   <Typography variant="subheading" color="textSecondary" />
                   <Typography>
-                    {i18n.language === 'fr'
+                    {i18n.language === 'fr' && company.description_fr
                       ? removeMd(ellipsis(company.description_fr + '', 40))
                       : removeMd(ellipsis(company.description + '', 40))}
                   </Typography>
