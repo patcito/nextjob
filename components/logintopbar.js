@@ -164,7 +164,7 @@ class LoginAppBarTop extends React.Component {
         href={`https://github.com/login/oauth/authorize?client_id=${
           publicRuntimeConfig.githubId
         }&scope=public_repo%20user:email`}>
-        {i18n.t('common:Login as Applicant')}
+        {i18n.t('common:Login as Talent')}
       </a>
     );
     //`
@@ -230,7 +230,7 @@ class LoginAppBarTop extends React.Component {
                 href={`https://github.com/login/oauth/authorize?client_id=${
                   publicRuntimeConfig.githubId
                 }&scope=public_repo%20user:email`}>
-                {i18n.t('common:Login as Applicant')}
+                {i18n.t('common:Login as Talent')}
               </Button>
 
               <Button
@@ -242,7 +242,7 @@ class LoginAppBarTop extends React.Component {
                 }&response_type=code&redirect_uri=${
                   publicRuntimeConfig.publicHostname
                 }&scope=r_basicprofile%20r_emailaddress`}>
-                {i18n.t('common:Login as HR to post a job')}
+                {i18n.t('common:Login as Employer')}
               </Button>
               <Button
                 color="inherit"
@@ -253,7 +253,7 @@ class LoginAppBarTop extends React.Component {
                 }&response_type=code&redirect_uri=${
                   publicRuntimeConfig.publicHostname
                 }&scope=r_basicprofile%20r_emailaddress`}>
-                {i18n.t('common:Login as HR')}
+                {i18n.t('common:Login as Employer')}
               </Button>
             </>
           )}

@@ -63,8 +63,8 @@
   "Send application": "Envoyer candidature",
   "Your application has been sent!'": "Votre candidature a bien été envoyée!",
 
-  "Login as Applicant": "S'identifier demmandeur d'emploi",
-  "Login as HR to post a job": "S'identifier RH et poster une offre",
+  "Login as Talent": "Postuler",
+  "Login as Employer": "Poster une offre",
   "Login as HR": "S'identifier RH",
   "My Profile": "Mon profile",
   "Logout": "Déconnexion",
