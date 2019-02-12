@@ -153,8 +153,8 @@ class Company extends React.Component {
                   <Typography variant="subheading" color="textSecondary" />
                   <Typography>
                     {i18n.language === 'fr'
-                      ? removeMd(ellipsis(company.description_fr, 40))
-                      : removeMd(ellipsis(company.description, 40))}
+                      ? removeMd(ellipsis(company.description_fr + '', 40))
+                      : removeMd(ellipsis(company.description + '', 40))}
                   </Typography>
                 </CardContent>
               </div>

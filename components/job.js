@@ -156,8 +156,8 @@ class Job extends React.Component {
               </Typography>
               <Typography>
                 {i18n.language === 'fr'
-                  ? removeMd(ellipsis(job.Company.description_fr, 120))
-                  : removeMd(ellipsis(job.Company.description, 120))}
+                  ? removeMd(ellipsis(job.Company.description_fr + '', 120))
+                  : removeMd(ellipsis(job.Company.description + '', 120))}
               </Typography>
               <Grid item>
                 <div className={classes.root}>
