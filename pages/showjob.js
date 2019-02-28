@@ -846,9 +846,9 @@ class ShowJob extends React.Component {
                       <CardContent>
                         <div style={{textAlign: 'left'}}>
                           <Markdown>
-                            {this.props.lang === 'fr'
-                              ? job.description_fr
-                              : job.description}
+                            {this.props.lang === 'fr' && job.description_fr
+                              ? job.description_fr + ''
+                              : job.description + ''}
                           </Markdown>{' '}
                         </div>
                       </CardContent>
