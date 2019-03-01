@@ -22,6 +22,7 @@ const showdown = require('showdown');
 const download = require('download-file');
 const Sentry = require('@sentry/node');
 const path = require('path');
+const slugify = require('slugify');
 
 Sentry.init({dsn: process.env.SENTRY_PUBLIC_DSN});
 
@@ -733,42 +734,51 @@ app.prepare().then(() => {
                         filename: `linkedin-avatar-${req.userId}.jpeg`,
                       };
 
-                      if (url) {
-                        download(url, options, function(err) {
-                          if (err) console.log(err);
-                          console.log('meow');
+                      if (
+                        bodyJson &&
+                        bodyJson.pictureUrls &&
+                        bodyJson.pictureUrls.values &&
+                        bodyJson.pictureUrls.values[0]
+                      ) {
+                        download(
+                          bodyJson.pictureUrls.values[0],
+                          options,
+                          function(err) {
+                            if (err) console.log(err);
+                            console.log('meow');
 
-                          sharp(
-                            options.directory + '/' + options.filename,
-                          ).toFile(
-                            `/tmp/linkedin-avatar-${req.userId}.webp`,
-                            (err, info) => {
-                              if (err) {
-                                console.log(err);
-                              }
-                              sharp(
-                                options.directory + '/' + options.filename,
-                              ).toFile(
-                                `/tmp/linkedin-avatar-${req.userId}.png`,
-                                (err, info) => {
-                                  if (err) {
-                                    originalRes.status(500).json(err);
-                                  }
-                                  uploadToGCE(
-                                    process.env.GOOGLE_STORAGE_BUCKET,
-                                    `/tmp/linkedin-avatar-${req.userId}.webp`,
-                                  );
+                            sharp(
+                              options.directory + '/' + options.filename,
+                            ).toFile(
+                              `/tmp/linkedin-avatar-${req.userId}.webp`,
+                              (err, info) => {
+                                if (err) {
+                                  console.log(err);
+                                }
+                                sharp(
+                                  options.directory + '/' + options.filename,
+                                ).toFile(
+                                  `/tmp/linkedin-avatar-${req.userId}.png`,
+                                  (err, info) => {
+                                    if (err) {
+                                      originalRes.status(500).json(err);
+                                    }
+                                    uploadToGCE(
+                                      process.env.GOOGLE_STORAGE_BUCKET,
+                                      `/tmp/linkedin-avatar-${req.userId}.webp`,
+                                    );
 
-                                  uploadToGCE(
-                                    process.env.GOOGLE_STORAGE_BUCKET,
-                                    `/tmp/linkedin-avatar-${req.userId}.png`,
-                                  );
-                                  console.log(err, info);
-                                },
-                              );
-                            },
-                          );
-                        });
+                                    uploadToGCE(
+                                      process.env.GOOGLE_STORAGE_BUCKET,
+                                      `/tmp/linkedin-avatar-${req.userId}.png`,
+                                    );
+                                    console.log(err, info);
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        );
                       }
                       next();
                       return;
@@ -822,7 +832,13 @@ app.prepare().then(() => {
                       name: bodyJson.formattedName,
                       linkedinEmail: bodyJson.emailAddress,
                       linkedinId: bodyJson.id,
-                      linkedinAvatarUrl: bodyJson.pictureUrl,
+                      linkedinAvatarUrl:
+                        bodyJson &&
+                        bodyJson.pictureUrls &&
+                        bodyJson.pictureUrls.values &&
+                        bodyJson.pictureUrls.values[0]
+                          ? bodyJson.pictureUrls.values[0]
+                          : '',
                       linkedinAccessToken: otoken,
                       firstName: bodyJson.firstName,
                       lastName: bodyJson.lastName,
@@ -1291,7 +1307,7 @@ The ReactEurope jobs team
       .then(data => {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
         const email = data.JobApplication[0].Job.applicationEmail;
-        const msg = {
+        let msg = {
           to: email,
           from: 'ReactEurope Jobs <jobs@react-europe.org>',
           subject: 'New job application',
@@ -1324,9 +1340,162 @@ The ReactEurope jobs team
 			`,
         };
         sgMail.send(msg);
+        msg.email = process.env.ADMIN_EMAIL;
+        msg.subject = '[admin]: New job application';
+        sgMail.send(msg);
         res.json(data);
       })
       .catch(() => res.status(500));
+  });
+
+  server.post('/jobCreateWebhook', function(req, res) {
+    console.log('/jobCreateWebhook', req.body.event.data.new.id);
+    const newJob = req.body.event.data.new;
+    const oldJob = req.body.event.data.old;
+
+    if (newJob.isPublished && (!oldJob || oldJob.isPublished !== true)) {
+      const getJobApplicationOwnerEmailopts = {
+        uri: process.env.HASURA,
+        json: true,
+        query: `
+        query Users($companyId: Int) {
+          User(
+            where: {
+              _and: {
+                getNotifications: {_eq: true}
+                githubEmail: {_is_null: false}
+              }
+            }
+          ) {
+            id
+            githubEmail
+			notificationsUUID
+          }
+          Company(where: {id: {_eq: $companyId}}) {
+            id
+            name
+          }
+        }
+      `,
+        headers: {
+          'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+        },
+      };
+      console.log('/jobCreateWebhook 2', newJob.id);
+
+      const getJobOwnerEmailVars = {
+        companyId: newJob.companyId,
+      };
+      console.log('/jobCreateWebhook 3', newJob.id);
+
+      const client = new grequest.GraphQLClient(
+        getJobApplicationOwnerEmailopts.uri,
+        {
+          headers: getJobApplicationOwnerEmailopts.headers,
+        },
+      );
+      let msg = {};
+      client
+        .request(getJobApplicationOwnerEmailopts.query, getJobOwnerEmailVars)
+        .then(data => {
+          sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+          const users = data.User;
+          const company = data.Company[0];
+          const subject = `${company.name} is looking for a ${newJob.JobTitle}`;
+          console.log('/jobCreateWebhook 4', newJob.id);
+
+          users.map(user => {
+            msg = {
+              from: 'ReactEurope Jobs <jobs@react-europe.org>',
+              subject: subject,
+              text: `Hi there, \n
+${company.name} is looking for a ${newJob.JobTitle}".\n\n
+
+You can read more about it here: ${process.env.PUBLIC_HOSTNAME}/jobs/${
+                newJob.id
+              }/${slugify(newJob.JobTitle + ' at ' + company.name)}
+\n\n
+Click here to stop receiving job offers from ReactEurope ${
+                process.env.PUBLIC_HOSTNAME
+              }/stop-notifications/${user.notificationsUUID}/
+\n\n
+
+Best,\n\n
+
+The ReactEurope jobs team
+`,
+              html: `Hi there, <br><p>
+${company.name} is looking for a ${newJob.JobTitle}.
+</p>
+
+<p>You can read more about it here:
+${process.env.PUBLIC_HOSTNAME}/jobs/${newJob.id}/${slugify(
+                newJob.JobTitle + ' at ' + company.name,
+              )}
+
+ </p>
+<p>
+Click here to stop receiving job offers from ReactEurope ${
+                process.env.PUBLIC_HOSTNAME
+              }/stop-notifications/${user.notificationsUUID}/
+</p>
+Best,
+<br>
+<br>
+The ReactEurope jobs team
+			`,
+            };
+            msg.to = user.githubEmail;
+            sgMail.send(msg);
+          });
+          res.json({sentTo: users, msg: msg});
+          return;
+        })
+        .catch(err => {
+          console.log('/jobCreateWebhook 5', newJob.id);
+          console.log(err);
+          res.status(500);
+          return;
+        });
+    } else {
+      res.json('already published or not published yet so nothing sent');
+      return;
+    }
+  });
+
+  server.get('/stop-notifications/:uuid', function(req, res) {
+    const checkUserRequestopts = {
+      uri: process.env.HASURA,
+      json: true,
+      query: `
+        mutation turnOffNotifications($uuid: uuid!) {
+          update_User(
+            _set: {getNotifications: false}
+            where: {notificationsUUID: {_eq: $uuid}}
+          ) {
+            affected_rows
+          }
+        }
+      `,
+      headers: {
+        'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+      },
+    };
+    const checkUserRequestVars = {
+      uuid: req.params.uuid,
+    };
+    const client = new grequest.GraphQLClient(checkUserRequestopts.uri, {
+      headers: checkUserRequestopts.headers,
+    });
+    console.log(checkUserRequestopts);
+    console.log('gt vars', checkUserRequestVars);
+    client
+      .request(checkUserRequestopts.query, checkUserRequestVars)
+      .then(ugdata => {
+        return app.render(req, res, '/', {
+          action: 'stop-notifications',
+        });
+      });
   });
 
   server.post('/upload', function(req, res) {

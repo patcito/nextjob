@@ -16,6 +16,10 @@ import getConfig from 'next/config';
 import {getHasuraHost} from '../lib/getHasuraHost';
 import Head from '../components/head';
 import Router from 'next/router';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+
 const {publicRuntimeConfig} = getConfig();
 const grequest = require('graphql-request');
 
@@ -388,7 +392,11 @@ class Index extends React.Component {
       url,
     };
   }
-
+  componentDidMount(props) {
+    if (this.props.query.action === 'stop-notifications') {
+      this.setState({openNotification: true});
+    }
+  }
   content = () => {
     const query = this.props.query;
     if (this.props.query.companies) {
@@ -446,6 +454,39 @@ class Index extends React.Component {
               </Grid>
             </Grid>
           </div>
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            open={this.state.openNotification}
+            autoHideDuration={6000}
+            onClose={() => {
+              this.setState({openNotification: false});
+            }}
+            ContentProps={{
+              'aria-describedby': 'message-id',
+            }}
+            message={
+              <span id="message-id">
+                {this.i18n.t(
+                  'You will not receive email notifications anymore.',
+                )}
+              </span>
+            }
+            action={[
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                className={styles.close}
+                onClick={() => {
+                  this.setState({openNotification: false});
+                }}>
+                <CloseIcon />
+              </IconButton>,
+            ]}
+          />
         </>
       </I18nextProvider>
     );
