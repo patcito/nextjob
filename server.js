@@ -1340,7 +1340,7 @@ The ReactEurope jobs team
 			`,
         };
         sgMail.send(msg);
-        msg.email = process.env.ADMIN_EMAIL;
+        msg.to = process.env.ADMIN_EMAIL;
         msg.subject = '[admin]: New job application';
         sgMail.send(msg);
         res.json(data);
