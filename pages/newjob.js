@@ -357,16 +357,23 @@ $applicationUrl: String,
           JobId: jobId,
         });
       });
-      that.state.skills.map(skill => {
-        skills.push({Skill: skill.value.Skill || skill.value, JobId: jobId});
-      });
+      this.state.skills
+        ? that.state.skills.map(skill => {
+            skills.push({
+              Skill: skill.value.Skill || skill.value,
+              JobId: jobId,
+            });
+          })
+        : null;
       const extraVars = {
         skills: skills,
         industries: industries,
         jobFunctions: jobFunctions,
         id: that.props.job ? that.props.job.id : 0,
       };
-
+      if (!skills || skills === [] || skills === null || skills.length === 0) {
+        skills = ['React.js'];
+      }
       const saveJobExtrasopts = {
         uri: getHasuraHost(process, undefined, publicRuntimeConfig),
         json: true,
@@ -453,7 +460,13 @@ $applicationUrl: String,
   handleChange = event => {
     this.setState({[event.target.name]: event.target.value});
   };
-
+  handleChangeApplicationUrl = event => {
+    this.setState({
+      [event.target.name]: event.target.value,
+      hasApplicationEmail: false,
+      applicationEmail: null,
+    });
+  };
   handleSliderChange = value => {
     this.setState({yearsExperienceRange: value});
   };
@@ -1144,12 +1157,14 @@ $applicationUrl: String,
                     aria-label="Has application email"
                     name="hasApplicationEmail"
                     className={classes.group}
-                    value={this.state.value}
-                    onChange={this.handleRadioChange}>
+                    value={this.state.value}>
                     <FormControlLabel
                       value="hasApplicationEmail"
                       control={
-                        <Radio checked={this.state.hasApplicationEmail} />
+                        <Radio
+                          checked={this.state.hasApplicationEmail}
+                          onChange={this.handleRadioChange}
+                        />
                       }
                       label={this.i18n.t(
                         'newjob:From this site directly (recommended)',
@@ -1182,7 +1197,10 @@ $applicationUrl: String,
                     <FormControlLabel
                       value="male"
                       control={
-                        <Radio checked={!this.state.hasApplicationEmail} />
+                        <Radio
+                          checked={!this.state.hasApplicationEmail}
+                          onChange={this.handleRadioChange}
+                        />
                       }
                       label={this.i18n.t(
                         'newjob:Direct applicants to an external site to apply',
@@ -1197,7 +1215,7 @@ $applicationUrl: String,
                         name="applicationUrl"
                         value={this.state.applicationUrl}
                         disabled={this.state.hasApplicationEmail}
-                        onChange={this.handleChange}
+                        onChange={this.handleChangeApplicationUrl}
                         onBlur={e => this.handleBlur(e, true)}
                         onFocus={e => this.handleFocus(e, true)}
                         required={true}
