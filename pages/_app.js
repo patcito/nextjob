@@ -30,14 +30,6 @@ class MyApp extends App {
   }
 
   componentDidCatch(error, errorInfo) {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.clear();
-      document.cookie.split(';').forEach(function(c) {
-        document.cookie = c
-          .replace(/^ +/, '')
-          .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
-      });
-    }
     Sentry.configureScope(scope => {
       Object.keys(errorInfo).forEach(key => {
         scope.setExtra(key, errorInfo[key]);
