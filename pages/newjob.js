@@ -265,6 +265,7 @@ $hasMonthlySalary: Boolean,
       $maximumMonthlySalary: Int,
       $minimumMonthlySalary: Int,
 $applicationEmail: String,
+$applicationUrl: String,
 
  $ownerId: Int,
  $location: geography,
@@ -293,6 +294,7 @@ $applicationEmail: String,
       maximumMonthlySalary: $maximumMonthlySalary,
       minimumMonthlySalary: $minimumMonthlySalary,
 	  applicationEmail: $applicationEmail,
+	  applicationUrl: $applicationUrl,
 
 				ownerId: $ownerId,
 
