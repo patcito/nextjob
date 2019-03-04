@@ -1044,234 +1044,247 @@ insert_Moderator(objects: $moderators){
                       </div>
                     </CardActionArea>
                   </Card>
-
-                  <Card className={classes.card}>
-                    <CardActionArea className={classes.cardActionArea}>
-                      <CardContent>
-                        <Grid
-                          container
-                          spacing={24}
-                          style={{textAlign: 'center'}}>
-                          <Grid item xs={12} md={6}>
-                            <Typography component="h3" variant="h3">
-                              {i18n.t('Number of devs')}
-                            </Typography>
-                            <Typography
-                              component="h1"
-                              variant="h1"
-                              style={{fontSize: '100px'}}>
-                              {company.devCount}
-                            </Typography>
-                            <LaptopIcon style={{fontSize: '200px'}} />
-                          </Grid>
-                          <Grid
-                            item
-                            xs={12}
-                            md={6}
-                            style={{background: '#f50057', color: '#fff'}}>
-                            <Typography
-                              component="h3"
-                              variant="h4"
-                              style={{marginBottom: '20px'}}>
-                              {i18n.t('Techs we use')}
-                            </Typography>
-                            {skills.map(skill => (
-                              <Typography
-                                key={skill.value}
-                                variant="h4"
-                                component="h4"
-                                style={{fontSize: '40', textAlign: 'left'}}>
-                                ✓ {skill.value}
-                              </Typography>
-                            ))}
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                  {company.media2.published ? (
-                    <Card className={classes.card}>
-                      <CardActionArea className={classes.cardActionArea}>
-                        {company.media2.hasVideo ? (
-                          <ReactPlayer url={company.media2.url} width="100%" />
-                        ) : (
-                          <CardMedia
-                            className={classes.media}
-                            image={
-                              publicRuntimeConfig.cdn +
-                              company.id +
-                              '-' +
-                              '2media.' +
-                              ext +
-                              '?u=' +
-                              company.updatedAt
-                            }
-                            title={company.name + ' media'}
-                          />
-                        )}
-                      </CardActionArea>
-                    </Card>
-                  ) : null}
-                  <Card className={classes.card}>
-                    <CardActionArea className={classes.cardActionArea}>
-                      <CardContent>
-                        <Grid container spacing={24}>
-                          <Grid
-                            item
-                            xs={12}
-                            md={6}
-                            style={{background: '#4caf50', color: '#fff'}}>
-                            <Typography
-                              component="h3"
-                              variant="h4"
-                              style={{marginBottom: '20px'}}>
-                              {i18n.t('Perks we provide')}
-                            </Typography>
-                            {(perks || []).map(perk => (
-                              <Typography
-                                component="h1"
-                                key={perk.label}
-                                variant="h4"
-                                style={{fontSize: 30}}>
-                                ✓ {perk.label}
-                              </Typography>
-                            ))}
-                          </Grid>
-                          {company.employee1.published ? (
-                            <Grid item xs={12} md={6}>
-                              <CardHeader
-                                avatar={
-                                  <Avatar
-                                    aria-label="Recipe"
-                                    className={classes.avatar}
-                                    src={
-                                      publicRuntimeConfig.cdn +
-                                      company.id +
-                                      '-' +
-                                      'employee1avatar.' +
-                                      ext +
-                                      '?u=' +
-                                      company.updatedAt
-                                    }
-                                  />
-                                }
-                                title={
-                                  <>
-                                    {company.employee1.name}
-                                    {company.employee1.twitter ? (
-                                      <a
-                                        style={{color: 'black'}}
-                                        href={
-                                          'https://twitter.com/' +
-                                          company.employee1.twitter
-                                        }>
-                                        <TwitterCircle />
-                                      </a>
-                                    ) : null}
-                                    {company.employee1.github ? (
-                                      <a
-                                        style={{color: 'black'}}
-                                        href={
-                                          'https://github.com/' +
-                                          company.employee1.github
-                                        }>
-                                        <GithubCircle />
-                                      </a>
-                                    ) : null}
-                                  </>
-                                }
-                                subheader={<>{company.employee1.title}</>}
-                              />
-                              <Typography component="p">
-                                {company.employee1.bio}
-                              </Typography>
+                  {!(
+                    company.devCount === 5 &&
+                    perks.length === 0 &&
+                    skills.length === 0
+                  ) ? (
+                    <>
+                      <Card className={classes.card}>
+                        <CardActionArea className={classes.cardActionArea}>
+                          <CardContent>
+                            <Grid
+                              container
+                              spacing={24}
+                              style={{textAlign: 'center'}}>
+                              <Grid item xs={12} md={6}>
+                                <Typography component="h3" variant="h3">
+                                  {i18n.t('Number of devs')}
+                                </Typography>
+                                <Typography
+                                  component="h1"
+                                  variant="h1"
+                                  style={{fontSize: '100px'}}>
+                                  {company.devCount}
+                                </Typography>
+                                <LaptopIcon style={{fontSize: '200px'}} />
+                              </Grid>
+                              <Grid
+                                item
+                                xs={12}
+                                md={6}
+                                style={{background: '#f50057', color: '#fff'}}>
+                                <Typography
+                                  component="h3"
+                                  variant="h4"
+                                  style={{marginBottom: '20px'}}>
+                                  {i18n.t('Techs we use')}
+                                </Typography>
+                                {skills.map(skill => (
+                                  <Typography
+                                    key={skill.value}
+                                    variant="h4"
+                                    component="h4"
+                                    style={{fontSize: '40', textAlign: 'left'}}>
+                                    ✓ {skill.value}
+                                  </Typography>
+                                ))}
+                              </Grid>
                             </Grid>
-                          ) : null}
-                        </Grid>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-
-                  {company.media3.published ? (
-                    <Card className={classes.card}>
-                      <CardActionArea className={classes.cardActionArea}>
-                        {company.media3.hasVideo ? (
-                          <ReactPlayer url={company.media3.url} width="100%" />
-                        ) : (
-                          <CardMedia
-                            className={classes.media}
-                            image={
-                              publicRuntimeConfig.cdn +
-                              company.id +
-                              '-' +
-                              '3media.' +
-                              ext +
-                              '?u=' +
-                              company.updatedAt
-                            }
-                            title={company.name + ' media'}
-                          />
-                        )}
-                      </CardActionArea>
-                    </Card>
-                  ) : null}
-                  {company.employee2.published ? (
-                    <Card className={classes.card}>
-                      <CardActionArea className={classes.cardActionArea}>
-                        <CardContent>
-                          <Grid container spacing={24}>
-                            <Grid item xs={12} md={12}>
-                              <CardHeader
-                                avatar={
-                                  <Avatar
-                                    aria-label="Recipe"
-                                    className={classes.avatar}
-                                    src={
-                                      publicRuntimeConfig.cdn +
-                                      company.id +
-                                      '-' +
-                                      'employee2avatar.' +
-                                      ext +
-                                      '?u=' +
-                                      company.updatedAt
-                                    }
-                                  />
-                                }
-                                title={
-                                  <>
-                                    {company.employee2.name}
-                                    {company.employee2.twitter ? (
-                                      <a
-                                        style={{color: 'black'}}
-                                        href={
-                                          'https://twitter.com/' +
-                                          company.employee2.twitter
-                                        }>
-                                        <TwitterCircle />
-                                      </a>
-                                    ) : null}
-                                    {company.employee2.github ? (
-                                      <a
-                                        style={{color: 'black'}}
-                                        href={
-                                          'https://github.com/' +
-                                          company.employee2.github
-                                        }>
-                                        <GithubCircle />
-                                      </a>
-                                    ) : null}
-                                  </>
-                                }
-                                subheader={<>{company.employee2.title}</>}
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                      {company.media2.published ? (
+                        <Card className={classes.card}>
+                          <CardActionArea className={classes.cardActionArea}>
+                            {company.media2.hasVideo ? (
+                              <ReactPlayer
+                                url={company.media2.url}
+                                width="100%"
                               />
-                              <Typography component="p">
-                                {company.employee2.bio}
-                              </Typography>
+                            ) : (
+                              <CardMedia
+                                className={classes.media}
+                                image={
+                                  publicRuntimeConfig.cdn +
+                                  company.id +
+                                  '-' +
+                                  '2media.' +
+                                  ext +
+                                  '?u=' +
+                                  company.updatedAt
+                                }
+                                title={company.name + ' media'}
+                              />
+                            )}
+                          </CardActionArea>
+                        </Card>
+                      ) : null}
+                      <Card className={classes.card}>
+                        <CardActionArea className={classes.cardActionArea}>
+                          <CardContent>
+                            <Grid container spacing={24}>
+                              <Grid
+                                item
+                                xs={12}
+                                md={6}
+                                style={{background: '#4caf50', color: '#fff'}}>
+                                <Typography
+                                  component="h3"
+                                  variant="h4"
+                                  style={{marginBottom: '20px'}}>
+                                  {i18n.t('Perks we provide')}
+                                </Typography>
+                                {(perks || []).map(perk => (
+                                  <Typography
+                                    component="h1"
+                                    key={perk.label}
+                                    variant="h4"
+                                    style={{fontSize: 30}}>
+                                    ✓ {perk.label}
+                                  </Typography>
+                                ))}
+                              </Grid>
+                              {company.employee1.published ? (
+                                <Grid item xs={12} md={6}>
+                                  <CardHeader
+                                    avatar={
+                                      <Avatar
+                                        aria-label="Recipe"
+                                        className={classes.avatar}
+                                        src={
+                                          publicRuntimeConfig.cdn +
+                                          company.id +
+                                          '-' +
+                                          'employee1avatar.' +
+                                          ext +
+                                          '?u=' +
+                                          company.updatedAt
+                                        }
+                                      />
+                                    }
+                                    title={
+                                      <>
+                                        {company.employee1.name}
+                                        {company.employee1.twitter ? (
+                                          <a
+                                            style={{color: 'black'}}
+                                            href={
+                                              'https://twitter.com/' +
+                                              company.employee1.twitter
+                                            }>
+                                            <TwitterCircle />
+                                          </a>
+                                        ) : null}
+                                        {company.employee1.github ? (
+                                          <a
+                                            style={{color: 'black'}}
+                                            href={
+                                              'https://github.com/' +
+                                              company.employee1.github
+                                            }>
+                                            <GithubCircle />
+                                          </a>
+                                        ) : null}
+                                      </>
+                                    }
+                                    subheader={<>{company.employee1.title}</>}
+                                  />
+                                  <Typography component="p">
+                                    {company.employee1.bio}
+                                  </Typography>
+                                </Grid>
+                              ) : null}
                             </Grid>
-                          </Grid>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+
+                      {company.media3.published ? (
+                        <Card className={classes.card}>
+                          <CardActionArea className={classes.cardActionArea}>
+                            {company.media3.hasVideo ? (
+                              <ReactPlayer
+                                url={company.media3.url}
+                                width="100%"
+                              />
+                            ) : (
+                              <CardMedia
+                                className={classes.media}
+                                image={
+                                  publicRuntimeConfig.cdn +
+                                  company.id +
+                                  '-' +
+                                  '3media.' +
+                                  ext +
+                                  '?u=' +
+                                  company.updatedAt
+                                }
+                                title={company.name + ' media'}
+                              />
+                            )}
+                          </CardActionArea>
+                        </Card>
+                      ) : null}
+                      {company.employee2.published ? (
+                        <Card className={classes.card}>
+                          <CardActionArea className={classes.cardActionArea}>
+                            <CardContent>
+                              <Grid container spacing={24}>
+                                <Grid item xs={12} md={12}>
+                                  <CardHeader
+                                    avatar={
+                                      <Avatar
+                                        aria-label="Recipe"
+                                        className={classes.avatar}
+                                        src={
+                                          publicRuntimeConfig.cdn +
+                                          company.id +
+                                          '-' +
+                                          'employee2avatar.' +
+                                          ext +
+                                          '?u=' +
+                                          company.updatedAt
+                                        }
+                                      />
+                                    }
+                                    title={
+                                      <>
+                                        {company.employee2.name}
+                                        {company.employee2.twitter ? (
+                                          <a
+                                            style={{color: 'black'}}
+                                            href={
+                                              'https://twitter.com/' +
+                                              company.employee2.twitter
+                                            }>
+                                            <TwitterCircle />
+                                          </a>
+                                        ) : null}
+                                        {company.employee2.github ? (
+                                          <a
+                                            style={{color: 'black'}}
+                                            href={
+                                              'https://github.com/' +
+                                              company.employee2.github
+                                            }>
+                                            <GithubCircle />
+                                          </a>
+                                        ) : null}
+                                      </>
+                                    }
+                                    subheader={<>{company.employee2.title}</>}
+                                  />
+                                  <Typography component="p">
+                                    {company.employee2.bio}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            </CardContent>
+                          </CardActionArea>
+                        </Card>
+                      ) : null}
+                    </>
                   ) : null}
                 </div>
               </Grid>
