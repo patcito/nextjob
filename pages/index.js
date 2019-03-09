@@ -210,7 +210,7 @@ class Index extends React.Component {
             locality
             country
           }
-          Job(
+          Job(order_by: {id: desc},
             where: {
               _and: [
                 {
