@@ -881,6 +881,7 @@ insert_Moderator(objects: $moderators){
                             company.updatedAt
                           }
                           className={classes.avatar}
+                          style={{borderRadius: 0}}
                         />
                       }
                       title={

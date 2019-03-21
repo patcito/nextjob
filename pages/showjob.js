@@ -564,6 +564,7 @@ class ShowJob extends React.Component {
                             job.Company.updatedAt
                           }
                           className={classes.avatar}
+                          style={{borderRadius: 0}}
                         />
                       }
                       title={
