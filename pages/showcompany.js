@@ -1125,27 +1125,32 @@ insert_Moderator(objects: $moderators){
                         <CardActionArea className={classes.cardActionArea}>
                           <CardContent>
                             <Grid container spacing={24}>
-                              <Grid
-                                item
-                                xs={12}
-                                md={6}
-                                style={{background: '#4caf50', color: '#fff'}}>
-                                <Typography
-                                  component="h3"
-                                  variant="h4"
-                                  style={{marginBottom: '20px'}}>
-                                  {i18n.t('Perks we provide')}
-                                </Typography>
-                                {(perks || []).map(perk => (
+                              {perks && perks.length > 0 ? (
+                                <Grid
+                                  item
+                                  xs={12}
+                                  md={6}
+                                  style={{
+                                    background: '#4caf50',
+                                    color: '#fff',
+                                  }}>
                                   <Typography
-                                    component="h1"
-                                    key={perk.label}
+                                    component="h3"
                                     variant="h4"
-                                    style={{fontSize: 30}}>
-                                    ✓ {perk.label}
+                                    style={{marginBottom: '20px'}}>
+                                    {i18n.t('Perks we provide')}
                                   </Typography>
-                                ))}
-                              </Grid>
+                                  {(perks || []).map(perk => (
+                                    <Typography
+                                      component="h1"
+                                      key={perk.label}
+                                      variant="h4"
+                                      style={{fontSize: 30}}>
+                                      ✓ {perk.label}
+                                    </Typography>
+                                  ))}
+                                </Grid>
+                              ) : null}
                               {company.employee1.published ? (
                                 <Grid item xs={12} md={6}>
                                   <CardHeader
