@@ -64,6 +64,7 @@ import EuroSymbolIcon from '@material-ui/icons/EuroSymbol';
 import WorkIcon from '@material-ui/icons/Work';
 import HistoryIcon from '@material-ui/icons/History';
 import Link from 'next/link';
+import SKILLS from '../data/skills';
 
 import Cookies from 'js-cookie';
 
@@ -243,10 +244,22 @@ class Profile extends React.Component {
         : (userId = null);
       userInfo = JSON.parse(localStorage.getItem('userInfo'));
     }
-    const queryOpts = {
+    let ownProfile = true;
+    if (query && query.userProfileId && query.userProfileId !== null) {
+      if (query.userProfileId !== userId) ownProfile = false;
+      userId = query.userProfileId;
+    }
+
+    let notifications = '';
+    if (ownProfile) {
+      notifications = `Notifications{
+            Skill userId            }`;
+    }
+    let queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
-      query: `
+      query:
+        `
         query User($id: Int!, $userId: Int) {
           Company_aggregate(
             where: {
@@ -280,6 +293,9 @@ class Profile extends React.Component {
             name
             pullRequests
             githubRepositories
+            ` +
+        notifications +
+        `
             Companies {
               id
               name
@@ -298,11 +314,6 @@ class Profile extends React.Component {
     const client = new grequest.GraphQLClient(queryOpts.uri, {
       headers: queryOpts.headers,
     });
-    let ownProfile = true;
-    if (query && query.userProfileId && query.userProfileId !== null) {
-      if (query.userProfileId !== userId) ownProfile = false;
-      userId = query.userProfileId;
-    }
     let user = await client.request(queryOpts.query, {
       id: userId,
       userId: userInfo.userId,
@@ -336,6 +347,10 @@ class Profile extends React.Component {
       value: suggestion.title,
       label: suggestion.title,
     }));
+    this.SKILLS = SKILLS.map(suggestion => ({
+      value: suggestion.name,
+      label: suggestion.name,
+    }));
   }
 
   componentDidMount(props) {
@@ -346,10 +361,29 @@ class Profile extends React.Component {
         ? (user = JSON.parse(localStorage.getItem('currentUser')))
         : (user = null);
     }
+    this.setState({
+      showNotifications: true,
+      skills: [{value: 'Express.js', label: 'Express.js'}],
+    });
+    /*skills: job.Skills.map(v => ({
+            value: v,
+            label: v.Skill,
+          })),*/
   }
 
   handleEditBioDialog = () => {
     this.setState({openEditBio: true, bio: this.props.bio});
+  };
+
+  handleChangeSkills = value => {
+    if (value) {
+      this.setState({skills: value, skillsvalid: true});
+    } else {
+      this.setState({
+        skills: this.state.skills,
+        skillsvalid: false,
+      });
+    }
   };
 
   handleBioChange = event => {
@@ -390,10 +424,52 @@ class Profile extends React.Component {
     });
     Router.push('/profile');
   };
+
+  handleSaveNotifications = async () => {
+    const {userInfo, userId} = this.props;
+    const queryOpts = {
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
+      json: true,
+      query: `
+        mutation updateNotifications($userId: Int, $skills: [Notification_insert_input!]!) {
+          delete_Notification(where: {userId: {_eq: $userId}}) {
+            affected_rows
+          }
+          insert_Notification(objects: $skills) {
+            returning {
+              Skill
+            }
+          }
+        }
+      `,
+      headers: {
+        'x-access-token': userInfo.token,
+      },
+    };
+    const client = new grequest.GraphQLClient(queryOpts.uri, {
+      headers: queryOpts.headers,
+    });
+    let skills = [];
+    this.state.skills
+      ? this.state.skills.map(skill => {
+          skills.push({
+            Skill: skill.value,
+            userId: userId,
+          });
+        })
+      : null;
+
+    let user = await client.request(queryOpts.query, {
+      userId: userId,
+      skills: skills,
+    });
+    Router.push('/profile');
+  };
   render(props) {
     const {classes, user} = this.props;
     const i18n = this.i18n;
     const {open} = this.state;
+    const skills = this.SKILLS;
     let title = `ReactEurope Jobs - ${user.name}`;
     let bio = this.props.bio;
     return (
@@ -488,6 +564,51 @@ class Profile extends React.Component {
                         ) : null
                       }
                     />
+                    {this.props.ownProfile && this.state.showNotifications ? (
+                      <Card className={classes.card}>
+                        <CardContent>
+                          <Typography
+                            variant="h4"
+                            gutterBottom
+                            className={classes.title}>
+                            Notifications
+                          </Typography>
+                          <FormControl
+                            fullWidth={true}
+                            className={classes.formControl}>
+                            <MultipleDownshiftSelect
+                              i18n={this.i18n}
+                              suggestions={skills}
+                              selectedItems={this.state.skills || []}
+                              label={this.i18n.t('newjob:Skills')}
+                              placeholder={this.i18n.t(
+                                'newjob:Select multiple skills (up to 25)',
+                              )}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              handleParentChange={this.handleChangeSkills}
+                              handleParentBlur={this.handleBlurSkills}
+                              name="skills"
+                              id="skills"
+                              maxSelection={25}
+                              required={true}
+                            />
+                            <FormHelperText>
+                              {this.i18n.t(
+                                'newjob:Select skills required for the job, at least one skill is required, defaults to React',
+                              )}
+                            </FormHelperText>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={this.handleSaveNotifications}
+                              className={classes.button}>
+                              {this.i18n.t('Save')}
+                            </Button>
+                          </FormControl>
+                        </CardContent>
+                      </Card>
+                    ) : null}
                     <CardActionArea className={classes.cardActionArea}>
                       <CardMedia
                         className={classes.media}
