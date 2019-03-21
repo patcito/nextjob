@@ -365,14 +365,14 @@ $applicationUrl: String,
             });
           })
         : null;
-      const extraVars = {
+      let extraVars = {
         skills: skills,
         industries: industries,
         jobFunctions: jobFunctions,
         id: that.props.job ? that.props.job.id : 0,
       };
       if (!skills || skills === [] || skills === null || skills.length === 0) {
-        skills = ['React.js'];
+        extraVars.skills = [{Skill: 'React.js', JobId: jobId}];
       }
       const saveJobExtrasopts = {
         uri: getHasuraHost(process, undefined, publicRuntimeConfig),
@@ -1628,7 +1628,9 @@ $applicationUrl: String,
                 required={true}
               />
               <FormHelperText>
-                {this.i18n.t('newjob:Select skills required for the job')}
+                {this.i18n.t(
+                  'newjob:Select skills required for the job, at least one skill is required, defaults to React',
+                )}
               </FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl} style={{width: '95%'}}>

@@ -22,6 +22,7 @@
   "Job description": "Description de l'offre",
   "Skills": "Compétences",
   "Select multiple skills (up to 25)": "Selectionnez jusque 25 compétences.",
+  "Select skills required for the job, at least one skill is required, defaults to React": "Selectionnez les compétences requises pour cette offre, au moins une compétence est requise, si aucune n'est selectionnée React.js sera affiché par defaut.",
   "Select skills required for the job": "Selectionnez les compétences requises pour cette offre.",
   "Minimum years of experience": "Minimum d'années d'experience",
   "Years of experience required": "Nombre d'années d'experience pour ces compétences",
