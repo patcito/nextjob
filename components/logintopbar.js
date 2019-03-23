@@ -140,6 +140,7 @@ class LoginAppBarTop extends React.Component {
       }
       if (
         !this.props.userInfo ||
+        this.props.userInfo.userId === null ||
         JSON.parse(localStorage.getItem('currentUser')) === null
       ) {
         this.logOut();
