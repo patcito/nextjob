@@ -65,6 +65,7 @@ import WorkIcon from '@material-ui/icons/Work';
 import HistoryIcon from '@material-ui/icons/History';
 import Link from 'next/link';
 import SKILLS from '../data/skills';
+import JOBSTITLES from '../data/jobstitles';
 
 import Cookies from 'js-cookie';
 
@@ -161,6 +162,7 @@ class Profile extends React.Component {
     open: false,
     openEditBio: false,
     skills: [],
+    jobsTitles: [],
     industry: {},
     bio: '',
     moderators: [],
@@ -251,9 +253,13 @@ class Profile extends React.Component {
     }
 
     let notifications = '';
+    let jobsTitlesNotifications = '';
     if (ownProfile) {
       notifications = `Notifications{
             Skill userId            }`;
+      jobsTitlesNotifications = `JobsTitlesNotifications{
+            JobTitle userId
+    }`;
     }
     let queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
@@ -295,6 +301,7 @@ class Profile extends React.Component {
             githubRepositories
             ` +
         notifications +
+        jobsTitlesNotifications +
         `
             Companies {
               id
@@ -351,6 +358,10 @@ class Profile extends React.Component {
       value: suggestion.name,
       label: suggestion.name,
     }));
+    this.JOBSTITLES = JOBSTITLES.map(suggestion => ({
+      value: suggestion.title,
+      label: suggestion.title,
+    }));
   }
 
   componentDidMount(props) {
@@ -361,14 +372,19 @@ class Profile extends React.Component {
         ? (user = JSON.parse(localStorage.getItem('currentUser')))
         : (user = null);
     }
+    let skills = this.props.user.Notifications.map(v => ({
+      value: v.Skill,
+      label: v.Skill,
+    }));
+    let jobsTitles = this.props.user.JobsTitlesNotifications.map(v => ({
+      value: v.JobTitle,
+      label: v.JobTitle,
+    }));
     this.setState({
       showNotifications: true,
-      skills: [{value: 'Express.js', label: 'Express.js'}],
+      skills: skills,
+      jobsTitles: jobsTitles,
     });
-    /*skills: job.Skills.map(v => ({
-            value: v,
-            label: v.Skill,
-          })),*/
   }
 
   handleEditBioDialog = () => {
@@ -382,6 +398,20 @@ class Profile extends React.Component {
       this.setState({
         skills: this.state.skills,
         skillsvalid: false,
+      });
+    }
+  };
+
+  handleChangeJobsTitlesNotifications = value => {
+    if (value) {
+      this.setState({
+        jobsTitles: value,
+        jobsTitlesvalid: true,
+      });
+    } else {
+      this.setState({
+        jobsTitles: this.state.jobsTitles,
+        jobsTitlesvalid: false,
       });
     }
   };
@@ -431,13 +461,25 @@ class Profile extends React.Component {
       uri: getHasuraHost(process, undefined, publicRuntimeConfig),
       json: true,
       query: `
-        mutation updateNotifications($userId: Int, $skills: [Notification_insert_input!]!) {
+        mutation updateNotifications(
+          $userId: Int
+          $skills: [Notification_insert_input!]!
+          $jobsTitles: [JobTitleNotification_insert_input!]!
+        ) {
           delete_Notification(where: {userId: {_eq: $userId}}) {
             affected_rows
           }
           insert_Notification(objects: $skills) {
             returning {
               Skill
+            }
+          }
+          delete_JobTitleNotification(where: {userId: {_eq: $userId}}) {
+            affected_rows
+          }
+          insert_JobTitleNotification(objects: $jobsTitles) {
+            returning {
+              JobTitle
             }
           }
         }
@@ -458,10 +500,21 @@ class Profile extends React.Component {
           });
         })
       : null;
+    let jobsTitles = [];
+    console.log(this.state.jobsTitles);
+    this.state.jobsTitles
+      ? this.state.jobsTitles.map(jobsTitle => {
+          jobsTitles.push({
+            JobTitle: jobsTitle.value,
+            userId: userId,
+          });
+        })
+      : null;
 
     let user = await client.request(queryOpts.query, {
       userId: userId,
       skills: skills,
+      jobsTitles: jobsTitles,
     });
     Router.push('/profile');
   };
@@ -470,6 +523,7 @@ class Profile extends React.Component {
     const i18n = this.i18n;
     const {open} = this.state;
     const skills = this.SKILLS;
+    const jobsTitles = this.JOBSTITLES;
     let title = `ReactEurope Jobs - ${user.name}`;
     let bio = this.props.bio;
     return (
@@ -595,7 +649,36 @@ class Profile extends React.Component {
                             />
                             <FormHelperText>
                               {this.i18n.t(
-                                'newjob:Select skills required for the job, at least one skill is required, defaults to React',
+                                'newjob:Select skills for jobs you would like to be notified of.',
+                              )}
+                            </FormHelperText>
+                          </FormControl>
+
+                          <FormControl
+                            fullWidth={true}
+                            className={classes.formControl}>
+                            <MultipleDownshiftSelect
+                              i18n={this.i18n}
+                              suggestions={jobsTitles}
+                              selectedItems={this.state.jobsTitles || []}
+                              label={this.i18n.t('newjob:Job Titles')}
+                              placeholder={this.i18n.t(
+                                'newjob:Select multiple jobsTitles (up to 25)',
+                              )}
+                              onBlur={e => this.handleBlur(e, true)}
+                              onFocus={e => this.handleFocus(e, true)}
+                              handleParentChange={
+                                this.handleChangeJobsTitlesNotifications
+                              }
+                              handleParentBlur={this.handleBlurSkills}
+                              name="jobsTitles"
+                              id="jobsTitles"
+                              maxSelection={25}
+                              required={true}
+                            />
+                            <FormHelperText>
+                              {this.i18n.t(
+                                'newjob:Select jobs titles for jobs you would like to be notified of.',
                               )}
                             </FormHelperText>
                             <Button
