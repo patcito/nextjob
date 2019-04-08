@@ -127,6 +127,7 @@ app.prepare().then(() => {
         req.token = token;
         req.github = decoded.github;
         req.linkedin = decoded.linkedin;
+        req.githubEmail = decoded.githubEmail;
         next();
         return;
       }
@@ -338,6 +339,7 @@ app.prepare().then(() => {
                         token: otoken,
                         userId: currentUser.id,
                         github: true,
+                        githubEmail: currentUser.githubEmail,
                         linkedin: false,
                       },
                       process.env.JWT_SECRET,
@@ -486,6 +488,7 @@ app.prepare().then(() => {
                           {
                             token: otoken,
                             userId: gdata.insert_User.returning[0].id,
+                            githubEmail: email,
                             github: true,
                             linkedin: false,
                           },
@@ -1352,31 +1355,57 @@ The ReactEurope jobs team
     console.log('/jobCreateWebhook', req.body.event.data.new.id);
     const newJob = req.body.event.data.new;
     const oldJob = req.body.event.data.old;
-
+    const x = {
+      skill: 'React.js',
+      remote: 'true',
+      country: 'France',
+      locality: 'Paris',
+      description: 'KEYWORD',
+      jobEmployementType: 'FullTime,Internship,Temporary,Contract,PartTime',
+    };
     if (newJob.isPublished && (!oldJob || oldJob.isPublished !== true)) {
       const getJobApplicationOwnerEmailopts = {
         uri: process.env.HASURA,
         json: true,
         query: `
-        query Users($companyId: Int) {
-          User(
-            where: {
-              _and: {
-                getNotifications: {_eq: true}
-                githubEmail: {_is_null: false}
+          query Users($companyId: Int, $id: Int!) {
+            SearchNotification {
+              id
+              User {
+                githubEmail
+                notificationsUUID
               }
+              query
             }
-          ) {
-            id
-            githubEmail
-			notificationsUUID
+            Job(where: {id: {_eq: $id}}) {
+              id
+              Skills {
+                Skill
+              }
+              EmployementType
+              description
+              country
+              locality
+              remote
+            }
+            User(
+              where: {
+                _and: {
+                  getNotifications: {_eq: true}
+                  githubEmail: {_is_null: false}
+                }
+              }
+            ) {
+              id
+              githubEmail
+              notificationsUUID
+            }
+            Company(where: {id: {_eq: $companyId}}) {
+              id
+              name
+            }
           }
-          Company(where: {id: {_eq: $companyId}}) {
-            id
-            name
-          }
-        }
-      `,
+        `,
         headers: {
           'X-Hasura-Access-Key': process.env.HASURA_SECRET,
         },
@@ -1385,6 +1414,7 @@ The ReactEurope jobs team
 
       const getJobOwnerEmailVars = {
         companyId: newJob.companyId,
+        id: newJob.id,
       };
       console.log('/jobCreateWebhook 3', newJob.id);
 
@@ -1400,11 +1430,14 @@ The ReactEurope jobs team
         .then(data => {
           sgMail.setApiKey(process.env.SENDGRID_API_KEY);
           const users = data.User;
+          const job = data.Job[0];
+          const searches = data.SearchNotification;
           const company = data.Company[0];
           const subject = `${company.name} is looking for a ${newJob.JobTitle}`;
           console.log('/jobCreateWebhook 4', newJob.id);
-
-          users.map(user => {
+          let emails = [];
+          searches.map(search => {
+            let user = search.User;
             msg = {
               from: 'ReactEurope Jobs <jobs@react-europe.org>',
               subject: subject,
@@ -1446,9 +1479,72 @@ The ReactEurope jobs team
 			`,
             };
             msg.to = user.githubEmail;
-            sgMail.send(msg);
+            let qq = {
+              id: 13,
+              User: {
+                githubEmail: 'patcito@gmail.com',
+                notificationsUUID: '2011f582-03ef-48b1-8c2f-da9d5afed792',
+              },
+              query: {
+                skill: 'React.js',
+                remote: 'true',
+                country: 'France',
+                locality: 'Paris',
+                description: 'KEYWORD',
+                jobEmployementType:
+                  'FullTime,Internship,Temporary,Contract,PartTime',
+              },
+            };
+            let jj = {
+              id: 85,
+              Skills: [
+                {
+                  Skill: 'React.js',
+                },
+              ],
+              EmployementType: 'FullTime',
+              description: 'this is a description',
+              country: 'France',
+              locality: 'Paris',
+              remote: false,
+            };
+            let q = search.query;
+            let skills = [];
+            console.log('JOB', job);
+            job.Skills.map(skill => {
+              skills.push(skill.Skill);
+            });
+            console.log('0', !q.remote || q.remote === job.remote);
+            console.log('1', !q.country || q.country === job.country);
+            console.log('2', !q.locality || q.locality === job.locality);
+            console.log(
+              '3',
+              !q.description || job.description.indexOf(q.description) !== -1,
+            );
+            console.log(
+              '4',
+              !q.jobEmployementType ||
+                q.jobEmployementType.indexOf(job.EmployementType) >= 0,
+            );
+            console.log('5', !q.skill || skills.indexOf(q.skill) >= 0);
+
+            if (
+              (!q.remote || q.remote === job.remote) &&
+              (!q.country || q.country === job.country) &&
+              (!q.locality || q.locality === job.locality) &&
+              (!q.description ||
+                job.description.indexOf(q.description) !== -1) &&
+              (!q.jobEmployementType ||
+                q.jobEmployementType.indexOf(job.EmployementType) >= 0) &&
+              (!q.skill || skills.indexOf(q.skill) >= 0)
+            ) {
+              if (emails.indexOf(user.githubEmail) === -1) {
+                emails.push(user.githubEmail);
+                sgMail.send(msg);
+              }
+            }
           });
-          res.json({sentTo: users, msg: msg});
+          res.json({sentTo: emails, msg: msg});
           return;
         })
         .catch(err => {

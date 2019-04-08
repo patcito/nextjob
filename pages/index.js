@@ -79,6 +79,7 @@ class Index extends React.Component {
         userId: req.userId ? req.userId : null,
         token: token,
         github: github,
+        githubEmail: req.githubEmail,
         linkedin: linkedin,
         currentUser: req.currentUser,
       };
@@ -93,6 +94,7 @@ class Index extends React.Component {
         userId: currentUser ? currentUser.id : null,
         github: currentUser ? !!currentUser.githubEmail : false,
         linkedin: currentUser ? !!currentUser.linkedinEmail : false,
+        githubEmail: currentUser ? !!currentUser.githubEmail : null,
         currentUser: currentUser,
       };
     }
@@ -110,6 +112,7 @@ class Index extends React.Component {
     let locality = null;
     let meId = null;
 
+    console.log('QUERY', query);
     if (query.skill) {
       skill = query.skill;
     }
@@ -380,6 +383,12 @@ class Index extends React.Component {
       ? (url = publicRuntimeConfig.host + req.path)
       : (url = publicRuntimeConfig.host + Router.pathname);
 
+    let showNotifications = !(Object.entries(query).length === 0); // && query.constructor === Object
+    if (Object.entries(query).length === 1 && query.code) {
+      showNotifications = false;
+    }
+    console.log('SHOW NOTIFICATIONS', showNotifications);
+    console.log('SHOW NOTIFICATIONS', query);
     return {
       translations,
       jobsAndCompanies,
@@ -390,6 +399,7 @@ class Index extends React.Component {
       title,
       metaDescription,
       url,
+      showNotifications,
     };
   }
   componentDidMount(props) {
@@ -422,6 +432,7 @@ class Index extends React.Component {
   render(props) {
     let userInfo;
     console.log('userInfoCheck', this.props.userInfo);
+    console.log('userInfoCheck', this.props.query);
     userInfo = this.props.userInfo;
     const i18n = this.i18n;
     return (
@@ -447,6 +458,8 @@ class Index extends React.Component {
                   userInfo={userInfo}
                   me={this.props.query.me || this.props.companyId}
                   companyCount={this.props.jobsAndCompanies.Company_aggregate}
+                  showNotifications={this.props.showNotifications}
+                  query={this.props.query}
                 />
               </Grid>
               <Grid item xs={12} md={8}>

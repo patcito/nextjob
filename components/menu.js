@@ -14,8 +14,20 @@ import ViewHeadlineIcon from '@material-ui/icons/ViewHeadline';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+const grequest = require('graphql-request');
+import {getHasuraHost} from '../lib/getHasuraHost';
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig();
+
+import Snackbar from '@material-ui/core/Snackbar';
+import CloseIcon from '@material-ui/icons/Close';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
@@ -66,6 +78,7 @@ const lang = 'fr';
 class MenuList extends React.Component {
   state = {
     open: false,
+    email: ',',
     anchorEl: null,
     selectedIndex: 1,
   };
@@ -106,8 +119,64 @@ class MenuList extends React.Component {
     this.setState({[name]: event.target.checked});
   };
 
+  handleSaveNotifications = async () => {
+    const {userInfo, userId, query} = this.props;
+    const that = this;
+    const queryOpts = {
+      uri: getHasuraHost(process, undefined, publicRuntimeConfig),
+      json: true,
+      query: `
+        mutation createNotifications($query: jsonb!, $userId: Int) {
+          insert_SearchNotification(objects: {userId: $userId, query: $query}) {
+            returning {
+              query
+            }
+          }
+        }
+      `,
+      headers: {
+        'x-access-token': userInfo.token,
+      },
+    };
+    const client = new grequest.GraphQLClient(queryOpts.uri, {
+      headers: queryOpts.headers,
+    });
+    console.log('NOOOOOOOO', userInfo, userId);
+    let user = await client
+      .request(queryOpts.query, {
+        userId: userInfo.userId,
+        query: query,
+      })
+      .then(() => {
+        that.setState({openNotification: true});
+      });
+  };
+
   constructor(props) {
     super(props);
+  }
+
+  componentDidMount(props) {
+    console.log(this.props.userInfo);
+    if (
+      this.props.userInfo &&
+      this.props.userInfo.userId &&
+      this.props.userInfo.githubEmail &&
+      this.props.userInfo.githubEmail.indexOf &&
+      this.props.userInfo.githubEmail.indexOf('@') !== -1
+    ) {
+      this.setState({email: this.props.userInfo.githubEmail});
+      console.log('email', this.props.userInfo.githubEmail);
+    } else if (
+      this.props.userInfo &&
+      this.props.userInfo.currentUser &&
+      this.props.userInfo.currentUser.githubEmail &&
+      this.props.userInfo.currentUser.githubEmail.indexOf &&
+      this.props.userInfo.currentUser.githubEmail.indexOf('@') !== -1
+    ) {
+      this.setState({email: this.props.userInfo.currentUser.githubEmail});
+      console.log('email', this.props.userInfo.currentUser.githubEmail);
+    }
   }
 
   render(props) {
@@ -119,7 +188,10 @@ class MenuList extends React.Component {
     const {anchorEl} = this.state;
     const {open} = this.state;
     const i18n = this.props.i18n;
+    const showNotifications = this.props.showNotifications;
     const isLoggedIn = this.props.userInfo && this.props.userInfo.userId;
+    console.log('shownotification', showNotifications);
+    console.log('email', this.state.email);
     return (
       <div className={classes.root}>
         <List
@@ -208,6 +280,48 @@ class MenuList extends React.Component {
             </Menu>
           </>
         ) : null}
+        {this.props.showNotifications &&
+        this.state.email.indexOf('@') !== -1 ? (
+          <List
+            component="nav"
+            className={this.props.drawer ? null : classes.drawer}>
+            <ListItem style={{backgroundColor: '#fff'}}>
+              <>
+                <Divider
+                  className={this.props.drawer ? null : classes.drawer}
+                />
+                <FormControl
+                  className={classes.formControl}
+                  error={this.state.emailvalid === false}>
+                  <TextField
+                    label="Email"
+                    name="email"
+                    onChange={this.handleChange}
+                    value={this.state.email}
+                    id="email"
+                  />
+                  <FormHelperText
+                    id={
+                      this.state.emailvalid !== false
+                        ? 'email-helper-text'
+                        : 'email-error-text'
+                    }>
+                    {i18n.t(
+                      'Get notifications when new jobs fitting this search are posted',
+                    )}
+                  </FormHelperText>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={this.handleSaveNotifications}
+                    className={classes.button}>
+                    {i18n.t('Save')}
+                  </Button>
+                </FormControl>
+              </>
+            </ListItem>
+          </List>
+        ) : null}
         <Divider className={this.props.drawer ? null : classes.drawer} />
         <List
           component="nav"
@@ -285,6 +399,35 @@ class MenuList extends React.Component {
             </ListItemIcon>
           </ListItem>
         </List>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.openNotification}
+          autoHideDuration={6000}
+          onClose={() => {
+            this.setState({openNotification: false});
+          }}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={
+            <span id="message-id">{i18n.t('Search notification saved')}</span>
+          }
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={styles.close}
+              onClick={() => {
+                this.setState({openNotification: false});
+              }}>
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }

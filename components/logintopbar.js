@@ -157,7 +157,7 @@ class LoginAppBarTop extends React.Component {
     const isRecruiter =
       this.state.currentUser && this.state.currentUser.recruiter;
     const {classes} = this.props;
-
+    console.log('propss', this.props.userInfo);
     const {open} = this.state;
     const i18n = this.props.i18n;
     const ApplicantLoginLink = () => (
@@ -168,7 +168,6 @@ class LoginAppBarTop extends React.Component {
         {i18n.t('common:Login as Talent')}
       </a>
     );
-    //`
     return (
       <>
         <Toolbar>

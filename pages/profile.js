@@ -238,6 +238,7 @@ class Profile extends React.Component {
         github: github,
         linkedin: linkedin,
         currentUser: req.currentUser,
+        githubEmail: req.githubEmail,
       };
     } else {
       token = localStorage.getItem('token');

@@ -611,6 +611,7 @@ $applicationUrl: String,
         token: token,
         github: github,
         linkedin: linkedin,
+        githubEmail: req.githubEmail,
         currentUser: req.currentUser,
       };
     } else {
