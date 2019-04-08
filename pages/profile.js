@@ -383,8 +383,6 @@ class Profile extends React.Component {
     }));*/
     this.setState({
       showNotifications: false,
-      skills: skills,
-      jobsTitles: jobsTitles,
     });
   }
 
