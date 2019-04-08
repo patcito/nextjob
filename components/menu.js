@@ -322,6 +322,54 @@ class MenuList extends React.Component {
             </ListItem>
           </List>
         ) : null}
+        {this.props.searchNotification ? (
+          <List
+            component="nav"
+            className={this.props.drawer ? null : classes.drawer}>
+            <ListItem style={{backgroundColor: '#fff'}}>
+              <>
+                <Divider
+                  className={this.props.drawer ? null : classes.drawer}
+                />
+                <List>
+                  <ListItem>
+                    <ListItemText
+                      variant="h6"
+                      gutterBottom
+                      primary="Saved search"
+                    />
+                  </ListItem>
+                  {this.props.searchNotification.map(s => (
+                    <a
+                      href={
+                        '/?' +
+                        Object.entries(s.query)
+                          .map(([key, val]) => `${key}=${val}`)
+                          .join('&')
+                      }>
+                      <ListItem>
+                        <ListItemText
+                          primary={
+                            (s.query.Skill ? s.query.Skill + ' ' : '') +
+                            (s.query.jobEmployementType
+                              ? s.query.jobEmployementType + ' '
+                              : '') +
+                            (s.query.description
+                              ? s.query.description + ' '
+                              : '') +
+                            (s.query.locality
+                              ? '@' + s.query.locality + ', ' + s.query.country
+                              : '')
+                          }
+                        />
+                      </ListItem>
+                    </a>
+                  ))}
+                </List>
+              </>
+            </ListItem>
+          </List>
+        ) : null}
         <Divider className={this.props.drawer ? null : classes.drawer} />
         <List
           component="nav"

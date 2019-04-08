@@ -142,7 +142,13 @@ class Index extends React.Component {
       companyModsquery = '{Company: {Moderators: {User: {id: {_eq: $meId}}}}}';
     }
     if (userInfo.userId && parseInt(userInfo.userId)) {
-      companyAggregatequery = `Company_aggregate(where:
+      companyAggregatequery = `
+    SearchNotification(where: {userId: {_eq: $userId}}){
+      id
+      userId
+      query
+      }
+	  Company_aggregate(where:
       { _or: [
                     {ownerId: {_eq: $userId}}
                     {ownerId: {_eq: $userId}}
@@ -370,7 +376,7 @@ class Index extends React.Component {
     query.companyId
       ? (metaDescription += jobsAndCompanies.Company[0].name)
       : (metaDescription += 'top companies');
-
+    let searches = jobsAndCompanies.SearchNotification;
     if (
       companyId &&
       jobsAndCompanies.Company &&
@@ -400,6 +406,7 @@ class Index extends React.Component {
       metaDescription,
       url,
       showNotifications,
+      searches,
     };
   }
   componentDidMount(props) {
@@ -460,6 +467,7 @@ class Index extends React.Component {
                   companyCount={this.props.jobsAndCompanies.Company_aggregate}
                   showNotifications={this.props.showNotifications}
                   query={this.props.query}
+                  searchNotification={this.props.searches}
                 />
               </Grid>
               <Grid item xs={12} md={8}>

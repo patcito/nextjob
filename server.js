@@ -1479,35 +1479,6 @@ The ReactEurope jobs team
 			`,
             };
             msg.to = user.githubEmail;
-            let qq = {
-              id: 13,
-              User: {
-                githubEmail: 'patcito@gmail.com',
-                notificationsUUID: '2011f582-03ef-48b1-8c2f-da9d5afed792',
-              },
-              query: {
-                skill: 'React.js',
-                remote: 'true',
-                country: 'France',
-                locality: 'Paris',
-                description: 'KEYWORD',
-                jobEmployementType:
-                  'FullTime,Internship,Temporary,Contract,PartTime',
-              },
-            };
-            let jj = {
-              id: 85,
-              Skills: [
-                {
-                  Skill: 'React.js',
-                },
-              ],
-              EmployementType: 'FullTime',
-              description: 'this is a description',
-              country: 'France',
-              locality: 'Paris',
-              remote: false,
-            };
             let q = search.query;
             let skills = [];
             console.log('JOB', job);
@@ -1538,7 +1509,10 @@ The ReactEurope jobs team
                 q.jobEmployementType.indexOf(job.EmployementType) >= 0) &&
               (!q.skill || skills.indexOf(q.skill) >= 0)
             ) {
-              if (emails.indexOf(user.githubEmail) === -1) {
+              if (
+                emails.indexOf(user.githubEmail) === -1 &&
+                user.getNotifications
+              ) {
                 emails.push(user.githubEmail);
                 sgMail.send(msg);
               }
