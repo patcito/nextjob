@@ -255,13 +255,13 @@ class Profile extends React.Component {
 
     let notifications = '';
     let jobsTitlesNotifications = '';
-    if (ownProfile) {
+    /*if (ownProfile) {
       notifications = `Notifications{
             Skill userId            }`;
       jobsTitlesNotifications = `JobsTitlesNotifications{
             JobTitle userId
     }`;
-    }
+    }*/
     let queryOpts = {
       uri: getHasuraHost(process, req, publicRuntimeConfig),
       json: true,
@@ -373,16 +373,16 @@ class Profile extends React.Component {
         ? (user = JSON.parse(localStorage.getItem('currentUser')))
         : (user = null);
     }
-    let skills = this.props.user.Notifications.map(v => ({
+    /*    let skills = this.props.user.Notifications.map(v => ({
       value: v.Skill,
       label: v.Skill,
     }));
     let jobsTitles = this.props.user.JobsTitlesNotifications.map(v => ({
       value: v.JobTitle,
       label: v.JobTitle,
-    }));
+    }));*/
     this.setState({
-      showNotifications: true,
+      showNotifications: false,
       skills: skills,
       jobsTitles: jobsTitles,
     });
