@@ -838,7 +838,7 @@ class EditCompany extends React.Component {
           $location: geography
           $skills: [SkillCompany_insert_input!]!
           $perks: [PerkCompany_insert_input!]!
-          $moderators: [Moderator_insert_input]
+          $moderators: [Moderator_insert_input!]!
         ) {
           update_Company(
             where: {id: {_eq: $id}}
