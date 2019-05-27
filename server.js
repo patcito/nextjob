@@ -23,6 +23,11 @@ const download = require('download-file');
 const Sentry = require('@sentry/node');
 const path = require('path');
 const slugify = require('slugify');
+const passport = require('passport');
+const CJSON = require('circular-json');
+
+var LinkedInStrategy = require('@sokratis/passport-linkedin-oauth2').Strategy;
+var headers = {};
 
 Sentry.init({dsn: process.env.SENTRY_PUBLIC_DSN});
 
@@ -32,7 +37,274 @@ app.prepare().then(() => {
   const staticPath = '/tmp';
   server.use(Sentry.Handlers.requestHandler());
   server.use(Sentry.Handlers.errorHandler());
+  server.use(passport.initialize());
 
+  passport.use(
+    new LinkedInStrategy(
+      {
+        clientID: process.env.LINKEDIN_ID,
+        clientSecret: process.env.LINKEDIN_SECRET,
+        callbackURL: process.env.PUBLIC_HOSTNAME + '/auth/linkedin/callback',
+        scope: ['r_emailaddress', 'r_liteprofile'],
+      },
+
+      function(accessToken, refreshToken, profile, done) {
+        // asynchronous verification, for effect...
+        const checkUserRequestopts = {
+          uri: process.env.HASURA,
+          json: true,
+          query: `
+                    query User($linkedinId: String!) {
+                      Company(
+                        where: {
+                          _or: [
+                            {Owner: {linkedinId: {_eq: $linkedinId}}}
+                            {Moderators: {User: {linkedinId: {_eq: $linkedinId}}}}
+                          ]
+                        }
+                      ) {
+                        id
+                        name
+                        description
+                        url
+                        Industry
+                        yearFounded
+                      }
+                      User(where: {linkedinId: {_eq: $linkedinId}}) {
+                        id
+                        linkedinEmail
+                        name
+                        linkedinAvatarUrl
+                      }
+                    }
+                  `,
+          headers: {
+            'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+          },
+        };
+        const checkUserRequestVars = {
+          linkedinId: profile.id,
+        };
+        const client = new grequest.GraphQLClient(checkUserRequestopts.uri, {
+          headers: checkUserRequestopts.headers,
+        });
+        client
+          .request(checkUserRequestopts.query, checkUserRequestVars)
+          .then(ugdata => {
+            let currentUser = ugdata.User[0];
+            const companies = ugdata.Company;
+            if (currentUser && currentUser.id) {
+              currentUser.Companies = companies;
+              const token = jwt.sign(
+                {
+                  token: accessToken,
+                  userId: currentUser.id,
+                  github: false,
+                  linkedin: true,
+                },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: '365d', // expires in 24 hours
+                },
+              );
+              currentUser.recruiter = true;
+              headers.userId = currentUser.id;
+              headers.token = token;
+              headers.github = false;
+              headers.linkedin = true;
+              headers.currentUser = currentUser;
+
+              let url = currentUser.linkedinAvatarUrl;
+              let options = {
+                directory: '/tmp',
+                filename: `linkedin-avatar-${currentUser.id}.jpeg`,
+              };
+
+              if (
+                profile &&
+                profile.photos &&
+                profile.photos[0] &&
+                profile.photos[0].value
+              ) {
+                download(profile.photos[0].value, options, function(err) {
+                  if (err) console.log(err);
+                  console.log('meow');
+
+                  sharp(options.directory + '/' + options.filename).toFile(
+                    `/tmp/linkedin-avatar-${currentUser.id}.webp`,
+                    (err, info) => {
+                      if (err) {
+                        console.log(err);
+                      }
+                      sharp(options.directory + '/' + options.filename).toFile(
+                        `/tmp/linkedin-avatar-${currentUser.id}.png`,
+                        (err, info) => {
+                          if (err) {
+                            originalRes.status(500).json(err);
+                          }
+                          uploadToGCE(
+                            process.env.GOOGLE_STORAGE_BUCKET,
+                            `/tmp/linkedin-avatar-${currentUser.id}.webp`,
+                          );
+
+                          uploadToGCE(
+                            process.env.GOOGLE_STORAGE_BUCKET,
+                            `/tmp/linkedin-avatar-${currentUser.id}.png`,
+                          );
+                          console.log(err, info);
+                        },
+                      );
+                    },
+                  );
+                });
+              }
+              return done(err, headers);
+            }
+            const uopts = {
+              uri: process.env.HASURA,
+              json: true,
+              query: `
+                        mutation insert_User(
+                          $name: String
+                          $linkedinEmail: String!
+                          $linkedinId: String
+                          $linkedinAvatarUrl: String
+                          $linkedinAccessToken: String
+                          $firstName: String
+                          $lastName: String
+                          $headlineLinkedin: String
+                          $industryLinkedin: String
+                          $companyLinkedin: String
+                          $linkedinUrl: String
+                        ) {
+                          insert_User(
+                            objects: {
+                              name: $name
+                              linkedinEmail: $linkedinEmail
+                              linkedinId: $linkedinId
+                              linkedinAvatarUrl: $linkedinAvatarUrl
+                              linkedinAccessToken: $linkedinAccessToken
+                              firstName: $firstName
+                              lastName: $lastName
+                              headlineLinkedin: $headlineLinkedin
+                              industryLinkedin: $industryLinkedin
+                              companyLinkedin: $companyLinkedin
+                              linkedinUrl: $linkedinUrl
+                            }
+                          ) {
+                            returning {
+                              id
+                              linkedinEmail
+                              name
+                              linkedinAvatarUrl
+                            }
+                          }
+                        }
+                      `,
+              headers: {
+                'X-Hasura-Access-Key': process.env.HASURA_SECRET,
+              },
+            };
+            const variables = {
+              name: profile.name.givenName + ' ' + profile.name.familyName,
+              linkedinEmail: profile.emails[0].value,
+              linkedinId: profile.id,
+              linkedinAvatarUrl:
+                profile &&
+                profile.photos &&
+                profile.photos[0] &&
+                profile.photos[0].value
+                  ? profile.photos[0].value
+                  : '',
+              linkedinAccessToken: accessToken,
+              firstName: profile.name.givenName,
+              lastName: profile.name.familyName,
+            };
+            client.request(uopts.query, variables).then(gdata => {
+              const currentUser = gdata.insert_User.returning[0];
+              currentUser.recruiter = true;
+              const token = jwt.sign(
+                {
+                  token: accessToken,
+                  userId: currentUser.id,
+                  github: false,
+                  linkedin: true,
+                },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: '365d', // expires in 24 hours
+                },
+              );
+              /*return originalRes.status(200).send({
+                      auth: true,
+                      token: token,
+                      user: currentUser,
+                    });*/
+              headers.userId = currentUser.id;
+              headers.token = token;
+              headers.github = false;
+              headers.linkedin = true;
+              headers.currentUser = currentUser;
+              let url = currentUser.linkedinAvatarUrl;
+
+              let options = {
+                directory: '/tmp',
+                filename: `linkedin-avatar-${currentUser.id}.jpeg`,
+              };
+
+              if (url) {
+                download(url, options, function(err) {
+                  if (err) console.log(err);
+                  console.log('meow');
+
+                  sharp(options.directory + '/' + options.filename).toFile(
+                    `/tmp/linkedin-avatar-${currentUser.id}.webp`,
+                    (err, info) => {
+                      if (err) {
+                        console.log(err);
+                      }
+                      sharp(options.directory + '/' + options.filename).toFile(
+                        `/tmp/linkedin-avatar-${currentUser.id}.png`,
+                        (err, info) => {
+                          if (err) {
+                            originalRes.status(500).json(err);
+                          }
+                          uploadToGCE(
+                            process.env.GOOGLE_STORAGE_BUCKET,
+                            `/tmp/linkedin-avatar-${currentUser.id}.webp`,
+                          );
+
+                          uploadToGCE(
+                            process.env.GOOGLE_STORAGE_BUCKET,
+                            `/tmp/linkedin-avatar-${currentUser.id}.png`,
+                          );
+                          console.log(err, info);
+                        },
+                      );
+                    },
+                  );
+                });
+              }
+              return err, headers;
+            });
+          });
+        process.nextTick(function() {
+          // To keep the example simple, the user's LinkedIn profile is returned to
+          // represent the logged-in user. In a typical application, you would want
+          // to associate the LinkedIn account with a user record in your database,
+          // and return that user instead.
+          console.log(headers);
+          /*          req.userId = headers.userId;
+          req.token = headers.token;
+          req.github = headers.github;
+          req.linkedin = headers.linkedin;
+          req.currentUser = headers.currentUser;
+*/
+          return done(null, headers);
+        });
+      },
+    ),
+  );
   server.use(acceptWebp(staticPath, ['jpg', 'jpeg', 'png']));
   server.use(express.static(staticPath));
 
@@ -138,6 +410,11 @@ app.prepare().then(() => {
   auth = async (req, res, next) => {
     const originalRes = res;
     if (req && req.query && req.query.code) {
+      if (req.query.code.length > 30) {
+        console.log('query!!!', req.query.code);
+        next();
+        return;
+      }
       if (req.query.code.length < 30) {
         //github oauth
         const oauth2 = SimpleOauth2.create({
@@ -573,22 +850,8 @@ app.prepare().then(() => {
           next();
           return res.status(500).json('Authentication failed');
         }
-      } else if (req.query.code.length > 30) {
         console.log('linkedin');
         //github oauth
-        const oauth2 = SimpleOauth2.create({
-          client: {
-            id: process.env.LINKEDIN_ID,
-            secret: process.env.LINKEDIN_SECRET,
-          },
-          auth: {
-            tokenHost: 'https://api.linkedin.com',
-            tokenPath: '/oauth/v2/accessToken',
-            authorizePath: '/oauth/v2/authorization',
-          },
-        });
-        const options = {code: req.query.code};
-
         try {
           const opts = {
             uri:
@@ -608,8 +871,7 @@ app.prepare().then(() => {
           request(opts, function(err, res, body) {
             const otoken = JSON.parse(body).access_token;
             const aopts = {
-              uri:
-                'https://api.linkedin.com/v1/people/~:(email-address,firstName,lastName,id,headline,siteStandardProfileRequest,industry,picture-urls::(original),formatted-name,positions)?format=json',
+              uri: 'https://api.linkedin.com/v2/me?format=json',
               headers: {
                 Authorization: 'Bearer ' + otoken,
               },
@@ -719,11 +981,6 @@ app.prepare().then(() => {
                         },
                       );
                       currentUser.recruiter = true;
-                      /*return originalRes.status(200).send({
-                      auth: true,
-                      token: token,
-                      user: currentUser,
-                    });*/
                       req.userId = currentUser.id;
                       req.token = token;
                       req.github = false;
@@ -944,10 +1201,12 @@ app.prepare().then(() => {
   };
   server.use(auth);
   server.get('/auth', (req, res) => {
+    console.log(4444444444444111);
     return originalRes.status(200).json({});
   });
 
   server.get('/checksession', (req, res) => {
+    console.log(5555555555544111);
     var token = req.headers['x-access-token'];
     if (!token)
       return res.status(401).send({auth: false, message: 'No token provided.'});
@@ -967,6 +1226,7 @@ app.prepare().then(() => {
   });
 
   server.get('/api', (req, res) => {
+    console.log(666666666);
     var token = req.headers['x-access-token'];
     if (!token) {
       console.log('anon');
@@ -1710,13 +1970,47 @@ The ReactEurope jobs team
     res.sendFile(staticPath + '/defaultmedia.png');
   });
 
+  server.get('/auth/linkedin', passport.authenticate('linkedin'), function(
+    req,
+    res,
+  ) {
+    console.log('');
+    // The request will be redirected to LinkedIn for authentication, so this
+    // function will not be called.
+  });
+  server.get('/in', function(req, res) {
+    console.log('lol headers', headers);
+    console.log('lol user', req.users);
+    console.log('lol req', CJSON.stringify(req));
+    req.userId = headers.userId;
+    req.token = headers.token;
+    req.github = headers.github;
+    req.linkedin = headers.linkedin;
+    req.currentUser = headers.currentUser;
+    return app.render(req, res, '/', {});
+  });
+  server.get(
+    '/auth/linkedin/callback',
+    passport.authenticate('linkedin', {
+      successRedirect: '/in',
+      failureRedirect: '/',
+      session: false,
+    }),
+    (req, res) => {
+      console.log(req.user);
+      console.log();
+    },
+  );
+
   server.get('*', (req, res) => {
+    if (req.user) console.log(req.user);
+
     return handle(req, res);
   });
 
   server.listen(port, err => {
     if (err) throw err;
-    console.log(process.env);
+    //    console.log(process.env);
     console.log(`> Now ready on http://localhost:${port}`);
   });
 });

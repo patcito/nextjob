@@ -772,7 +772,8 @@ class Profile extends React.Component {
                         ))
                       ) : (
                         <>
-                          {this.props.isCurrentUserProfile ? (
+                          //TODO fix with new linkedin API
+                          {false && this.props.isCurrentUserProfile ? (
                             <CardActions>
                               <a
                                 href={`https://www.linkedin.com/oauth/v2/authorization?client_id=${

@@ -376,7 +376,9 @@ class Index extends React.Component {
     query.companyId
       ? (metaDescription += jobsAndCompanies.Company[0].name)
       : (metaDescription += 'top companies');
-    let searches = jobsAndCompanies.SearchNotification;
+	  let searches = []
+	  if(jobsAndCompanies && jobsAndCompanies !='undefined')
+		   searches = jobsAndCompanies.SearchNotification;
     if (
       companyId &&
       jobsAndCompanies.Company &&
