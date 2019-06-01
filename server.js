@@ -885,7 +885,7 @@ app.prepare().then(() => {
                           bodyJson.profilePicture['displayImage~'].elements[
                             bodyJson.profilePicture['displayImage~'].elements
                               .length - 1
-                          ].identifiers[0];
+                          ].identifiers[0].identifier;
                       }
                       console.log('avatar url', avatarUrl, bodyJson);
                       console.log('ebodyJson', ebodyJson);
