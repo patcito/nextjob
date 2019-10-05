@@ -52,7 +52,12 @@ class Index extends React.Component {
     let lang = '';
     if (req && req.locale && req.locale.language) {
       lang = req.locale.language;
-    } else if (window && window.navigator && window.navigator.language) {
+    } else if (
+      typeof window !== 'undefined' &&
+      window &&
+      window.navigator &&
+      window.navigator.language
+    ) {
       lang = window.navigator.language.split('-')[0];
     }
     if (lang !== 'en' && lang !== 'fr') {
@@ -376,9 +381,10 @@ class Index extends React.Component {
     query.companyId
       ? (metaDescription += jobsAndCompanies.Company[0].name)
       : (metaDescription += 'top companies');
-	  let searches = []
-	  if(jobsAndCompanies && jobsAndCompanies !='undefined')
-		   searches = jobsAndCompanies.SearchNotification;
+    let searches = [];
+    if (jobsAndCompanies) {
+      searches = jobsAndCompanies.SearchNotification;
+    }
     if (
       companyId &&
       jobsAndCompanies.Company &&

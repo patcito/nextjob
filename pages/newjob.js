@@ -109,6 +109,7 @@ class NewJob extends React.Component {
     dailySalaryRange: [100, 1500],
     hasApplicationEmail: true,
     open: false,
+    isPublished: true,
     yearlySalaryRange: [40000, 50000],
     monthlySalaryRange: [500, 1000],
     remote: false,
@@ -569,7 +570,12 @@ $applicationUrl: String,
     let lang = '';
     if (req && req.locale && req.locale.language) {
       lang = req.locale.language;
-    } else if (window && window.navigator && window.navigator.language) {
+    } else if (
+      typeof window !== 'undefined' &&
+      window &&
+      window.navigator &&
+      window.navigator.language
+    ) {
       lang = window.navigator.language.split('-')[0];
     }
     if (lang !== 'en' && lang !== 'fr') {
@@ -749,7 +755,7 @@ $applicationUrl: String,
       });
     }
 
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (typeof window !== 'undefined' && window && window.localStorage) {
       const job = this.props.job;
       if (job) {
         const jobState = {
@@ -1736,7 +1742,9 @@ $applicationUrl: String,
                     color="primary"
                   />
                 }
-                label={this.i18n.t('newjob:Publish')}
+                label={this.i18n.t(
+                  'newjob:Publish (if left uncheck, your ad will not be published)',
+                )}
               />
             </FormControl>
           </>

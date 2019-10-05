@@ -406,7 +406,12 @@ class IndexApplications extends React.Component {
     let lang = '';
     if (req && req.locale && req.locale.language) {
       lang = req.locale.language;
-    } else if (window && window.navigator && window.navigator.language) {
+    } else if (
+      typeof window !== 'undefined' &&
+      window &&
+      window.navigator &&
+      window.navigator.language
+    ) {
       lang = window.navigator.language.split('-')[0];
     }
     if (lang !== 'en' && lang !== 'fr') {

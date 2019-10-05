@@ -4,11 +4,16 @@
   "Job title": "Position",
   "Select your job's title": "Selectionnez la position du poste",
   "Where the job will take place": "Lieu de travail",
-  "Choose how you want people to apply": "Choisir comment les candidats devront postuler",
-  "From this site directly (recommended)": "Sur notre site directement (recommandé).",
-  "The email applications will be sent to": "L'adresse email qui sera utilisée pour recevoir les candidatures",
-  "Direct applicants to an external site to apply": "Rediriger les candidats vers un site externe.",
-  "The url applicants will be redirected to": "L'adresse du site vers lequel les candidats seront redirigés.",
+  "Choose how you want people to apply":
+    "Choisir comment les candidats devront postuler",
+  "From this site directly (recommended)":
+    "Sur notre site directement (recommandé).",
+  "The email applications will be sent to":
+    "L'adresse email qui sera utilisée pour recevoir les candidatures",
+  "Direct applicants to an external site to apply":
+    "Rediriger les candidats vers un site externe.",
+  "The url applicants will be redirected to":
+    "L'adresse du site vers lequel les candidats seront redirigés.",
   "Job function": "Fonctions de l'offre",
   "Select multiple functions (up to 3)": "Selectionnez jusque trois fonctions",
   "Select your job's function": "Selectionnez vos fonctions.",
@@ -17,18 +22,25 @@
   "Seniority level": "Niveau d'ancienneté",
   "Select your seniority level": "Selectionnez le niveau d'ancienneté",
   "Company industry": "Secteur d'industrie",
-  "Select multiple company industries (up to 3)": "Selectionnez jusque trois industries",
-  "Select your job's company industries this job is related to": "Selectionnez les secteurs d'industrie de votre entreprise qui s'appliquent à cette offre.",
+  "Select multiple company industries (up to 3)":
+    "Selectionnez jusque trois industries",
+  "Select your job's company industries this job is related to":
+    "Selectionnez les secteurs d'industrie de votre entreprise qui s'appliquent à cette offre.",
   "Job description": "Description de l'offre",
   "Skills": "Compétences",
   "Select multiple skills (up to 25)": "Selectionnez jusque 25 compétences.",
-  "Select skills required for the job, at least one skill is required, defaults to React": "Selectionnez les compétences requises pour cette offre, au moins une compétence est requise, si aucune n'est selectionnée React.js sera affiché par defaut.",
-  "Select skills required for the job": "Selectionnez les compétences requises pour cette offre.",
+  "Select skills required for the job, at least one skill is required, defaults to React":
+    "Selectionnez les compétences requises pour cette offre, au moins une compétence est requise, si aucune n'est selectionnée React.js sera affiché par defaut.",
+  "Select skills required for the job":
+    "Selectionnez les compétences requises pour cette offre.",
   "Minimum years of experience": "Minimum d'années d'experience",
-  "Years of experience required": "Nombre d'années d'experience pour ces compétences",
+  "Years of experience required":
+    "Nombre d'années d'experience pour ces compétences",
   "Update your job post": "Modifier votre offre",
-  "All steps completed - your job has been saved!": "Toutes les étapes sont terminées - votre offre a bien été sauvegardée!",
-  "Publish": "Publier",
+  "All steps completed - your job has been saved!":
+    "Toutes les étapes sont terminées - votre offre a bien été sauvegardée!",
+  "Publish (if left uncheck, your ad will not be published)":
+    "Publier (si vous ne cochez pas cette case votre annonce ne sera pas publiée)",
   "Salary range": "Fourchette de salaire",
   "Switch to a yearly salary range instead": "Selectionner un salaire annuel",
   "Switch to a monthly salary range instead": "Selectionner un salaire mensuel"

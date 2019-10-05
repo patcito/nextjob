@@ -1038,7 +1038,9 @@ app.prepare().then(() => {
       }
     });
   });
-
+  server.get('/apii', (req, res) => {
+    return res.status(200).json('lol');
+  });
   server.get('/api', (req, res) => {
     var token = req.headers['x-access-token'];
     if (!token) {
