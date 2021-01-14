@@ -24,7 +24,7 @@
     "download-file": "^0.1.5",
     "downshift": "^3.1.7",
     "express": "^4.16.4",
-    "express-fileupload": "^1.0.0",
+    "express-fileupload": "^1.1.9",
     "express-locale": "^1.0.5",
     "global": "^4.3.2",
     "graphql": "^14.0.2",
